@@ -64,6 +64,33 @@ cd hayeos
 claude --plugin-dir .
 ```
 
+## Permanent Install
+
+Use this when you want the Haye commands to appear in normal `claude` sessions without passing `--plugin-dir` every time.
+
+```text
+claude
+/plugin marketplace add /Users/haye/Desktop/HayeeOS
+/plugin install haye@haye-marketplace
+```
+
+After install, new Claude Code sessions should expose:
+
+```text
+/haye:start
+/haye:work
+/haye:fix
+/haye:secure
+/haye:ship
+/haye:close
+```
+
+For one-off development testing, keep using:
+
+```bash
+claude --plugin-dir /Users/haye/Desktop/HayeeOS
+```
+
 ## Project setup
 
 At the root of your project, create or let Haye create `.hayeos.json`:

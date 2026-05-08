@@ -1,0 +1,13 @@
+{
+  "name": "haye-marketplace",
+  "owner": {
+    "name": "Haye Labs"
+  },
+  "plugins": [
+    {
+      "name": "haye",
+      "source": "./",
+      "description": "Obsidian-powered memory-first workflow system for Claude Code."
+    }
+  ]
+}

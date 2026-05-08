@@ -16,8 +16,7 @@
     "workflow"
   ],
   "homepage": "https://github.com/harunyilmazz10/hayeos",
-  "repository": "https://github.com/harunyilmazz10/hayeos",
+  "repository": "https://github.com/harunyilmazz10/HayeOS",
   "commands": "./commands",
-  "skills": "./skills",
-  "hooks": "./hooks/hooks.json"
+  "skills": "./skills"
 }
