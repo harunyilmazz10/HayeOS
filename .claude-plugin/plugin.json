@@ -1,0 +1,23 @@
+{
+  "name": "haye",
+  "version": "0.1.0",
+  "description": "Obsidian-powered memory, daily command routers, advanced workflow skills, dependency security, React/Next/Cloudflare advisory awareness, CLI helpers, agents, hooks, monitors and examples for Claude Code.",
+  "author": {
+    "name": "Haye Labs"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "obsidian",
+    "memory",
+    "security",
+    "nextjs",
+    "cloudflare",
+    "workflow"
+  ],
+  "homepage": "https://github.com/harunyilmazz10/hayeos",
+  "repository": "https://github.com/harunyilmazz10/hayeos",
+  "commands": "./commands",
+  "skills": "./skills",
+  "hooks": "./hooks/hooks.json"
+}

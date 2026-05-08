@@ -1,0 +1,12 @@
+{
+  "project": "Sample",
+  "memoryPath": "./Sample_obs",
+  "sourcePath": ".",
+  "stack": [
+    "Next.js",
+    "React"
+  ],
+  "riskLevel": "medium",
+  "defaultWorkflow": "memory-first",
+  "sessionCloseRequired": true
+}
