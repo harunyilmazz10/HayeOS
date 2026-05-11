@@ -22,12 +22,15 @@ Expected commands after install:
 
 ```text
 /haye:start
+/haye:init-memory
 /haye:work
 /haye:fix
 /haye:secure
 /haye:ship
 /haye:close
 ```
+
+In normal use, you do not need to run `bin/haye` manually. Open Claude Code in a project and use `/haye:start`. If Haye memory is missing, `/haye:start` offers to create it automatically; `/haye:init-memory` can also be run directly.
 
 The marketplace manifest lives at `.claude-plugin/marketplace.json`, and the `haye` plugin source points to the repository root with `./`.
 
@@ -39,6 +42,20 @@ Claude Code marketplace add accepts a URL, path, or GitHub repo. After the GitHu
 claude
 /plugin marketplace add https://github.com/harunyilmazz10/HayeOS.git
 /plugin install haye@haye-marketplace
+```
+
+## Windows manual fallback
+
+Manual CLI use should be rare. If you need it on Windows, do not run `bin/haye` through bash. Use:
+
+```text
+C:\Users\hayed\Desktop\HayeOS\bin\haye.cmd init
+```
+
+or:
+
+```text
+powershell -ExecutionPolicy Bypass -File C:\Users\hayed\Desktop\HayeOS\bin\haye.ps1 init
 ```
 
 If your Claude Code build requires GitHub shorthand instead of a full URL, use:

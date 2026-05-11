@@ -6,6 +6,12 @@ description: Run security, dependency and safe-version workflows.
 
 Use `skills/secure/SKILL.md`.
 
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
+- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
+- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
+- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+
 Route to advanced workflows when needed:
 - `security`, `dependency-security`, `dependency-audit` and `version-policy`.
 - `react-nextjs-security` for React Server Components, Next.js App Router, middleware/proxy, server actions, image optimization or cache components.

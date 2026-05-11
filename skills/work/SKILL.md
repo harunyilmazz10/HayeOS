@@ -8,6 +8,12 @@ description: Smart router for development work
 ## Purpose
 Smart router for development work
 
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
+- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
+- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
+- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+
 ## When to use
 - Use when the user's request matches this workflow.
 - Use when the current project has `.hayeos.json` or an Obsidian memory vault.

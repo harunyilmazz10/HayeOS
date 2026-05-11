@@ -8,6 +8,12 @@ description: Start simple session
 ## Purpose
 Start simple session
 
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
+- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
+- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
+- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+
 ## When to use
 - Use when the user's request matches this workflow.
 - Use when the current project has `.hayeos.json` or an Obsidian memory vault.
@@ -32,8 +38,11 @@ Start simple session
 
 ## Workflow
 1. Locate project config and memory path.
-   - If `.hayeos.json` is missing and no `*_obs` vault exists, stop the memory workflow and direct the user to run `bin/haye init` or `/haye:init-memory`.
-   - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path and suggest `bin/haye init` to repair the vault.
+   - If `.hayeos.json` is missing and no `*_obs` vault exists, ask in Turkish: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+   - If the user says yes, run `/haye:init-memory`. Do not ask the user to find `bin/haye`, bash or Python paths.
+   - If the CLI path fails, use the manual fallback from `skills/init-memory/SKILL.md`.
+   - After successful creation, automatically continue with `memory-start`.
+   - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
 3. Identify task type, risks and affected files.
 4. Create or reuse a context pack when work is non-trivial.

@@ -23,12 +23,27 @@ for f in $(find skills -name SKILL.md); do
   sed -n '1,8p' "$f" | grep -q '^name:' || { echo "missing skill name $f"; exit 1; }
   sed -n '1,8p' "$f" | grep -q '^description:' || { echo "missing skill description $f"; exit 1; }
 done
-for cmd in start work fix secure ship close; do
+for cmd in start work fix secure ship close init-memory; do
   test -f "commands/$cmd.md" || { echo "missing command: $cmd"; exit 1; }
   grep -q "skills/$cmd/SKILL.md" "commands/$cmd.md" || { echo "command does not route to skill: $cmd"; exit 1; }
   sed -n '1,8p' "commands/$cmd.md" | grep -q '^description:' || { echo "command missing description: $cmd"; exit 1; }
 done
-grep -q "bin/haye init" commands/start.md skills/start/SKILL.md || { echo "start command does not route missing config to init"; exit 1; }
+for cmd in start work fix secure ship close init-memory; do
+  grep -q "User Response Language Rule" "commands/$cmd.md" || { echo "commands/$cmd.md missing language rule"; exit 1; }
+done
+for skill in start work fix secure ship close init-memory memory-start session-close context-pack dependency-security react-nextjs-security; do
+  grep -q "User Response Language Rule" "skills/$skill/SKILL.md" || { echo "skills/$skill/SKILL.md missing language rule"; exit 1; }
+done
+grep -q "User Response Language Rule" commands/init-memory.md skills/init-memory/SKILL.md || { echo "init-memory missing language rule"; exit 1; }
+grep -qi "fallback" skills/init-memory/SKILL.md || { echo "init-memory missing manual fallback"; exit 1; }
+grep -q "CLAUDE_PLUGIN_ROOT" skills/init-memory/SKILL.md commands/init-memory.md || { echo "init-memory missing CLAUDE_PLUGIN_ROOT"; exit 1; }
+test -f bin/haye.cmd || { echo "missing bin/haye.cmd"; exit 1; }
+test -f bin/haye.ps1 || { echo "missing bin/haye.ps1"; exit 1; }
+test -f docs/windows-install.md || { echo "missing docs/windows-install.md"; exit 1; }
+grep -q "/haye:start" README.md || { echo "README missing /haye:start"; exit 1; }
+grep -q "otomatik oluştur" README.md || { echo "README missing automatic memory setup"; exit 1; }
+grep -q "Bu projede Haye hafızası bulunamadı" commands/start.md skills/start/SKILL.md || { echo "start command does not ask Turkish init question"; exit 1; }
+grep -q "/haye:init-memory" commands/start.md skills/start/SKILL.md || { echo "start command does not route missing config to init-memory"; exit 1; }
 grep -q "package.json" commands/secure.md skills/secure/SKILL.md || { echo "secure command missing package.json guidance"; exit 1; }
 grep -q "lockfile" commands/secure.md skills/secure/SKILL.md || { echo "secure command missing lockfile guidance"; exit 1; }
 grep -q "current.md" commands/close.md skills/close/SKILL.md || { echo "close command missing memory update guidance"; exit 1; }

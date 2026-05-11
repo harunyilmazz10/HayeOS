@@ -2,6 +2,12 @@
 
 This project uses Haye memory-first workflow.
 
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
+- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
+- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
+- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+
 ## Core rules
 - Start with `/haye:start`.
 - Close with `/haye:close`.

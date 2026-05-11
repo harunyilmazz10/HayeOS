@@ -91,6 +91,33 @@ For one-off development testing, keep using:
 claude --plugin-dir /Users/haye/Desktop/HayeeOS
 ```
 
+## Memory Setup
+
+After Haye is installed permanently, users normally do not need to run `bin/haye` manually. In any project, start with:
+
+```text
+/haye:start
+```
+
+If the project does not have `.hayeos.json` or an Obsidian vault yet, `/haye:start` asks in Turkish:
+
+```text
+Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
+```
+
+When you approve, Haye automatically creates `.hayeos.json` and the `<project-name>_obs` vault, then continues with memory-start. You can also run the setup directly:
+
+```text
+/haye:init-memory
+```
+
+Manual CLI use is only a fallback. On Windows, use one of these instead of trying to run the Python script through bash:
+
+```text
+C:\Users\hayed\Desktop\HayeOS\bin\haye.cmd init
+powershell -ExecutionPolicy Bypass -File C:\Users\hayed\Desktop\HayeOS\bin\haye.ps1 init
+```
+
 ## Project setup
 
 At the root of your project, create or let Haye create `.hayeos.json`:
