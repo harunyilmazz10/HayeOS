@@ -52,7 +52,7 @@ Deploy/release sırasında:
 - build/test/deploy sonrası checkpoint yaz
 - failure olursa current blocker yaz
 - rollback gerekiyorsa next 3 actions içine yaz
-- uzun deploy loglarını chat'e basma; checkpoint ve `health.md` içine özetle
+- uzun deploy loglarını chat'e basma; checkpoint ve `<resolved memoryPath>/health.md` içine özetle
 
 ## Output format
 - What I found

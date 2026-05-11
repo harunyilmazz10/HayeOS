@@ -43,7 +43,7 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 
 ## Output Budget Rule
 - `/haye:close` sırasında uzun session log basma.
-- Uzun ayrıntıları HayeOS memory dosyalarına yaz: `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`, `05-sessions/`, `02-decisions/`, `12-risks/`.
+- Uzun ayrıntıları HayeOS memory dosyalarına yaz: `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/02-decisions/`, `<resolved memoryPath>/12-risks/`.
 - Chat'te kısa özet, değişen dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
 - Büyük kapanış raporu 5000-6000 tokenı geçecekse dosyaya yaz ve chat'te dosya yolunu göster.
 

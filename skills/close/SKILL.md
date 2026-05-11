@@ -48,8 +48,8 @@ Close session and update memory
    - `<resolved memoryPath>/next.md` for the next five actions.
    - `<resolved memoryPath>/changelog.md` for completed changes.
    - `<resolved memoryPath>/health.md` for verification status.
-   - `05-sessions/` for a dated session handoff when useful.
-   - `12-risks/` and `02-decisions/` when security or dependency decisions changed.
+   - `<resolved memoryPath>/05-sessions/` for a dated session handoff when useful.
+   - `<resolved memoryPath>/12-risks/` and `<resolved memoryPath>/02-decisions/` when security or dependency decisions changed.
 
 ## Checkpoint finalization
 - `<resolved memoryPath>/05-sessions/latest-checkpoint.md` varsa oku.

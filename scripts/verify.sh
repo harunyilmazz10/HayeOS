@@ -51,7 +51,11 @@ import sys
 
 errors = []
 files = sorted(Path("commands").glob("*.md")) + sorted(Path("skills").glob("*/SKILL.md"))
-target_re = re.compile(r"(?<!<resolved memoryPath>/)(04-tasks/active-task\.md|05-sessions/latest-checkpoint\.md|09-context-packs/|current\.md|next\.md)")
+target_re = re.compile(
+    r"(?<!<resolved memoryPath>/)"
+    r"(05-sessions/|04-tasks/|09-context-packs/|02-decisions/|12-risks/|"
+    r"current\.md|next\.md|changelog\.md|health\.md)"
+)
 for path in files:
     text = path.read_text(encoding="utf-8")
     for match in target_re.finditer(text):

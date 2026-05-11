@@ -44,7 +44,7 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 4. If memory is missing and the user has approved init, initialize it without asking the user to find `bin/haye`, bash, Python or plugin paths.
 5. First try CLI commands through `${CLAUDE_PLUGIN_ROOT}`.
 6. If every CLI command fails, use the mandatory manual fallback below.
-7. Verify that `.hayeos.json`, `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `changelog.md` and `health.md` exist.
+7. Verify that `.hayeos.json`, `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md` and `<resolved memoryPath>/health.md` exist.
 8. After successful creation, memory is already started. Do not ask "Şimdi hafızayı başlatmamı ister misiniz?"
 9. Do not load `/haye:work`, do not start a task classification wizard, and do not move into implementation from init-memory.
 
@@ -158,9 +158,9 @@ Project: <project-name>
 - [[next]]
 - [[changelog]]
 - [[health]]
-- [[04-tasks/active-task]]
-- [[02-decisions/safe-dependency-versions]]
-- [[12-risks/dependency-risks]]
+- [[<resolved memoryPath>/04-tasks/active-task]]
+- [[<resolved memoryPath>/02-decisions/safe-dependency-versions]]
+- [[<resolved memoryPath>/12-risks/dependency-risks]]
 ```
 
 `<resolved memoryPath>/current.md`:
@@ -186,7 +186,7 @@ Project: <project-name>
 5. `/haye:close` ile hafızayı güncelle.
 ```
 
-`changelog.md`:
+`<resolved memoryPath>/changelog.md`:
 ```markdown
 # Değişiklik Geçmişi
 
@@ -194,7 +194,7 @@ Project: <project-name>
 - Haye hafızası oluşturuldu.
 ```
 
-`health.md`:
+`<resolved memoryPath>/health.md`:
 ```markdown
 # Bellek Sağlığı
 

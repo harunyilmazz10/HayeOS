@@ -24,7 +24,7 @@ Update the relevant memory files explicitly:
 - `<resolved memoryPath>/next.md` for the next five actions.
 - `<resolved memoryPath>/changelog.md` for completed changes.
 - `<resolved memoryPath>/health.md` for verification status.
-- `05-sessions/` for the session handoff when useful.
+- `<resolved memoryPath>/05-sessions/` for the session handoff when useful.
 
 ## Checkpoint finalization
 If `<resolved memoryPath>/05-sessions/latest-checkpoint.md` exists, read it, fold it into the session summary, update `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, and `<resolved memoryPath>/04-tasks/active-task.md`, then mark the checkpoint as `closed`. Do not delete it. Chat output stays short/kısa: yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım, memory updated files.
