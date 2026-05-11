@@ -43,7 +43,7 @@ HayeOS minimizes approval friction. It asks for approval at phase boundaries and
 
 No Fake Completion Rule: HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" demez. Build/test/lint/typecheck çalışmadıysa bunu açıkça yazar.
 
-Output Budget Rule: large outputs go to files. HayeOS büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun çıktıları chat'e basmak yerine `docs/` veya HayeOS vault dosyalarına yazar; chat'te kısa özet, dosyalar, kararlar, doğrulama durumu ve sıradaki 3 adım kalır.
+Output Budget Rule: large outputs go to files. HayeOS büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun çıktıları chat'e basmak yerine `docs/` veya HayeOS vault dosyalarına yazar; chat'te kısa özet, dosyalar, kararlar, doğrulama durumu ve sıradaki 3 adım kalır. Bu kural 64000 output token hatasına yol açabilecek büyük chat çıktılarının önüne geçer.
 
 Quality Preservation Rule: token discipline must never reduce implementation quality. HayeOS token tasarrufunu uzun chat, tekrar, gereksiz repo taraması ve dev logları azaltarak yapar; gerekli kod okuma, test, validation, security check, error handling ve mimari akıl yürütmeden ödün vermez. Doğruluk hızdan ve token tasarrufundan önce gelir.
 

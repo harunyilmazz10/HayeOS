@@ -82,6 +82,8 @@ Phase sonunda Verification Status verir:
 
 Chat cevabı kısa tutulur. Varsayılan cevap 1500-3000 token civarında olur; büyük işler için 5000-6000 tokenı geçmemeye çalışır.
 
+Amaç, 64000 output token limitine takılabilecek büyük cevapları önlemektir.
+
 Uzun içerikler chat'e değil dosyalara yazılır:
 - büyük mimari
 - roadmap

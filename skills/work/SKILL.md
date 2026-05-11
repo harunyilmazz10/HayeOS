@@ -215,6 +215,7 @@ Phase sonunda rapor:
 - Chat cevabını kısa tut.
 - Varsayılan chat cevabı 1500-3000 token civarında olsun.
 - Büyük işler için maksimum 5000-6000 tokenı geçme.
+- 64000 output token hatasına yol açabilecek uzun çıktıları chat'e basma.
 - Büyük mimari, roadmap, servis planı, DB planı, event schema, queue schema, deployment planı gibi uzun içerikleri chat'e değil dosyalara yaz.
 - Detaylı içerikler için `docs/` veya HayeOS vault içinde uygun dosyaları kullan.
 - Chat'te sadece şunları ver: kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu.

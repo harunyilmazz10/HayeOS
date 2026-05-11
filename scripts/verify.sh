@@ -3,7 +3,7 @@ set -euo pipefail
 ROOT_DIR="$(pwd)"
 
 check_plugin_root_clean() {
-  for path in .hayeos.json 09-context-packs 05-sessions/latest-checkpoint.md 04-tasks/active-task.md current.md next.md; do
+  for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
   done
   if find "$ROOT_DIR" -maxdepth 1 -type d -name '*_obs' | grep -q .; then
@@ -16,12 +16,14 @@ bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"
 bad_win_user='C:\Us'"ers\hayed"
 bad_mac_user='/Us'"ers/haye"
+bad_win_users_root='C:\Us'"ers"
+bad_unix_users_root='/Us'"ers/"
 bad_proj_desktop='Desktop\'"Projeler"
 bad_desktop_hayeos='Desktop/'"HayeOS"
 if rg -F "$bad_project" . >/dev/null || rg -F "$bad_vault" . >/dev/null; then
   echo "project-specific hardcoded name found"; exit 1
 fi
-if rg -F "$bad_win_user" . >/dev/null || rg -F "$bad_mac_user" . >/dev/null || rg -F "$bad_proj_desktop" . >/dev/null || rg -F "$bad_desktop_hayeos" . >/dev/null; then
+if rg -F "$bad_win_user" . >/dev/null || rg -F "$bad_mac_user" . >/dev/null || rg -F "$bad_win_users_root" . >/dev/null || rg -F "$bad_unix_users_root" . >/dev/null || rg -F "$bad_proj_desktop" . >/dev/null || rg -F "$bad_desktop_hayeos" . >/dev/null; then
   echo "user-specific hardcoded path found"; exit 1
 fi
 python3 -m json.tool .claude-plugin/plugin.json >/dev/null
@@ -91,6 +93,7 @@ grep -q "Full Architecture Mode" skills/work/SKILL.md || { echo "skills/work mis
 grep -q "Approval Friction Rule" skills/work/SKILL.md || { echo "skills/work missing Approval Friction Rule"; exit 1; }
 grep -q "No Fake Completion Rule" skills/work/SKILL.md || { echo "skills/work missing No Fake Completion Rule"; exit 1; }
 grep -q "Output Budget Rule" skills/work/SKILL.md || { echo "skills/work missing Output Budget Rule"; exit 1; }
+grep -q "64000 output token" skills/work/SKILL.md docs/commands.md README.md || { echo "missing output token limit prevention note"; exit 1; }
 grep -q "Quality Preservation Rule" skills/work/SKILL.md || { echo "skills/work missing Quality Preservation Rule"; exit 1; }
 grep -q "token-economist" skills/work/SKILL.md || { echo "skills/work missing token-economist"; exit 1; }
 test -f skills/team-mode/SKILL.md || { echo "missing internal team-mode skill"; exit 1; }
