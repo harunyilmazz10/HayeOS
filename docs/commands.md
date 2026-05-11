@@ -168,6 +168,16 @@ Commands inspect `.hayeos.json` first:
 - `sourcePath` points to the source tree for package/security checks.
 - `riskLevel`, `defaultWorkflow`, `sessionCloseRequired` and `rawReadPolicy` guide workflow strictness.
 
+Plugin root and project memory vault are different:
+
+- `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root.
+- `.hayeos.json` `memoryPath` is the single source of truth for the current project's memory vault.
+- `.hayeos.json` `sourcePath` is the current project's source root.
+- Context packs are written only to `<resolved memoryPath>/09-context-packs/`.
+- Checkpoints are written only to `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
+- Active task, `current.md`, `next.md` and `changelog.md` are updated only inside the resolved project vault.
+- HayeOS must stop before writing any project memory file under `CLAUDE_PLUGIN_ROOT` and warn: `Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı.`
+
 Do not read `08-raw/` unless the user asks or a context pack names specific raw files.
 
 ## Memory initialization

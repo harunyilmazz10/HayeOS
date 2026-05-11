@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+ROOT_DIR="$(pwd)"
 python3 -m json.tool .claude-plugin/plugin.json >/dev/null
 for key in name version description commands skills; do
   grep -q "\"$key\"" .claude-plugin/plugin.json || { echo "plugin manifest missing $key"; exit 1; }
@@ -84,8 +85,16 @@ if ! grep -q "Output Budget Rule" README.md && ! grep -q "large outputs go to fi
   echo "README missing Output Budget Rule"; exit 1
 fi
 grep -q "Quality Preservation Rule" skills/init-memory/templates/HAYE.md || { echo "HAYE template missing Quality Preservation Rule"; exit 1; }
+grep -q "memoryPath" skills/context-pack/SKILL.md || { echo "context-pack missing memoryPath rule"; exit 1; }
+grep -q "Never write project context packs to \`CLAUDE_PLUGIN_ROOT\`" skills/context-pack/SKILL.md || { echo "context-pack missing plugin root guard"; exit 1; }
+grep -q "memoryPath" skills/checkpoint/SKILL.md || { echo "checkpoint missing memoryPath rule"; exit 1; }
+grep -q "Plugin root" skills/start/SKILL.md || { echo "start missing Plugin root distinction"; exit 1; }
+grep -q "Memory vault" skills/start/SKILL.md || { echo "start missing Memory vault distinction"; exit 1; }
+grep -q "Plugin root and project memory vault are different" docs/obsidian-vault-standard.md || { echo "vault docs missing plugin/project distinction"; exit 1; }
+grep -q "Plugin root vs project vault" skills/init-memory/templates/HAYE.md || { echo "HAYE template missing plugin/project distinction"; exit 1; }
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
+(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })
 (cd examples/sample-project && ../../bin/haye deps-audit || true)
 (cd examples/sample-project && ../../bin/haye react-nextjs-audit || true)
 echo "verification OK"

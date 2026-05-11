@@ -2,6 +2,12 @@
 
 Core files: `HAYE.md`, `index.md`, `current.md`, `next.md`, `changelog.md`, `health.md`.
 
+## Plugin root vs project vault
+
+Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only where plugin commands, skills and CLI files live. Project memory must always be stored under the current project's `.hayeos.json` `memoryPath`, resolved relative to that project root.
+
+Never write project memory into the plugin repository. Context packs belong in `<resolved memoryPath>/09-context-packs/`; checkpoints belong in `<resolved memoryPath>/05-sessions/latest-checkpoint.md`; active task, `current.md`, `next.md` and `changelog.md` belong inside the resolved project vault.
+
 Generated vaults must contain useful starter content, not empty placeholders:
 
 - `HAYE.md` records operating rules, simple commands, raw-read policy and dependency security policy.

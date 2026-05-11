@@ -21,8 +21,9 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 
 ## Inputs to inspect first
 1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Only minimal memory files:
+2. Resolve Memory vault from `.hayeos.json` `memoryPath` relative to current project root.
+3. Keep Plugin root and Memory vault separate: `CLAUDE_PLUGIN_ROOT` is used only to find HayeOS CLI wrappers.
+4. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
    - `current.md`
@@ -60,6 +61,11 @@ Mac/Linux attempts:
 3. `${CLAUDE_PLUGIN_ROOT}/bin/haye init`
 
 If `${CLAUDE_PLUGIN_ROOT}` is unavailable, infer the plugin root from the loaded command/skill location when possible. If it still cannot be resolved, skip CLI execution and use the manual fallback.
+
+## Project vault safety
+- `.hayeos.json` `memoryPath` is the only source of truth for project memory.
+- Never initialize project memory inside `CLAUDE_PLUGIN_ROOT`.
+- If `memoryPath` resolves to the plugin root or under the HayeOS plugin repo, stop and warn in Turkish: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
 
 ## Mandatory manual fallback
 If the CLI cannot run for any reason, Claude Code must directly create the memory files in the current project root. This fallback is required on Windows, Mac and Linux.

@@ -20,14 +20,24 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 - Use instead of loading a huge old conversation or scanning the entire repository.
 
 ## Inputs to inspect first
-1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
+1. First read `.hayeos.json` from current project root.
+2. Resolve `memoryPath` relative to current project root.
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
    - `current.md`
    - `next.md`
    - `04-tasks/active-task.md` when present.
+
+## Plugin root vs project vault
+- `CLAUDE_PLUGIN_ROOT` or HayeOS install path is the plugin code root only.
+- `.hayeos.json` `memoryPath` is the only source of truth for the current project memory vault.
+- `.hayeos.json` `sourcePath` is the current project source root.
+- Write context packs ONLY to `<resolved memoryPath>/09-context-packs/`.
+- Never write project context packs to `CLAUDE_PLUGIN_ROOT`.
+- Never create `09-context-packs` under the plugin installation directory.
+- If `memoryPath` is missing, stop and ask to run `/haye:init-memory`.
+- Before writing, verify the target path is not under `CLAUDE_PLUGIN_ROOT`. If it is, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.
@@ -55,7 +65,7 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 1. Locate project config and memory path.
 2. Read minimal memory.
 3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
+4. Create or reuse a context pack only under `<resolved memoryPath>/09-context-packs/`.
 5. Execute the smallest safe step.
 6. Verify with real commands when possible.
 7. Update memory through `/haye:close` or session-close rules.

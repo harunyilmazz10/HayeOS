@@ -21,13 +21,18 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 
 ## Inputs to inspect first
 1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
+2. Resolve Memory vault from `.hayeos.json` `memoryPath` relative to current project root.
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
    - `current.md`
    - `next.md`
    - `04-tasks/active-task.md` when present.
+
+## Project vault write rule
+- Session summaries, checkpoint finalization, `current.md`, `next.md`, `changelog.md`, `health.md` and `active-task.md` are written only under resolved `.hayeos.json` `memoryPath`.
+- Never write session memory into `CLAUDE_PLUGIN_ROOT`.
+- If a target path resolves under the plugin installation directory, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.

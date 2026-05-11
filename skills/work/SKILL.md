@@ -16,14 +16,20 @@ description: Smart Work Router for development, Team Mode planning, low-friction
 
 ## Inputs to inspect first
 1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Minimal memory only:
+2. Resolve Memory vault from `.hayeos.json` `memoryPath` relative to current project root.
+3. Treat `CLAUDE_PLUGIN_ROOT` as plugin code root only.
+4. Minimal memory only:
    - `HAYE.md`
    - `index.md`
    - `current.md`
    - `next.md`
    - `04-tasks/active-task.md` when present.
-4. Task prompt and any explicit scope/phase limits.
+5. Task prompt and any explicit scope/phase limits.
+
+## Project vault write rule
+- Project memory, context packs, checkpoints, active task, `current.md`, `next.md`, `changelog.md` and session summaries must be written only under resolved `.hayeos.json` `memoryPath`.
+- Never write project memory into `CLAUDE_PLUGIN_ROOT` or the HayeOS plugin repository.
+- If any target path resolves under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
 ## Smart Work Router
 Classify every meaningful task before acting:

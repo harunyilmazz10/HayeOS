@@ -17,11 +17,19 @@ Internal workflow used by `/haye:work`, `/haye:fix`, `/haye:ship`, `/haye:start`
 ## Auto Checkpoint Rule
 HayeOS uzun, riskli veya çok adımlı işlerde `/haye:close` beklemeden checkpoint yazar.
 
+## Plugin root vs project vault
+- `CLAUDE_PLUGIN_ROOT` or HayeOS install path is the plugin code root only.
+- `.hayeos.json` `memoryPath` is the only source of truth for the current project memory vault.
+- Resolve `memoryPath` relative to current project root.
+- Never write project checkpoints to `CLAUDE_PLUGIN_ROOT`.
+- Never create `05-sessions`, `04-tasks`, `current.md` or `next.md` under the plugin installation directory.
+- If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+
 Checkpoint file locations:
-- `<vault>/05-sessions/latest-checkpoint.md`
-- `<vault>/04-tasks/active-task.md`
-- `<vault>/current.md`
-- `<vault>/next.md`
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
+- `<resolved memoryPath>/04-tasks/active-task.md`
+- `<resolved memoryPath>/current.md`
+- `<resolved memoryPath>/next.md`
 
 Chat'e uzun checkpoint basma. Sadece şunu söyle:
 

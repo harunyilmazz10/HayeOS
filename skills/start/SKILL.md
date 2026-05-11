@@ -78,6 +78,16 @@ Kaldığımız yerden devam edeyim mi?
 
 Never start coding automatically from `/haye:start` when a checkpoint exists.
 
+## Plugin root vs project vault
+- `CLAUDE_PLUGIN_ROOT` or HayeOS install path is the Plugin root.
+- `.hayeos.json` `memoryPath` resolves to the Memory vault.
+- `.hayeos.json` `sourcePath` resolves to the Project root.
+- `/haye:start` must show a short path summary:
+  - `Project root: ...`
+  - `Memory vault: ...`
+  - `Plugin root: ...`
+- If `Memory vault` is the same as `Plugin root` or resolves under the plugin repository, stop and warn in Turkish: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
+
 ## Output format
 - What I found
 - What I will do / did

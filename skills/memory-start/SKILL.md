@@ -21,13 +21,16 @@ Start a Claude Code session from Haye Obsidian memory with minimal context. Use 
 
 ## Inputs to inspect first
 1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Only minimal memory files:
+2. Resolve Memory vault from `.hayeos.json` `memoryPath` relative to current project root.
+3. Keep Plugin root and Memory vault separate: `CLAUDE_PLUGIN_ROOT` is plugin code, not project memory.
+4. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
    - `current.md`
    - `next.md`
    - `04-tasks/active-task.md` when present.
+
+If the Memory vault resolves to the Plugin root or under the plugin repository, stop and warn: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.

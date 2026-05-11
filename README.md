@@ -48,6 +48,8 @@ Quality Preservation Rule: token discipline must never reduce implementation qua
 
 Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden `05-sessions/latest-checkpoint.md`, `04-tasks/active-task.md`, `current.md` ve `next.md` dosyalarını günceller. Claude Code API 400, output limit veya bağlantı hatasıyla kapanırsa yeni oturumda `/haye:start` latest checkpoint'i okur, kısa recovery özeti verir ve kullanıcı onayı olmadan kodlamaya devam etmez.
 
+Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root. All project memory is stored under the current project's `.hayeos.json` `memoryPath`; HayeOS must not write context packs, checkpoints, `current.md`, `next.md` or `changelog.md` into the plugin repository.
+
 Recommended daily flow:
 
 ```text

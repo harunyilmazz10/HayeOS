@@ -23,3 +23,10 @@ If `.hayeos.json` is missing and no `*_obs` vault exists, do not make the user f
 
 ## Safe Resume Rule
 If memory exists, read `05-sessions/latest-checkpoint.md` when present. Give a short `HayeOS Recovery Summary` with current task, phase, last successful step, changed files, blocker, next 3 actions and recommended next mode. Do not automatically start implementation. Ask: "Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?" If no checkpoint exists, show a short start summary from `next.md` and ask: "Hangi görevle devam edelim?"
+
+## Plugin root vs project vault
+- `CLAUDE_PLUGIN_ROOT` veya HayeOS install path sadece plugin code root'tur.
+- `.hayeos.json` `memoryPath` current project memory vault yoludur.
+- `.hayeos.json` `sourcePath` current project source root yoludur.
+- `/haye:start` kısa şekilde `Project root`, `Memory vault`, `Plugin root` gösterir.
+- `Memory vault` plugin root ile aynıysa dur ve Türkçe hata ver: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
