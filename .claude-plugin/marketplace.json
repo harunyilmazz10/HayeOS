@@ -1,5 +1,8 @@
 {
   "name": "haye-marketplace",
+  "metadata": {
+    "description": "Local marketplace for installing the HayeOS memory-first Claude Code workflow plugin."
+  },
   "owner": {
     "name": "Haye Labs"
   },
