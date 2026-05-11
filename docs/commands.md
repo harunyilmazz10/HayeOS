@@ -63,6 +63,25 @@ Phase sonunda Verification Status verir:
 - not run
 - reason if not run
 
+# Output Budget Rule
+
+Chat cevabı kısa tutulur. Varsayılan cevap 1500-3000 token civarında olur; büyük işler için 5000-6000 tokenı geçmemeye çalışır.
+
+Uzun içerikler chat'e değil dosyalara yazılır:
+- büyük mimari
+- roadmap
+- servis planı
+- DB planı
+- event schema
+- queue schema
+- deployment planı
+- uzun Team Mode role çıktıları
+- uzun session close logları
+
+Detaylar için `docs/` veya HayeOS vault dosyaları kullanılır. Full Architecture Mode detayları örneğin `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazılır.
+
+Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu verilir. Eğer çıktı çok uzayacaksa bölümlere ayrılır ve kullanıcıdan devam onayı istenir.
+
 # When HayeOS asks for approval
 
 - destructive işlem

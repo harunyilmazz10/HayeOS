@@ -36,6 +36,12 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 - Prefer summaries, file paths, root causes, decisions and verification outputs over pasted logs.
 - If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
 
+## Output Budget Rule
+- `/haye:close` sırasında uzun session log basma.
+- Uzun ayrıntıları HayeOS memory dosyalarına yaz: `current.md`, `next.md`, `changelog.md`, `health.md`, `05-sessions/`, `02-decisions/`, `12-risks/`.
+- Chat'te kısa özet, değişen dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
+- Büyük kapanış raporu 5000-6000 tokenı geçecekse dosyaya yaz ve chat'te dosya yolunu göster.
+
 ## Workflow
 1. Locate project config and memory path.
 2. Read minimal memory.

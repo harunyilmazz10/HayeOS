@@ -205,6 +205,18 @@ Phase sonunda rapor:
 - reason if not run:
 ```
 
+## Output Budget Rule
+- Chat cevabını kısa tut.
+- Varsayılan chat cevabı 1500-3000 token civarında olsun.
+- Büyük işler için maksimum 5000-6000 tokenı geçme.
+- Büyük mimari, roadmap, servis planı, DB planı, event schema, queue schema, deployment planı gibi uzun içerikleri chat'e değil dosyalara yaz.
+- Detaylı içerikler için `docs/` veya HayeOS vault içinde uygun dosyaları kullan.
+- Chat'te sadece şunları ver: kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu.
+- Eğer çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
+- Team Mode agent çıktıları kısa olmalı; her agent en fazla 3-7 madde yazmalı.
+- Full Architecture Mode detayları `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazmalı; chat'e tamamını basmamalı.
+- `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
+
 ## Token discipline
 Büyük işlerde:
 - önce HayeOS memory kullan

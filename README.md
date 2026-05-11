@@ -42,6 +42,8 @@ HayeOS minimizes approval friction. It asks for approval at phase boundaries and
 
 No Fake Completion Rule: HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" demez. Build/test/lint/typecheck çalışmadıysa bunu açıkça yazar.
 
+Output Budget Rule: large outputs go to files. HayeOS büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun çıktıları chat'e basmak yerine `docs/` veya HayeOS vault dosyalarına yazar; chat'te kısa özet, dosyalar, kararlar, doğrulama durumu ve sıradaki 3 adım kalır.
+
 Recommended daily flow:
 
 ```text

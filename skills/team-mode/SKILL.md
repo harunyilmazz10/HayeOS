@@ -76,3 +76,10 @@ Plan veya phase onaylandıktan sonra küçük güvenli işleri tek tek sorma. Ri
 
 ## No Fake Completion Rule
 Doğrulama çıktısı olmadan tamamlandı/geçti/production-ready deme. Build/test/lint/typecheck çalışmadıysa açıkça belirt.
+
+## Output Budget Rule
+- Chat cevabını kısa tut; varsayılan 1500-3000 token, büyük işler için en fazla 5000-6000 token hedefle.
+- Role findings kısa olsun: her agent en fazla 3-7 madde yazsın.
+- Büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun içerikleri chat'e değil dosyalara yaz.
+- Full Architecture Mode detaylarını `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` veya HayeOS vault dosyalarına taşı.
+- Chat'te kısa özet, dosya listesi, kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu kalsın.

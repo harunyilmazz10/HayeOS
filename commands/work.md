@@ -38,4 +38,12 @@ Plan veya phase onaylandıysa, HayeOS o phase içindeki küçük ve güvenli iş
 ## No Fake Completion Rule
 Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" deme. Test/build/lint/typecheck çalışmadıysa bunu açıkça yaz.
 
+## Output Budget Rule
+- Chat cevabını kısa tut; varsayılan cevap 1500-3000 token civarında olsun.
+- Büyük işler için chat çıktısı 5000-6000 tokenı geçmesin.
+- Büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun içerikleri chat'e değil dosyalara yaz.
+- Detaylı içerikler için `docs/` veya HayeOS vault içinde uygun dosyaları kullan.
+- Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
+- Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
+
 Respect `.hayeos.json`, keep scope narrow, verify with real commands, and leave memory updates for `/haye:close`.

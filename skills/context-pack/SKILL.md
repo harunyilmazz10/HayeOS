@@ -36,6 +36,12 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 - Prefer summaries, file paths, root causes, decisions and verification outputs over pasted logs.
 - If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
 
+## Output Budget Rule
+- Chat cevabını kısa tut; varsayılan 1500-3000 token hedefle.
+- Büyük context pack içeriklerini chat'e basma; HayeOS vault içinde `09-context-packs/` altına yaz.
+- Chat'te context pack dosya yolu, kısa özet, kritik kararlar, doğrulama durumu ve sıradaki 3 adımı ver.
+- Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
+
 ## Workflow
 1. Locate project config and memory path.
 2. Read minimal memory.

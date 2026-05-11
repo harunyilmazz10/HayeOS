@@ -32,6 +32,13 @@ This project uses Haye memory-first workflow.
 - Do not claim "tamamlandı", "geçti", "çalışıyor" or "production-ready" without verification output.
 - If build/test/lint/typecheck did not run, say so clearly.
 
+## Output Budget Rule
+- Chat cevabını kısa tut; varsayılan 1500-3000 token civarında olsun.
+- Büyük işler için 5000-6000 tokenı geçme.
+- Büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun içerikleri chat'e değil `docs/` veya HayeOS vault dosyalarına yaz.
+- Chat'te kısa özet, dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
+- `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
+
 ## Scope Control Rule
 - Stay inside the approved phase and scope.
 - If extra scope is needed, ask: "Bu işlem mevcut scope dışında. Ekleyeyim mi?"

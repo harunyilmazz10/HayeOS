@@ -60,6 +60,7 @@ grep -q "Team Mode" skills/work/SKILL.md || { echo "skills/work missing Team Mod
 grep -q "Full Architecture Mode" skills/work/SKILL.md || { echo "skills/work missing Full Architecture Mode"; exit 1; }
 grep -q "Approval Friction Rule" skills/work/SKILL.md || { echo "skills/work missing Approval Friction Rule"; exit 1; }
 grep -q "No Fake Completion Rule" skills/work/SKILL.md || { echo "skills/work missing No Fake Completion Rule"; exit 1; }
+grep -q "Output Budget Rule" skills/work/SKILL.md || { echo "skills/work missing Output Budget Rule"; exit 1; }
 grep -q "token-economist" skills/work/SKILL.md || { echo "skills/work missing token-economist"; exit 1; }
 test -f skills/team-mode/SKILL.md || { echo "missing internal team-mode skill"; exit 1; }
 grep -q "Fast Mode" docs/commands.md || { echo "docs/commands missing Fast Mode"; exit 1; }
@@ -67,6 +68,10 @@ grep -q "Standard Mode" docs/commands.md || { echo "docs/commands missing Standa
 grep -q "Team Mode" docs/commands.md || { echo "docs/commands missing Team Mode"; exit 1; }
 grep -q "Full Architecture Mode" docs/commands.md || { echo "docs/commands missing Full Architecture Mode"; exit 1; }
 grep -q "Approval Friction Rule" docs/commands.md || { echo "docs/commands missing Approval Friction Rule"; exit 1; }
+grep -q "Output Budget Rule" docs/commands.md || { echo "docs/commands missing Output Budget Rule"; exit 1; }
+if ! grep -q "Output Budget Rule" README.md && ! grep -q "large outputs go to files" README.md; then
+  echo "README missing Output Budget Rule"; exit 1
+fi
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (cd examples/sample-project && ../../bin/haye deps-audit || true)
