@@ -35,10 +35,90 @@ description: Smart Work Router for development, Team Mode planning, low-friction
 Classify every meaningful task before acting:
 
 - `task_size`: `small`, `medium`, `large`, `massive`
-- `task_type`: `feature`, `bugfix`, `refactor`, `architecture`, `security`, `deploy`, `research`, `bootstrap`, `documentation`, `media-pipeline`, `AI-system`
+- `task_type`: `quick fix`, `feature`, `refactor`, `architecture`, `full system`, `security`, `deployment`, `debugging`, `research/planning`
 - `risk_level`: `low`, `medium`, `high`
-- `affected_layers`: `frontend`, `backend`, `database`, `infra`, `AI`, `security`, `deployment`, `media pipeline`, `queue/event system`, `storage`, `analytics`
-- `recommended_mode`: `fast`, `standard`, `team`, `full-architecture`
+- `affected_layers`: `frontend`, `backend`, `database`, `infra`, `AI pipeline`, `security`, `deployment`, `docs`, `tests`
+- `recommended_mode`: `Fast Single Agent`, `Standard Single Agent`, `Plan First`, `Team Mode`, `Full Architecture Mode`
+
+## Work Strategy Selection Rule
+`/haye:work` must classify the task first, then decide whether to proceed directly or ask the user to choose a work strategy. It must not silently choose single-agent vs subagent/team behavior for large or ambiguous work.
+
+## Massive Task Classification Rule
+If the prompt includes signals like `production-grade`, `complete system`, `autonomous`, `multi-service`, `microservices`, `24/7`, `scale horizontally`, `Kubernetes`, `monitoring`, `analytics`, `AI pipeline`, `full architecture`, `from scratch`, many services, Phase 0/1/2 roadmap, or backend + frontend + infra + AI + monitoring together, classify it as `massive`.
+
+For massive tasks:
+- `recommended_mode` = `Full Architecture Mode`
+- Team Mode internally enabled
+- `token-economist` mandatory
+- `security-reviewer` mandatory
+- `deployment-doctor` mandatory
+- `database-architect` mandatory when DB exists
+- no coding before plan approval
+
+## Team Mode Offer Rule
+For massive or high-risk work, the first response must:
+1. Show classification: `task_size`, `task_type`, `risk_level`, `affected_layers`, `recommended_mode`.
+2. Show a short Team Mode plan with `project-manager`, `memory-architect`, `database-architect`, `api-integrator`, `security-reviewer`, `deployment-doctor`, `release-manager`, `token-economist`.
+3. Ask in Turkish: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?"
+4. If the prompt already explicitly says "Full Architecture Mode kullan" or similar, skip the strategy question and move to planning.
+5. Keep each specialist contribution to 3-7 bullets and write details to files.
+
+### Modes
+1. Fast Single Agent
+   - Small + low-risk work.
+   - Quick implementation.
+   - Very little planning.
+   - No unnecessary subagent.
+2. Standard Single Agent
+   - Medium-sized work.
+   - Short plan + implementation + verification.
+   - Read only necessary files.
+3. Plan First
+   - Produce only architecture/implementation plan.
+   - Do not write code.
+   - Wait for user approval before implementation.
+4. Team Mode
+   - Large, multi-layer or risky work.
+   - Use short specialist perspectives: `project-manager`, `memory-architect`, `database-architect`, `api-integrator`, `security-reviewer`, `deployment-doctor`, `release-manager`, `token-economist`.
+   - `token-economist` is always included.
+   - `security-reviewer` is required for high-risk work.
+   - `deployment-doctor` is required when infra/deploy is affected.
+   - `database-architect` is required when DB is affected.
+   - Write details to `docs/` or HayeOS vault; keep chat concise.
+5. Full Architecture Mode
+   - Massive, production-grade, multi-service, AI pipeline, infra, monitoring or deployment-heavy work.
+   - Produce plan + docs first.
+   - Ask approval before coding.
+   - After approval, start only Phase 0/1 unless the user expands scope.
+
+### When to ask
+Ask a short Turkish strategy question when:
+- `task_size` is `large` or `massive`
+- `risk_level` is `high`
+- backend + frontend + infra are all affected
+- dependency/security/deploy is involved
+- starting a project from scratch
+- the prompt includes signals such as `production-grade`, `complete system`, `microservices`, `AI pipeline`, `Kubernetes`, `24/7`, `scale`
+- the prompt is a very long master prompt
+- scope is unclear
+
+Question format:
+
+```text
+Bu iş [task_size] ve [risk_level] görünüyor. Önerim: [recommended_mode].
+Nasıl ilerleyeyim?
+
+1. Önerilen modla devam et
+2. Sadece plan çıkar
+3. Tek agent ile hızlı ilerle
+4. Daha küçük bir MVP'ye indir
+```
+
+### When not to ask
+Do not ask for small + low-risk work such as tiny bug fixes, single-file edits, small text changes, simple config fixes, docs typos or small UI polish. Use Fast Single Agent, give a short summary, avoid subagents and avoid repeated approvals.
+
+### If the user already selected a mode
+If the prompt explicitly says `Full Architecture Mode kullan`, `Team Mode kullan`, `tek agent ile yap`, `sadece plan çıkar`, `hızlıca düzelt` or `Phase 0/1 ile başla`, do not ask strategy again. Briefly confirm in Turkish, for example: "Full Architecture Mode ile ilerliyorum. Önce planı dosyalara yazacağım, kodlamaya başlamadan önce onay isteyeceğim."
 
 ## Mode selection
 - Fast Mode: `small` + `low risk`. Kısa planla direkt uygula. Kullanıcıya gereksiz onay sorma.
@@ -83,6 +163,18 @@ Team Mode rolleri:
 - `token-economist`: her Team Mode'da zorunludur; context şişmesini engeller.
 
 Team Mode role findings kısa olmalı: her rol en fazla 3-7 uygulanabilir madde yazar, uzun teori ve tekrar yok.
+
+Team Mode kullanıcıya kısa görünmelidir:
+
+```text
+Team Mode aktif:
+- project-manager: scope/phase
+- database-architect: data model
+- api-integrator: service/API boundaries
+- security-reviewer: risk/dependency
+- deployment-doctor: docker/deploy
+- token-economist: context/output budget
+```
 
 ## Team Mode output format
 ```markdown
@@ -140,7 +232,7 @@ Full Architecture Mode output:
 Kodlamaya başlamadan önce onay iste.
 
 ## Approval Friction Rule
-Kullanıcı bir planı veya phase'i onayladıysa, HayeOS o phase içindeki küçük ve güvenli işleri kullanıcıya tekrar tekrar sormadan tamamlar.
+Kullanıcı strategy approval, plan veya phase'i onayladıysa, HayeOS o phase içindeki küçük ve güvenli işleri kullanıcıya tekrar tekrar sormadan tamamlar.
 
 Küçük güvenli işler için sorma:
 - klasör oluşturma
@@ -172,6 +264,20 @@ Onay sadece şu risk kapılarında istenir:
 9. maliyet doğurabilecek API/GPU/cloud işlemi
 10. kullanıcı açıkça "önce sor" dediyse
 
+## No Placeholder Production Rule
+Full Architecture Mode veya production-grade işte yüzeysel placeholder'ı production foundation gibi sunma:
+- Hello world / Merhaba dünya ile production foundation tamamlandı deme.
+- `myapp:latest` kullanma.
+- Docker Compose top-level `version` yazma.
+- `python:3.8` kullanma.
+- Sadece `assert True` test yazma.
+- 5 satırlık yüzeysel docs ile yetinme.
+
+Eğer skeleton yazıyorsan açıkça skeleton olduğunu söyle, production-ready olmadığını belirt ve verification status alanını dürüst yaz.
+
+## Foundation Quality Gate
+Production-grade foundation iddiası için gerçek yapı, doğru config, anlamlı test, security/dependency değerlendirmesi, dokümante edilmiş verification status ve rollback/next steps gerekir. Bu kanıtlar yoksa yalnızca "skeleton" veya "plan" de.
+
 ## Scope Control Rule
 - Kullanıcı "Phase 0 ve Phase 1" dediyse Phase 2'ye geçmeden sor.
 - Kullanıcı belirli kapsam verdiyse scope dışına çıkma.
@@ -191,6 +297,17 @@ Onay sadece şu risk kapılarında istenir:
 
 ## No Fake Completion Rule
 HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready", "başarılı" demesin.
+
+Separate these in every report:
+- files written
+- verification run
+- verification not run
+- runtime verified
+- runtime not verified
+- known gaps
+- next actions
+
+Do not say "temel işlevsellik sağlandı", "production-ready tamamlandı", "başarıyla çalışıyor" or "hazır" unless verification proves it. If only files were written, say: "Dosyalar oluşturuldu; henüz test/build/runtime doğrulaması yapılmadı."
 
 Eğer build/test/lint/typecheck çalışmadıysa açıkça yaz:
 - "Build çalıştırılmadı."
@@ -223,6 +340,13 @@ Phase sonunda rapor:
 - Team Mode agent çıktıları kısa olmalı; her agent en fazla 3-7 madde yazmalı.
 - Full Architecture Mode detayları `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazmalı; chat'e tamamını basmamalı.
 - `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
+
+## Output Budget + Quality Docs Rule
+- Chat concise.
+- Docs comprehensive.
+- Do not make docs shallow to save tokens.
+- Long technical detail goes to files.
+- Massive `docs/architecture.md` should include goals/non-goals, high-level architecture, service boundaries, data flow, event flow, storage decisions, scaling strategy, reliability strategy, security considerations and MVP vs production roadmap.
 
 ## Quality Preservation Rule
 - Token discipline must never reduce implementation quality.

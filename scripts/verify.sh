@@ -88,14 +88,36 @@ grep -q "Permanent Install" README.md || { echo "README missing permanent instal
 grep -q "/plugin marketplace add <hayeos-plugin-root>" README.md docs/claude-code-install.md || { echo "docs missing generic local marketplace install command"; exit 1; }
 grep -q "/plugin install haye@haye-marketplace" README.md docs/claude-code-install.md || { echo "docs missing plugin install command"; exit 1; }
 grep -q "Smart Work Router" commands/work.md || { echo "commands/work.md missing Smart Work Router"; exit 1; }
+grep -q "Work Strategy Selection Rule" skills/work/SKILL.md || { echo "skills/work missing Work Strategy Selection Rule"; exit 1; }
+grep -q "Work Strategy Selection Rule" commands/work.md || { echo "commands/work missing Work Strategy Selection Rule"; exit 1; }
+grep -q "Work Strategy Selection Rule" docs/commands.md || { echo "docs/commands missing Work Strategy Selection Rule"; exit 1; }
+grep -q "Massive Task Classification Rule" skills/work/SKILL.md || { echo "skills/work missing Massive Task Classification Rule"; exit 1; }
+grep -q "Massive Task Classification Rule" docs/commands.md || { echo "docs/commands missing Massive Task Classification Rule"; exit 1; }
+grep -q "Team Mode Offer Rule" skills/work/SKILL.md || { echo "skills/work missing Team Mode Offer Rule"; exit 1; }
+grep -q "Team Mode Offer Rule" docs/commands.md || { echo "docs/commands missing Team Mode Offer Rule"; exit 1; }
+grep -q "Fast Single Agent" skills/work/SKILL.md || { echo "skills/work missing Fast Single Agent"; exit 1; }
+grep -q "Standard Single Agent" skills/work/SKILL.md || { echo "skills/work missing Standard Single Agent"; exit 1; }
+grep -q "Plan First" skills/work/SKILL.md || { echo "skills/work missing Plan First"; exit 1; }
 grep -q "Team Mode" skills/work/SKILL.md || { echo "skills/work missing Team Mode"; exit 1; }
 grep -q "Full Architecture Mode" skills/work/SKILL.md || { echo "skills/work missing Full Architecture Mode"; exit 1; }
+grep -q "task_size" skills/work/SKILL.md || { echo "skills/work missing task_size"; exit 1; }
+grep -q "risk_level" skills/work/SKILL.md || { echo "skills/work missing risk_level"; exit 1; }
+grep -q "recommended_mode" skills/work/SKILL.md || { echo "skills/work missing recommended_mode"; exit 1; }
 grep -q "Approval Friction Rule" skills/work/SKILL.md || { echo "skills/work missing Approval Friction Rule"; exit 1; }
 grep -q "No Fake Completion Rule" skills/work/SKILL.md || { echo "skills/work missing No Fake Completion Rule"; exit 1; }
 grep -q "Output Budget Rule" skills/work/SKILL.md || { echo "skills/work missing Output Budget Rule"; exit 1; }
 grep -q "64000 output token" skills/work/SKILL.md docs/commands.md README.md || { echo "missing output token limit prevention note"; exit 1; }
 grep -q "Quality Preservation Rule" skills/work/SKILL.md || { echo "skills/work missing Quality Preservation Rule"; exit 1; }
 grep -q "token-economist" skills/work/SKILL.md || { echo "skills/work missing token-economist"; exit 1; }
+grep -q "strategy approval" skills/work/SKILL.md commands/work.md || { echo "work missing strategy approval semantics"; exit 1; }
+grep -q "No Placeholder Production Rule" skills/work/SKILL.md docs/commands.md commands/work.md || { echo "missing No Placeholder Production Rule"; exit 1; }
+grep -q "Foundation Quality Gate" skills/work/SKILL.md docs/commands.md || { echo "missing Foundation Quality Gate"; exit 1; }
+grep -q "myapp:latest" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing myapp:latest forbidden pattern"; exit 1; }
+grep -q "image: latest" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing image latest forbidden pattern"; exit 1; }
+grep -q "Docker Compose top-level" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing Docker Compose version field rule"; exit 1; }
+grep -q "python:3.8" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing python:3.8 forbidden pattern"; exit 1; }
+grep -q "assert True" skills/work/SKILL.md docs/commands.md || { echo "missing assert True forbidden pattern"; exit 1; }
+grep -qi "hello world" skills/work/SKILL.md docs/commands.md commands/work.md || { echo "missing hello world placeholder rule"; exit 1; }
 test -f skills/team-mode/SKILL.md || { echo "missing internal team-mode skill"; exit 1; }
 test -f skills/checkpoint/SKILL.md || { echo "missing checkpoint skill"; exit 1; }
 test -f skills/checkpoint/templates/latest-checkpoint.md || { echo "missing latest checkpoint template"; exit 1; }
@@ -129,6 +151,10 @@ grep -q "Plugin root vs project vault" skills/init-memory/templates/HAYE.md || {
 test -f commands/update.md || { echo "missing commands/update.md"; exit 1; }
 test -f skills/update/SKILL.md || { echo "missing skills/update/SKILL.md"; exit 1; }
 grep -q "git pull --ff-only" skills/update/SKILL.md || { echo "update skill missing ff-only pull"; exit 1; }
+grep -q "Never run \`git init\`" skills/update/SKILL.md || { echo "update skill must explicitly forbid git init"; exit 1; }
+grep -q "Never run \`git remote add\`" skills/update/SKILL.md || { echo "update skill must explicitly forbid git remote add"; exit 1; }
+bad_placeholder='[your_'"repository_url_here]"
+if rg -F "$bad_placeholder" skills/update/SKILL.md commands/update.md docs/commands.md >/dev/null; then echo "update must not use placeholder remote"; exit 1; fi
 if grep -q "reset --hard" skills/update/SKILL.md; then echo "update skill must not mention reset --hard"; exit 1; fi
 grep -q "/haye:update" docs/commands.md || { echo "docs/commands missing /haye:update"; exit 1; }
 if grep -q "force" skills/update/SKILL.md commands/update.md README.md docs/commands.md; then echo "update docs must not recommend force behavior"; exit 1; fi

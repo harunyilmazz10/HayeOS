@@ -72,6 +72,11 @@ Close session and update memory
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## No Fake Completion Rule
+- Session close must distinguish files written, verification run, verification not run, runtime verified, runtime not verified, known gaps and next actions.
+- Do not mark work as "hazır", "başarıyla çalışıyor" or "production-ready" unless verification output supports it.
+- If verification did not run, say that clearly in the close summary.
+
 ## Smart routing
 This simplified command may route internally to:
 - `session-close`

@@ -16,8 +16,14 @@ Update the installed HayeOS plugin repository from GitHub so users do not need t
 
 ## Scope and safety
 - `/haye:update` only updates the HayeOS plugin repository.
+- If plugin root cannot be detected, stop.
+- Never run `git init`.
+- Never run `git remote add` with a placeholder.
+- Never set remote to a placeholder.
+- Never create a git repo in the current user/project directory.
 - Do not commit.
 - Do not push.
+- Do not use placeholder repository URLs.
 - Do not remove, overwrite, discard, clean or hard reset local files.
 - Do not touch project vault files.
 - Do not create project memory, context packs, checkpoints or active tasks.
@@ -38,7 +44,7 @@ Run from plugin root.
 3. Check remotes:
    - `git remote -v`
    - Expected origin URL: `https://github.com/harunyilmazz10/HayeOS.git`
-   - If origin is missing or different, show the current value and ask before changing anything.
+   - If origin is missing or different, show the current value and ask before changing anything. Do not auto-set a placeholder remote.
 4. Check branch:
    - `git branch --show-current`
    - If branch is not `main`, report it and behave conservatively. Do not change branches automatically.

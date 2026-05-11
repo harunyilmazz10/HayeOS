@@ -33,6 +33,7 @@ Davranış:
 - `.git` yoksa durur ve yeniden clone gerektiğini Türkçe açıklar.
 - `origin` URL beklenen repo değilse kullanıcıya gösterir ve onay almadan değiştirmez.
 - Local değişiklik varsa durur; otomatik pull yapmaz ve değişiklikleri göstermeyi teklif eder.
+- Plugin root bulunamazsa durur; `git init`, placeholder remote veya kullanıcı/proje klasöründe yeni git repo oluşturma davranışı yoktur.
 - Temiz repo'da `git fetch origin` ve `git pull --ff-only origin main` çalıştırır.
 - Güncelleme sonrası `claude plugin validate .`, varsa `./scripts/verify.sh`, mümkünse `bin/haye --help` çalıştırır.
 - Commit/push yapmaz, project vault dosyalarına dokunmaz, context pack veya checkpoint üretmez.
@@ -44,15 +45,61 @@ Davranış:
 
 Classification fields:
 - `task_size`: `small`, `medium`, `large`, `massive`
-- `task_type`: `feature`, `bugfix`, `refactor`, `architecture`, `security`, `deploy`, `research`, `bootstrap`, `documentation`, `media-pipeline`, `AI-system`
+- `task_type`: `quick fix`, `feature`, `refactor`, `architecture`, `full system`, `security`, `deployment`, `debugging`, `research/planning`
 - `risk_level`: `low`, `medium`, `high`
-- `affected_layers`: frontend, backend, database, infra, AI, security, deployment, media pipeline, queue/event system, storage, analytics
-- `recommended_mode`: `fast`, `standard`, `team`, `full-architecture`
+- `affected_layers`: frontend, backend, database, infra, AI pipeline, security, deployment, docs, tests
+- `recommended_mode`: Fast Single Agent, Standard Single Agent, Plan First, Team Mode, Full Architecture Mode
 
-1. Fast Mode: small + low risk. Kısa planla direkt uygular, gereksiz onay sormaz.
-2. Standard Mode: medium. Kısa plan + implementation + verification yapar.
-3. Team Mode: large veya high risk. Uzman rollere böler, `token-economist` her zaman dahil edilir.
-4. Full Architecture Mode: massive veya sıfırdan production-grade sistem. Kodlamadan önce mimari plan ve onay gerekir.
+# Work Strategy Selection Rule
+
+`/haye:work` büyük, belirsiz veya riskli işlerde çalışma stratejisini kendisi sessizce seçmez. Önce sınıflandırma yapar, önerilen modu açıklar ve Türkçe sorar:
+
+```text
+Bu iş [task_size] ve [risk_level] görünüyor. Önerim: [recommended_mode].
+Nasıl ilerleyeyim?
+
+1. Önerilen modla devam et
+2. Sadece plan çıkar
+3. Tek agent ile hızlı ilerle
+4. Daha küçük bir MVP'ye indir
+```
+
+Modes:
+1. Fast Single Agent / Fast Mode: small + low risk. Gereksiz subagent yok, kısa özetle uygular.
+2. Standard Single Agent / Standard Mode: medium. Kısa plan + implementation + verification.
+3. Plan First: önce plan çıkarır, kod yazmaz, implementation için onay bekler.
+4. Team Mode: large/high-risk. Uzman perspektifleri kısa tutar; `token-economist` her zaman dahil edilir.
+5. Full Architecture Mode: massive/production-grade/multi-service. Önce docs/plan üretir, kodlamadan önce onay ister.
+
+Kullanıcı modu açıkça belirtmişse tekrar sormaz; seçilen modu kısa teyit eder.
+
+# Massive Task Classification Rule
+
+Şu sinyaller varsa iş `massive` kabul edilir: `production-grade`, `complete system`, `autonomous`, `multi-service`, `microservices`, `24/7`, `scale horizontally`, `Kubernetes`, `monitoring`, `analytics`, `AI pipeline`, `full architecture`, `from scratch`, çok sayıda servis listesi, Phase 0/1/2 roadmap, veya backend + frontend + infra + AI + monitoring birlikte istenmesi.
+
+Massive ise `recommended_mode = Full Architecture Mode`, Team Mode internally enabled, `token-economist`, `security-reviewer`, `deployment-doctor` zorunlu; DB varsa `database-architect` zorunlu. Kodlamadan önce plan onayı gerekir.
+
+# Team Mode Offer Rule
+
+Massive veya high-risk işlerde ilk cevap sınıflandırma + kısa Team Mode planı verir ve Türkçe sorar: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?" Uzman katkıları 3-7 maddeyle sınırlıdır ve detaylar dosyalara yazılır.
+
+## Behavior Examples
+
+Örnek 1 - küçük iş:
+- User: `/haye:work "README'de typo düzelt"`
+- Expected: Fast Single Agent. Sormadan düzeltir, kısa özet verir.
+
+Örnek 2 - orta iş:
+- User: `/haye:work "Yeni API endpoint ekle"`
+- Expected: Standard Single Agent. Kısa plan + implementation. Risk yoksa sürekli sormaz.
+
+Örnek 3 - büyük iş:
+- User: `/haye:work "Production-grade microservices AI media system build"`
+- Expected: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?"
+
+Örnek 4 - kullanıcı modu belirtmiş:
+- User: `/haye:work "Full Architecture Mode kullan..."`
+- Expected: Tekrar strateji sormadan Full Architecture Mode ile plan üretir, kodlamadan önce onay ister.
 
 # Approval Friction Rule
 
@@ -66,6 +113,20 @@ Plan veya phase onaylandıysa küçük ve güvenli işleri tekrar tekrar sormada
 - service/route/test placeholder oluşturma
 - internal refactor
 - HayeOS memory'ye kısa not yazma
+
+Strategy approval = phase içindeki güvenli küçük işleri yapma iznidir. Risk gate ve phase sonunda tekrar sorulur.
+
+# No Placeholder Production Rule
+
+Production-grade veya Full Architecture Mode işlerde Hello world / Merhaba dünya, `myapp:latest`, Docker Compose top-level `version`, `python:3.8`, yalnızca `assert True` testleri veya yüzeysel docs ile production foundation tamamlandı denmez. Skeleton yazıldıysa açıkça skeleton olduğu ve production-ready olmadığı belirtilir.
+
+# Foundation Quality Gate
+
+Production foundation iddiası için gerçek yapı, anlamlı test, dependency/security değerlendirmesi, verification status ve next/rollback steps gerekir.
+
+# Dependency / Base Image Safety Rule
+
+Docker image'larında latest tag kullanma. `myapp:latest`, `image: latest`, Docker Compose top-level `version`, eski/EOL `python:3.8` ve kör dependency install yasaktır. Modern desteklenen explicit version tag kullan; Python için uyumluysa `python:3.12-slim` gibi güncel slim base tercih et ve kararı dependency/security notes içine yaz.
 
 # No Fake Completion Rule
 

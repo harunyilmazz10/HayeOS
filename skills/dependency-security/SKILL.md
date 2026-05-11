@@ -58,6 +58,18 @@ Check dependencies and version choices using package files, audit tools, officia
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## Dependency / Base Image Safety Rule
+- Do not use latest tags in Docker images.
+- Do not use placeholder image names like `myapp:latest`.
+- Do not use `image: latest`.
+- Do not include Docker Compose top-level `version` field.
+- Use modern supported base images with explicit version tags.
+- For Python service images, prefer a current supported slim base such as `python:3.12-slim` only if compatible, and record the decision.
+- Do not use old/EOL examples such as `python:3.8`.
+- If unsure, write the decision to dependency/security notes and mark as pending verification.
+- Do not install dependencies blindly.
+- Do not pin vulnerable EOL versions.
+
 
 ## Embedded React / Next.js security baseline
 When a project uses React Server Components, Next.js App Router, middleware/proxy routes, server actions, image optimization or cache components:

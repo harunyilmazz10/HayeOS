@@ -34,10 +34,13 @@ Use these first. They are smart routers over the advanced HayeOS workflows.
 `/haye:work "görev"` Smart Work Router olarak çalışır. Görevi `task_size`, `task_type`, `risk_level`, `affected_layers` ve `recommended_mode` alanlarıyla sınıflandırır.
 
 Modes:
-- Fast Mode: small + low risk işler için kısa planla direkt uygular.
-- Standard Mode: medium işler için plan + implementation + verification yapar.
+- Fast Single Agent: small + low risk işler için kısa planla direkt uygular.
+- Standard Single Agent: medium işler için plan + implementation + verification yapar.
+- Plan First: önce sadece plan çıkarır, kod yazmadan onay bekler.
 - Team Mode: large veya high risk işlerde uzman rollere böler; ayrı `/haye:team` komutu yoktur.
 - Full Architecture Mode: massive veya sıfırdan production-grade sistemlerde kodlamadan önce mimari plan çıkarır ve onay ister.
+
+Work Strategy Selection Rule: large, massive, high-risk veya belirsiz işlerde HayeOS önce önerilen çalışma modunu açıklar ve Türkçe onay ister; small + low-risk işlerde sormadan Fast Single Agent ile ilerler.
 
 HayeOS minimizes approval friction. It asks for approval at phase boundaries and risk gates, not after every small edit.
 

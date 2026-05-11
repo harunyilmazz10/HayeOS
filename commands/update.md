@@ -17,8 +17,10 @@ HayeOS plugin repo'sunu GitHub'dan güvenli şekilde güncelle. Project vault, c
 
 ## Safety summary
 - Önce plugin root'u tespit et.
+- Plugin root bulunamazsa dur; bulunduğun kullanıcı/proje klasöründe git repo oluşturma.
 - `.git` yoksa güncelleme yapma; yeniden clone gerektiğini Türkçe açıkla.
 - `origin` URL farklıysa onay almadan değiştirme.
+- `git init`, placeholder remote veya placeholder repository URL kullanma.
 - Local değişiklik varsa otomatik pull yapma.
 - Sadece temiz repo'da `git fetch origin` ve `git pull --ff-only origin main` kullan.
 - Güncellemeden sonra `claude plugin validate .`, varsa `./scripts/verify.sh`, mümkünse `bin/haye --help` çalıştır.

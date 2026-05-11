@@ -67,6 +67,11 @@ Deploy/release sırasında:
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## No Fake Completion Rule
+- Separate files written, verification run, verification not run, runtime verified, runtime not verified, known gaps and next actions.
+- Do not say "temel işlevsellik sağlandı", "production-ready tamamlandı", "başarıyla çalışıyor" or "hazır" unless build/test/lint/runtime verification proves it.
+- If only files were written, say: "Dosyalar oluşturuldu; henüz test/build/runtime doğrulaması yapılmadı."
+
 ## Smart routing
 This simplified command may route internally to:
 - `deploy`
