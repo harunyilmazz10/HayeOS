@@ -86,6 +86,81 @@ if errors:
 PY
 }
 
+check_special_skill_contracts() {
+  python3 - <<'PY'
+from pathlib import Path
+import sys
+
+errors = []
+special = [
+    Path("skills/memory-start/SKILL.md"),
+    Path("skills/start/SKILL.md"),
+    Path("skills/init-memory/SKILL.md"),
+    Path("skills/context-pack/SKILL.md"),
+    Path("skills/checkpoint/SKILL.md"),
+    Path("skills/close/SKILL.md"),
+    Path("skills/session-close/SKILL.md"),
+    Path("skills/update/SKILL.md"),
+]
+forbidden = [
+    "Execute the smallest safe step",
+    "Create or reuse a context pack when work is non-trivial",
+    "Identify task type, risks and affected files",
+    "Verify with real commands when possible",
+    "Update memory through `/haye:close` or session-close rules",
+]
+for path in special:
+    text = path.read_text(encoding="utf-8")
+    for phrase in forbidden:
+        if phrase in text:
+            errors.append(f"{path}: forbidden generic workflow phrase: {phrase}")
+
+memory_start = Path("skills/memory-start/SKILL.md").read_text(encoding="utf-8")
+for phrase in [
+    "must not execute implementation",
+    "must not create context packs",
+    "must not run tests/build/lint",
+    "must not load `/haye:work`",
+    "Hangi görevle devam edelim?",
+]:
+    if phrase not in memory_start:
+        errors.append(f"skills/memory-start/SKILL.md missing contract phrase: {phrase}")
+
+for path in [Path("skills/close/SKILL.md"), Path("skills/session-close/SKILL.md")]:
+    text = path.read_text(encoding="utf-8")
+    for phrase in [
+        "must not start implementation",
+        "must not create context packs",
+        "must write only under `<resolved memoryPath>`",
+        "<resolved memoryPath>/05-sessions/latest-checkpoint.md",
+        "<resolved memoryPath>/changelog.md",
+        "<resolved memoryPath>/current.md",
+        "<resolved memoryPath>/next.md",
+        "<resolved memoryPath>/04-tasks/active-task.md",
+    ]:
+        if phrase not in text:
+            errors.append(f"{path} missing close contract phrase: {phrase}")
+
+context = Path("skills/context-pack/SKILL.md").read_text(encoding="utf-8")
+for phrase in [
+    "Write context packs ONLY to `<resolved memoryPath>/09-context-packs/`",
+    "must not execute implementation",
+    "must not run tests/build/lint",
+]:
+    if phrase not in context:
+        errors.append(f"skills/context-pack/SKILL.md missing contract phrase: {phrase}")
+
+if "HayeOS komutları Harun için varsayılan" in "\n".join(p.read_text(encoding="utf-8") for p in sorted(Path("commands").glob("*.md")) + sorted(Path("skills").glob("*/SKILL.md"))):
+    errors.append("Harun-specific default language hardcode found")
+
+if errors:
+    print("Special skill contract errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -97,6 +172,7 @@ check_plugin_root_clean() {
 
 check_markdown_frontmatter
 check_memory_path_contract
+check_special_skill_contracts
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

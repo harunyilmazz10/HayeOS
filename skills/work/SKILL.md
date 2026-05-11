@@ -12,7 +12,7 @@ description: Smart Work Router for development, Team Mode planning, low-friction
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## Inputs to inspect first
 1. `.hayeos.json` if present.

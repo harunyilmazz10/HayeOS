@@ -12,7 +12,7 @@ Update the installed HayeOS plugin repository from GitHub so users do not need t
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## Scope and safety
 - `/haye:update` only updates the HayeOS plugin repository.
@@ -28,6 +28,9 @@ Update the installed HayeOS plugin repository from GitHub so users do not need t
 - Do not touch project vault files.
 - Do not create project memory, context packs, checkpoints or active tasks.
 - Keep plugin root and project vault separate: `CLAUDE_PLUGIN_ROOT` is plugin code root; `.hayeos.json` `memoryPath` belongs to the current project and is not used by this update flow.
+- must not execute implementation
+- must not create context packs
+- must not touch project memory
 
 ## Plugin root detection
 1. Prefer `CLAUDE_PLUGIN_ROOT`.

@@ -12,7 +12,7 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## When to use
 - Use when the user's request matches this workflow.
@@ -75,6 +75,14 @@ If `${CLAUDE_PLUGIN_ROOT}` is unavailable, infer the plugin root from the loaded
 - Never initialize project memory inside `CLAUDE_PLUGIN_ROOT`.
 - If `memoryPath` resolves to the plugin root or under the HayeOS plugin repo, stop and warn in Turkish: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
 
+## Init-memory boundaries
+- must not load `/haye:work`
+- must not start a task classification wizard
+- must not create context packs
+- must not execute implementation
+- must not ask "Şimdi hafızayı başlatmamı ister misiniz?" after init
+- must only create or repair `.hayeos.json` and files under `<resolved memoryPath>`
+
 ## Mandatory manual fallback
 If the CLI cannot run for any reason, Claude Code must directly create the memory files in the current project root. This fallback is required on Windows, Mac and Linux.
 
@@ -132,7 +140,7 @@ Project: <project-name>
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## Proje kuralları
 - Oturum başında `/haye:start`, oturum sonunda `/haye:close` kullan.

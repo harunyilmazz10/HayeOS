@@ -12,7 +12,7 @@ Close session and update memory
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## When to use
 - Use when the user's request matches this workflow.
@@ -38,18 +38,25 @@ Close session and update memory
 
 ## Workflow
 1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules:
+2. Resolve `memoryPath` and confirm it is not under `CLAUDE_PLUGIN_ROOT`.
+3. Read `<resolved memoryPath>/05-sessions/latest-checkpoint.md` when present.
+4. Create a concise session summary from the current conversation and checkpoint.
+5. Update only memory files under `<resolved memoryPath>`:
    - `<resolved memoryPath>/current.md` for current state.
    - `<resolved memoryPath>/next.md` for the next five actions.
    - `<resolved memoryPath>/changelog.md` for completed changes.
    - `<resolved memoryPath>/health.md` for verification status.
    - `<resolved memoryPath>/05-sessions/` for a dated session handoff when useful.
    - `<resolved memoryPath>/12-risks/` and `<resolved memoryPath>/02-decisions/` when security or dependency decisions changed.
+6. Mark `<resolved memoryPath>/05-sessions/latest-checkpoint.md` as `closed` when present.
+7. Return only a short close summary.
+
+## Close boundaries
+- must not start implementation
+- must not create context packs
+- must not start a new task
+- must not run tests/build/lint unless the user explicitly asked
+- must write only under `<resolved memoryPath>`
 
 ## Checkpoint finalization
 - `<resolved memoryPath>/05-sessions/latest-checkpoint.md` varsa oku.

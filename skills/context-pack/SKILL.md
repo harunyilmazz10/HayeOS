@@ -12,7 +12,7 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## When to use
 - Use when the user's request matches this workflow.
@@ -64,11 +64,17 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 ## Workflow
 1. Locate project config and memory path.
 2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack only under `<resolved memoryPath>/09-context-packs/`.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+3. Identify only the task-relevant memory and source files needed for context.
+4. Read only the necessary source files; do not scan the entire repository.
+5. Create or update a context pack only under `<resolved memoryPath>/09-context-packs/<task>.md`.
+6. Return a short chat summary with the context pack path, key included files and any known gaps.
+
+## Context-pack boundaries
+- must not execute implementation
+- must not run tests/build/lint
+- must not start work execution
+- must not create project-root `09-context-packs`
+- must not write to `CLAUDE_PLUGIN_ROOT`
 
 ## Output format
 - What I found

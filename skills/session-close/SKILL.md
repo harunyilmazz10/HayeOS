@@ -12,7 +12,7 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## When to use
 - Use when the user's request matches this workflow.
@@ -49,12 +49,19 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 
 ## Workflow
 1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+2. Resolve `memoryPath` and confirm it is not under `CLAUDE_PLUGIN_ROOT`.
+3. Read `<resolved memoryPath>/05-sessions/latest-checkpoint.md` when present.
+4. Create a concise session summary file under `<resolved memoryPath>/05-sessions/` when useful.
+5. Update `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/health.md` and `<resolved memoryPath>/04-tasks/active-task.md`.
+6. Mark `<resolved memoryPath>/05-sessions/latest-checkpoint.md` as `closed` when present.
+7. Return only a short close summary with memory updated files.
+
+## Session-close boundaries
+- must not start implementation
+- must not create context packs
+- must not start a new task
+- must not run tests/build/lint unless the user explicitly asked
+- must write only under `<resolved memoryPath>`
 
 ## Checkpoint finalization
 - `<resolved memoryPath>/05-sessions/latest-checkpoint.md` varsa oku.

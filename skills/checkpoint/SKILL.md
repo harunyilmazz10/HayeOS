@@ -12,7 +12,7 @@ Internal workflow used by `/haye:work`, `/haye:fix`, `/haye:ship`, `/haye:start`
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## Auto Checkpoint Rule
 HayeOS uzun, riskli veya çok adımlı işlerde `/haye:close` beklemeden checkpoint yazar.
@@ -49,6 +49,13 @@ Checkpoint şu durumlarda mutlaka yazılır:
 8. output çok uzayacaksa chat'e basmadan önce
 9. riskli işlemden önce
 10. kullanıcı uzun/büyük proje promptu verdiyse ilk plan tamamlandığında
+
+## Checkpoint boundaries
+- must not execute implementation
+- must not create context packs
+- must not start task classification
+- must not run tests/build/lint
+- must only update checkpoint-related files under `<resolved memoryPath>`
 
 ## Checkpoint template
 Use `skills/checkpoint/templates/latest-checkpoint.md`:

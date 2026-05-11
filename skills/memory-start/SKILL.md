@@ -12,7 +12,7 @@ Start a Claude Code session from Haye Obsidian memory with minimal context. Use 
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS komutları Harun için varsayılan olarak Türkçe konuşur.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
 ## When to use
 - Use when the user's request matches this workflow.
@@ -40,13 +40,29 @@ If the Memory vault resolves to the Plugin root or under the plugin repository, 
 - If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
 
 ## Workflow
-1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+1. Read `.hayeos.json` from the current project root.
+2. Resolve `memoryPath` relative to the current project root.
+3. Confirm Plugin root and Memory vault are separate. If the Memory vault points to the plugin root, stop.
+4. Read only minimal memory:
+   - `HAYE.md`
+   - `index.md`
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present
+   - `<resolved memoryPath>/05-sessions/latest-checkpoint.md` when present
+5. If `<resolved memoryPath>/05-sessions/latest-checkpoint.md` exists, provide a short recovery summary.
+6. If a checkpoint exists, ask: "Kaldığımız yerden devam edeyim mi?"
+7. If no checkpoint exists, ask: "Hangi görevle devam edelim?"
+
+## Memory-start boundaries
+- must not execute implementation
+- must not create context packs
+- must not run tests/build/lint
+- must not load `/haye:work`
+- must not start a task classification wizard
+- must not scan the repository
+- must not write `<resolved memoryPath>/04-tasks/active-task.md`
+- must not write `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
 
 ## Output format
 - What I found
