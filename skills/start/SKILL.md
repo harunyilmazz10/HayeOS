@@ -29,6 +29,9 @@ Start simple session
 - ask before creating `.hayeos.json`
 
 `/haye:start` must not:
+- must not load `/haye:work`
+- must not start a task classification wizard
+- must not ask "Şimdi hafızayı başlatmamı ister misiniz?" after init
 - must not use subagents
 - must not enter plan mode
 - must not scan the whole repository
@@ -61,7 +64,7 @@ Start simple session
    - Do not create files until the user explicitly says yes.
    - If the user says yes, run `/haye:init-memory`. Do not ask the user to find `bin/haye`, bash or Python paths.
    - If the CLI path fails, use the manual fallback from `skills/init-memory/SKILL.md`.
-   - After successful creation, run only the lightweight `memory-start` read.
+   - After successful creation, memory is already considered started. Do not ask "Şimdi hafızayı başlatmamı ister misiniz?". Run only the lightweight `memory-start` read and ask: "Hangi görevle devam edelim?"
    - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
 3. Apply Safe Resume Rule:
@@ -123,6 +126,9 @@ Never start coding automatically from `/haye:start` when a checkpoint exists.
 
 ## Team/Subagent Rule
 Subagent and Team Mode behavior is only allowed inside `/haye:work` for large or risky tasks. `/haye:start` must not use subagents, must not enter plan mode and must not trigger Team Mode.
+
+## No Work Loading Rule
+`/haye:start` must not load `/haye:work`, must not start task classification, and must not ask broad work questions like task size, risk level or affected layers. Work classification belongs only to `/haye:work`.
 
 ## Smart routing
 This simplified command may route internally only to:

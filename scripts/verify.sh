@@ -74,6 +74,9 @@ grep -q "Start Light Rule" commands/start.md || { echo "commands/start.md missin
 grep -q "Start Light Rule" skills/start/SKILL.md || { echo "skills/start missing Start Light Rule"; exit 1; }
 grep -q "must not use subagents" skills/start/SKILL.md || { echo "skills/start must forbid subagents"; exit 1; }
 grep -q "must not enter plan mode" skills/start/SKILL.md || { echo "skills/start must forbid plan mode"; exit 1; }
+grep -q "must not load \`/haye:work\`" skills/start/SKILL.md || { echo "skills/start must forbid loading work"; exit 1; }
+grep -q "must not start a task classification wizard" skills/start/SKILL.md || { echo "skills/start must forbid classification wizard"; exit 1; }
+grep -q "Şimdi hafızayı başlatmamı ister misiniz" commands/start.md skills/start/SKILL.md docs/commands.md || { echo "start must forbid second memory-start question"; exit 1; }
 grep -q "ask before creating \`.hayeos.json\`" skills/start/SKILL.md || { echo "skills/start must ask before creating .hayeos.json"; exit 1; }
 if grep -q "project-map\\|token-audit" commands/start.md skills/start/SKILL.md; then echo "start must not route to heavy workflows"; exit 1; fi
 grep -q "package.json" commands/secure.md skills/secure/SKILL.md || { echo "secure command missing package.json guidance"; exit 1; }
@@ -103,6 +106,8 @@ grep -q "Full Architecture Mode" skills/work/SKILL.md || { echo "skills/work mis
 grep -q "task_size" skills/work/SKILL.md || { echo "skills/work missing task_size"; exit 1; }
 grep -q "risk_level" skills/work/SKILL.md || { echo "skills/work missing risk_level"; exit 1; }
 grep -q "recommended_mode" skills/work/SKILL.md || { echo "skills/work missing recommended_mode"; exit 1; }
+grep -q "affected_layers" skills/work/SKILL.md || { echo "skills/work missing affected_layers"; exit 1; }
+grep -q "Full Architecture Mode Gate" skills/work/SKILL.md docs/commands.md || { echo "missing Full Architecture Mode Gate"; exit 1; }
 grep -q "Approval Friction Rule" skills/work/SKILL.md || { echo "skills/work missing Approval Friction Rule"; exit 1; }
 grep -q "No Fake Completion Rule" skills/work/SKILL.md || { echo "skills/work missing No Fake Completion Rule"; exit 1; }
 grep -q "Output Budget Rule" skills/work/SKILL.md || { echo "skills/work missing Output Budget Rule"; exit 1; }
@@ -113,11 +118,20 @@ grep -q "strategy approval" skills/work/SKILL.md commands/work.md || { echo "wor
 grep -q "No Placeholder Production Rule" skills/work/SKILL.md docs/commands.md commands/work.md || { echo "missing No Placeholder Production Rule"; exit 1; }
 grep -q "Foundation Quality Gate" skills/work/SKILL.md docs/commands.md || { echo "missing Foundation Quality Gate"; exit 1; }
 grep -q "myapp:latest" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing myapp:latest forbidden pattern"; exit 1; }
+grep -q "your-\\*-image" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing your-*-image forbidden pattern"; exit 1; }
+grep -q "placeholder-image" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing placeholder-image forbidden pattern"; exit 1; }
 grep -q "image: latest" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing image latest forbidden pattern"; exit 1; }
 grep -q "Docker Compose top-level" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing Docker Compose version field rule"; exit 1; }
 grep -q "python:3.8" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing python:3.8 forbidden pattern"; exit 1; }
 grep -q "assert True" skills/work/SKILL.md docs/commands.md || { echo "missing assert True forbidden pattern"; exit 1; }
 grep -qi "hello world" skills/work/SKILL.md docs/commands.md commands/work.md || { echo "missing hello world placeholder rule"; exit 1; }
+grep -q "2-line docs" skills/work/SKILL.md docs/commands.md || { echo "missing shallow docs forbidden rule"; exit 1; }
+grep -q "Aşama tamamlandı" skills/work/SKILL.md docs/commands.md || { echo "missing pre-gate completion wording rule"; exit 1; }
+grep -q "pip install" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing pip install risk gate"; exit 1; }
+grep -q "npm install" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing npm install risk gate"; exit 1; }
+grep -q "docker pull" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing docker pull risk gate"; exit 1; }
+grep -q "docker compose up" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing docker compose preflight rule"; exit 1; }
+grep -q "Do not assume \`pip\` exists on Windows" skills/work/SKILL.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing Windows pip rule"; exit 1; }
 test -f skills/team-mode/SKILL.md || { echo "missing internal team-mode skill"; exit 1; }
 test -f skills/checkpoint/SKILL.md || { echo "missing checkpoint skill"; exit 1; }
 test -f skills/checkpoint/templates/latest-checkpoint.md || { echo "missing latest checkpoint template"; exit 1; }
@@ -161,7 +175,7 @@ if grep -q "force" skills/update/SKILL.md commands/update.md README.md docs/comm
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })
-(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && project_name=final-start-test && mkdir -p "$tmpdir/$project_name" && cd "$tmpdir/$project_name" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && vault="${project_name}_obs" && test -f .hayeos.json && test -d "$vault" && test ! -d memory && test -f "$vault/HAYE.md" && test -f "$vault/index.md" && test -f "$vault/current.md" && test -f "$vault/next.md" && test -f "$vault/changelog.md" && test -f "$vault/health.md" && test -d "$vault/04-tasks" && test -d "$vault/05-sessions" && test -d "$vault/09-context-packs" && python3 - <<'PY'
+(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && project_name=final-start-test && mkdir -p "$tmpdir/$project_name" && cd "$tmpdir/$project_name" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && vault="${project_name}_obs" && test -f .hayeos.json && test -d "$vault" && test -d "$vault/04-tasks" && test -d "$vault/05-sessions" && test -d "$vault/09-context-packs" && test ! -d memory && test ! -d 04-tasks && test ! -d 05-sessions && test ! -d 09-context-packs && test ! -f current.md && test ! -f next.md && test -f "$vault/HAYE.md" && test -f "$vault/index.md" && test -f "$vault/current.md" && test -f "$vault/next.md" && test -f "$vault/changelog.md" && test -f "$vault/health.md" && python3 - <<'PY'
 import json
 import os
 from pathlib import Path

@@ -83,6 +83,10 @@ Massive ise `recommended_mode = Full Architecture Mode`, Team Mode internally en
 
 Massive veya high-risk işlerde ilk cevap sınıflandırma + kısa Team Mode planı verir ve Türkçe sorar: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?" Uzman katkıları 3-7 maddeyle sınırlıdır ve detaylar dosyalara yazılır.
 
+# Full Architecture Mode Gate
+
+Massive projelerde implementation öncesi plan artifact'leri dosyalara yazılır: Project Understanding, Architecture Overview, Service Map, Data Flow, Event Flow, Database Plan, Queue Plan, Storage Plan, AI Pipeline Plan, Monitoring Plan, Security Plan, Deployment Plan, HayeOS Memory Usage Plan, Phased Implementation Roadmap ve First Implementation Plan. Tercih edilen dosyalar `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md`, `docs/database.md`, `docs/deployment.md`, `docs/security.md`, `docs/monitoring.md`, `docs/operations.md`, `docs/ai-pipeline.md`, `docs/queues.md`, `docs/storage.md`. Kodlamaya başlamadan önce onay gerekir.
+
 ## Behavior Examples
 
 Örnek 1 - küçük iş:
@@ -118,15 +122,17 @@ Strategy approval = phase içindeki güvenli küçük işleri yapma iznidir. Ris
 
 # No Placeholder Production Rule
 
-Production-grade veya Full Architecture Mode işlerde Hello world / Merhaba dünya, `myapp:latest`, Docker Compose top-level `version`, `python:3.8`, yalnızca `assert True` testleri veya yüzeysel docs ile production foundation tamamlandı denmez. Skeleton yazıldıysa açıkça skeleton olduğu ve production-ready olmadığı belirtilir.
+Production-grade veya Full Architecture Mode işlerde Hello world / Merhaba dünya, `myapp:latest`, `your-*-image`, `placeholder-image`, Docker Compose top-level `version`, `python:3.8`, executable commands içinde `./path/to/...` veya `/path/to/...`, yalnızca `assert True` testleri veya 2-line docs ile production foundation tamamlandı denmez. Skeleton yazıldıysa açıkça skeleton olduğu ve production-ready olmadığı belirtilir.
 
 # Foundation Quality Gate
 
-Production foundation iddiası için gerçek yapı, anlamlı test, dependency/security değerlendirmesi, verification status ve next/rollback steps gerekir.
+Production foundation iddiası için gerçek yapı, anlamlı test, dependency/security değerlendirmesi, verification status ve next/rollback steps gerekir. Bu gate geçmeden "Aşama tamamlandı", "production-ready", "temel işlevsellik sağlandı", "hazır" veya "başarıyla çalışıyor" denmez.
 
 # Dependency / Base Image Safety Rule
 
 Docker image'larında latest tag kullanma. `myapp:latest`, `image: latest`, Docker Compose top-level `version`, eski/EOL `python:3.8` ve kör dependency install yasaktır. Modern desteklenen explicit version tag kullan; Python için uyumluysa `python:3.12-slim` gibi güncel slim base tercih et ve kararı dependency/security notes içine yaz.
+
+Dependency install/update/remove risk gate'tir. `pip install`, `python -m pip install`, `py -m pip install`, `npm install`, `pnpm add`, `yarn add`, `docker pull` veya unknown image pull eden Docker komutlarından önce onay al. `docker compose up` öncesi fake image, build context, Dockerfile, obsolete top-level `version` ve `latest` tag kontrolü yap.
 
 # No Fake Completion Rule
 
@@ -250,7 +256,7 @@ Commands inspect `.hayeos.json` first:
 
 `/haye:start` must stay lightweight. It may check `.hayeos.json`, read `memoryPath`, read minimal memory files, show a short recovery summary and ask the next Turkish question.
 
-`/haye:start` must not use subagents, must not enter plan mode, must not scan the whole repository, must not perform codebase exploration, must not search test patterns, must not produce an automatic project plan and must not create `.hayeos.json` before user approval.
+`/haye:start` must not load `/haye:work`, must not start a task classification wizard, must not ask "Şimdi hafızayı başlatmamı ister misiniz?" after init, must not use subagents, must not enter plan mode, must not scan the whole repository, must not perform codebase exploration, must not search test patterns, must not produce an automatic project plan and must not create `.hayeos.json` before user approval.
 
 Plugin root and project memory vault are different:
 

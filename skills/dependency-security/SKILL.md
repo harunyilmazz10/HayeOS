@@ -61,6 +61,7 @@ Check dependencies and version choices using package files, audit tools, officia
 ## Dependency / Base Image Safety Rule
 - Do not use latest tags in Docker images.
 - Do not use placeholder image names like `myapp:latest`.
+- Do not use fake image names like `your-*-image` or `placeholder-image`.
 - Do not use `image: latest`.
 - Do not include Docker Compose top-level `version` field.
 - Use modern supported base images with explicit version tags.
@@ -68,6 +69,9 @@ Check dependencies and version choices using package files, audit tools, officia
 - Do not use old/EOL examples such as `python:3.8`.
 - If unsure, write the decision to dependency/security notes and mark as pending verification.
 - Do not install dependencies blindly.
+- Dependency install/update/remove is a risk gate: ask before `pip install`, `python -m pip install`, `py -m pip install`, `npm install`, `pnpm add`, `yarn add`, `docker pull` or Docker commands that pull unknown images.
+- Before `docker compose up`, check compose has no fake images, build contexts exist, referenced Dockerfiles exist, no top-level obsolete `version` field and no `latest` tags unless explicitly justified.
+- Do not assume `pip` exists on Windows; prefer `py -m pip` or `python -m pip` after checking, and still require approval.
 - Do not pin vulnerable EOL versions.
 
 

@@ -231,6 +231,30 @@ Full Architecture Mode output:
 
 Kodlamaya başlamadan önce onay iste.
 
+## Full Architecture Mode Gate
+Massive projects must generate planning artifacts into files before implementation and must not dump the full plan into chat.
+
+Required planning artifacts:
+- Project Understanding
+- Architecture Overview
+- Service Map
+- Data Flow
+- Event Flow
+- Database Plan
+- Queue Plan
+- Storage Plan
+- AI Pipeline Plan
+- Monitoring Plan
+- Security Plan
+- Deployment Plan
+- HayeOS Memory Usage Plan
+- Phased Implementation Roadmap
+- First Implementation Plan
+
+Preferred files: `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md`, `docs/database.md`, `docs/deployment.md`, `docs/security.md`, `docs/monitoring.md`, `docs/operations.md`, `docs/ai-pipeline.md`, `docs/queues.md`, `docs/storage.md`.
+
+After planning, provide a short chat summary, created/changed files, verification status and ask for coding approval. Do not start coding before approval.
+
 ## Approval Friction Rule
 Kullanıcı strategy approval, plan veya phase'i onayladıysa, HayeOS o phase içindeki küçük ve güvenli işleri kullanıcıya tekrar tekrar sormadan tamamlar.
 
@@ -268,15 +292,18 @@ Onay sadece şu risk kapılarında istenir:
 Full Architecture Mode veya production-grade işte yüzeysel placeholder'ı production foundation gibi sunma:
 - Hello world / Merhaba dünya ile production foundation tamamlandı deme.
 - `myapp:latest` kullanma.
+- `your-*-image` veya `placeholder-image` gibi fake image adı kullanma.
 - Docker Compose top-level `version` yazma.
 - `python:3.8` kullanma.
+- Executable commands içinde `./path/to/...` veya `/path/to/...` gibi fake path kullanma.
 - Sadece `assert True` test yazma.
+- Massive architecture için 2-line docs yazıp yeterli sayma.
 - 5 satırlık yüzeysel docs ile yetinme.
 
 Eğer skeleton yazıyorsan açıkça skeleton olduğunu söyle, production-ready olmadığını belirt ve verification status alanını dürüst yaz.
 
 ## Foundation Quality Gate
-Production-grade foundation iddiası için gerçek yapı, doğru config, anlamlı test, security/dependency değerlendirmesi, dokümante edilmiş verification status ve rollback/next steps gerekir. Bu kanıtlar yoksa yalnızca "skeleton" veya "plan" de.
+Production-grade foundation iddiası için gerçek yapı, doğru config, anlamlı test, security/dependency değerlendirmesi, dokümante edilmiş verification status ve rollback/next steps gerekir. Bu gate geçmeden "Aşama tamamlandı", "production-ready", "temel işlevsellik sağlandı", "hazır" veya "başarıyla çalışıyor" deme. Bu kanıtlar yoksa yalnızca "skeleton" veya "plan" de.
 
 ## Scope Control Rule
 - Kullanıcı "Phase 0 ve Phase 1" dediyse Phase 2'ye geçmeden sor.
@@ -347,6 +374,13 @@ Phase sonunda rapor:
 - Do not make docs shallow to save tokens.
 - Long technical detail goes to files.
 - Massive `docs/architecture.md` should include goals/non-goals, high-level architecture, service boundaries, data flow, event flow, storage decisions, scaling strategy, reliability strategy, security considerations and MVP vs production roadmap.
+
+## Dependency Security and Risk Gate Rule
+- Dependency install/update/remove is a risk gate.
+- Ask before `pip install`, `python -m pip install`, `py -m pip install`, `npm install`, `pnpm add`, `yarn add`, `docker pull` or Docker commands that pull unknown images.
+- Before `docker compose up`, check compose has no fake images, build contexts exist, referenced Dockerfiles exist, no top-level obsolete `version` field and no `latest` tags unless explicitly justified.
+- Do not assume `pip` exists on Windows.
+- Never blindly use latest versions.
 
 ## Quality Preservation Rule
 - Token discipline must never reduce implementation quality.
