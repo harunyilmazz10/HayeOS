@@ -17,5 +17,31 @@ This project uses Haye memory-first workflow.
 - Check official advisories when internet is available.
 - Record safe dependency decisions in `02-decisions/safe-dependency-versions.md`.
 
+## Smart Work Router
+- `/haye:work` classifies `task_size`, `task_type`, `risk_level`, `affected_layers` and `recommended_mode`.
+- Small low-risk work uses Fast Mode.
+- Medium work uses Standard Mode.
+- Large or high-risk work may use Team Mode.
+- Massive or production-grade architecture work uses Full Architecture Mode and requires approval before coding.
+
+## Approval Friction Rule
+- If a plan or phase is approved, continue small safe steps without asking after every edit.
+- Ask at phase boundaries and risk gates only.
+
+## No Fake Completion Rule
+- Do not claim "tamamlandı", "geçti", "çalışıyor" or "production-ready" without verification output.
+- If build/test/lint/typecheck did not run, say so clearly.
+
+## Scope Control Rule
+- Stay inside the approved phase and scope.
+- If extra scope is needed, ask: "Bu işlem mevcut scope dışında. Ekleyeyim mi?"
+
+## Token discipline
+- Use HayeOS memory first.
+- Avoid unnecessary repo scans and raw/log reads.
+- Use context packs for big work.
+- Keep Team Mode role findings short.
+- Split large work into phases/sessions and close with `/haye:close`.
+
 ## Framework Security Rule
 For React/Next.js projects, Haye must check both dependency advisories and edge/WAF mitigation status. Cloudflare WAF may reduce exposure but vulnerable dependencies must still be patched. Do not mark safe unless dependency patch status and WAF status are documented.

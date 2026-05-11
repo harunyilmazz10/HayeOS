@@ -13,3 +13,14 @@ Generated vaults must contain useful starter content, not empty placeholders:
 - `07-checklists/dependency-security-checklist.md`, `12-risks/dependency-risks.md` and `02-decisions/safe-dependency-versions.md` support safe dependency decisions.
 
 The `08-raw/` area is for explicit ingestion only. Normal start/work commands should prefer summarized memory and context packs.
+
+## Work discipline
+
+`HAYE.md` should include:
+
+- User Response Language Rule for Turkish-first responses.
+- Smart Work Router summary for `/haye:work`.
+- Approval Friction Rule.
+- No Fake Completion Rule.
+- Scope Control Rule.
+- Token discipline for Team Mode and large tasks.

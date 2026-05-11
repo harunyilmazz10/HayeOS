@@ -28,6 +28,20 @@ Use these first. They are smart routers over the advanced HayeOS workflows.
 /haye:close   # update Obsidian memory and close the session
 ```
 
+### /haye:work Smart Modes
+
+`/haye:work "görev"` Smart Work Router olarak çalışır. Görevi `task_size`, `task_type`, `risk_level`, `affected_layers` ve `recommended_mode` alanlarıyla sınıflandırır.
+
+Modes:
+- Fast Mode: small + low risk işler için kısa planla direkt uygular.
+- Standard Mode: medium işler için plan + implementation + verification yapar.
+- Team Mode: large veya high risk işlerde uzman rollere böler; ayrı `/haye:team` komutu yoktur.
+- Full Architecture Mode: massive veya sıfırdan production-grade sistemlerde kodlamadan önce mimari plan çıkarır ve onay ister.
+
+HayeOS minimizes approval friction. It asks for approval at phase boundaries and risk gates, not after every small edit.
+
+No Fake Completion Rule: HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" demez. Build/test/lint/typecheck çalışmadıysa bunu açıkça yazar.
+
 Recommended daily flow:
 
 ```text
