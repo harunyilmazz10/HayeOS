@@ -46,6 +46,15 @@ Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "prod
 - Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
 - Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
 
+## Quality Preservation Rule
+- Token discipline must never reduce implementation quality.
+- Do not skip necessary code reading, tests, validation, security checks, error handling, or architecture reasoning just to save tokens.
+- Save tokens by reducing verbose chat output, repeated explanations, unnecessary repo scans, huge pasted logs, and oversized reports.
+- Detailed technical artifacts should be written to files when needed.
+- Chat should be concise, but code and project files must remain complete, maintainable, secure, and production-quality.
+- If there is a conflict between token saving and correctness, correctness wins.
+- If there is a conflict between speed and safety, safety wins.
+
 ## Auto Checkpoint Rule
 - `/haye:work` başladığında `04-tasks/active-task.md` oluştur/güncelle.
 - Büyük işlerde `05-sessions/latest-checkpoint.md` oluştur.

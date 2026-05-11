@@ -83,3 +83,12 @@ Doğrulama çıktısı olmadan tamamlandı/geçti/production-ready deme. Build/t
 - Büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun içerikleri chat'e değil dosyalara yaz.
 - Full Architecture Mode detaylarını `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` veya HayeOS vault dosyalarına taşı.
 - Chat'te kısa özet, dosya listesi, kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu kalsın.
+
+## Quality Preservation Rule
+- Token discipline must never reduce implementation quality.
+- Do not skip necessary code reading, tests, validation, security checks, error handling, or architecture reasoning just to save tokens.
+- Save tokens by reducing verbose chat output, repeated explanations, unnecessary repo scans, huge pasted logs, and oversized reports.
+- Detailed technical artifacts should be written to files when needed.
+- Chat should be concise, but code and project files must remain complete, maintainable, secure, and production-quality.
+- If token saving conflicts with correctness, correctness wins.
+- If speed conflicts with safety, safety wins.

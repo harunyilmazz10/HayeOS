@@ -39,6 +39,15 @@ This project uses Haye memory-first workflow.
 - Chat'te kısa özet, dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
 - `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
 
+## Quality Preservation Rule
+- Token discipline must never reduce implementation quality.
+- Do not skip necessary code reading, tests, validation, security checks, error handling, or architecture reasoning just to save tokens.
+- Save tokens by reducing verbose chat output, repeated explanations, unnecessary repo scans, huge pasted logs, and oversized reports.
+- Detailed technical artifacts should be written to files when needed.
+- Chat should be concise, but code and project files must remain complete, maintainable, secure, and production-quality.
+- If there is a conflict between token saving and correctness, correctness wins.
+- If there is a conflict between speed and safety, safety wins.
+
 ## Auto Checkpoint Rule
 - HayeOS uzun veya riskli işlerde `/haye:close` beklemeden checkpoint yazar.
 - Checkpoint dosyası: `05-sessions/latest-checkpoint.md`

@@ -44,6 +44,8 @@ No Fake Completion Rule: HayeOS doğrulama çıktısı olmadan "çalışıyor", 
 
 Output Budget Rule: large outputs go to files. HayeOS büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun çıktıları chat'e basmak yerine `docs/` veya HayeOS vault dosyalarına yazar; chat'te kısa özet, dosyalar, kararlar, doğrulama durumu ve sıradaki 3 adım kalır.
 
+Quality Preservation Rule: token discipline must never reduce implementation quality. HayeOS token tasarrufunu uzun chat, tekrar, gereksiz repo taraması ve dev logları azaltarak yapar; gerekli kod okuma, test, validation, security check, error handling ve mimari akıl yürütmeden ödün vermez. Doğruluk hızdan ve token tasarrufundan önce gelir.
+
 Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden `05-sessions/latest-checkpoint.md`, `04-tasks/active-task.md`, `current.md` ve `next.md` dosyalarını günceller. Claude Code API 400, output limit veya bağlantı hatasıyla kapanırsa yeni oturumda `/haye:start` latest checkpoint'i okur, kısa recovery özeti verir ve kullanıcı onayı olmadan kodlamaya devam etmez.
 
 Recommended daily flow:

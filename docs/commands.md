@@ -82,6 +82,27 @@ Detaylar için `docs/` veya HayeOS vault dosyaları kullanılır. Full Architect
 
 Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu verilir. Eğer çıktı çok uzayacaksa bölümlere ayrılır ve kullanıcıdan devam onayı istenir.
 
+# Quality Preservation Rule
+
+Token discipline must never reduce implementation quality.
+
+HayeOS token tasarrufu için şunları azaltır:
+- verbose chat output
+- repeated explanations
+- unnecessary repo scans
+- huge pasted logs
+- oversized reports
+
+HayeOS token tasarrufu için şunları atlamaz:
+- gerekli code reading
+- tests
+- validation
+- security checks
+- error handling
+- architecture reasoning
+
+Detailed technical artifacts gerektiğinde dosyalara yazılır. Chat concise kalır, ama code ve project files complete, maintainable, secure ve production-quality kalmalıdır. Token saving ile correctness çakışırsa correctness kazanır. Speed ile safety çakışırsa safety kazanır.
+
 # Auto Checkpoint Rule
 
 HayeOS `/haye:work`, `/haye:fix`, `/haye:ship` ve büyük işlemler sırasında `/haye:close` beklemeden checkpoint yazar.

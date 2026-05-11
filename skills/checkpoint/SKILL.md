@@ -94,3 +94,12 @@ Kaldığımız yerden devam edeyim mi?
 - Checkpoint and recovery outputs must be short.
 - Long details go to `latest-checkpoint.md`, `current.md`, `next.md`, or session summary files.
 - Chat shows only recovery summary, next 3 actions and approval question.
+
+## Quality Preservation Rule
+- Token discipline must never reduce implementation quality.
+- Do not skip necessary code reading, tests, validation, security checks, error handling, or architecture reasoning just to save tokens.
+- Save tokens by reducing verbose chat output, repeated explanations, unnecessary repo scans, huge pasted logs, and oversized reports.
+- Detailed technical artifacts should be written to files when needed.
+- Chat should be concise, but code and project files must remain complete, maintainable, secure, and production-quality.
+- If there is a conflict between token saving and correctness, correctness wins.
+- If there is a conflict between speed and safety, safety wins.
