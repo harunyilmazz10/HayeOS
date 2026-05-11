@@ -16,7 +16,7 @@ The simple command layer stays user-facing and routes to advanced skills instead
 
 Internal routing:
 
-- `/haye:start` -> `start`, `memory-start`, `project-map`, `token-audit`
+- `/haye:start` -> `start`, `memory-start`
 - `/haye:init-memory` -> `init-memory`
 - `/haye:work` -> `work`, `context-pack`, `feature`, `refactor`, `api-integration`, `migration`, `test-plan`, internal `team-mode`
 - `/haye:fix` -> `fix`, `bugfix`, `nextjs-doctor`, `prisma-doctor`, `docker-doctor`, `coolify-doctor`, `cloudflare-doctor`, `database-doctor`
@@ -181,7 +181,13 @@ Commands inspect `.hayeos.json` first:
 
 - `memoryPath` points to the Obsidian vault.
 - `sourcePath` points to the source tree for package/security checks.
-- `riskLevel`, `defaultWorkflow`, `sessionCloseRequired` and `rawReadPolicy` guide workflow strictness.
+- `defaultWorkflow` and `sessionCloseRequired` guide workflow strictness.
+
+## /haye:start Start Light Rule
+
+`/haye:start` must stay lightweight. It may check `.hayeos.json`, read `memoryPath`, read minimal memory files, show a short recovery summary and ask the next Turkish question.
+
+`/haye:start` must not use subagents, must not enter plan mode, must not scan the whole repository, must not perform codebase exploration, must not search test patterns, must not produce an automatic project plan and must not create `.hayeos.json` before user approval.
 
 Plugin root and project memory vault are different:
 
@@ -205,7 +211,7 @@ If `.hayeos.json` or the Obsidian vault is missing, `/haye:start` asks in Turkis
 Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
 ```
 
-If approved, Haye runs the `/haye:init-memory` flow. That flow tries `${CLAUDE_PLUGIN_ROOT}` based CLI commands first and falls back to creating `.hayeos.json` and the vault files directly when CLI execution is unavailable.
+If approved, Haye runs the `/haye:init-memory` flow. That flow writes a relative `memoryPath` using `./<project-name>_obs`, writes `sourcePath` as `"."`, never writes Windows absolute paths into JSON and never creates a generic `memory` folder.
 
 On Windows, manual fallback commands are:
 

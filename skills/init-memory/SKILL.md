@@ -64,6 +64,12 @@ If `${CLAUDE_PLUGIN_ROOT}` is unavailable, infer the plugin root from the loaded
 
 ## Project vault safety
 - `.hayeos.json` `memoryPath` is the only source of truth for project memory.
+- New init must write a relative `memoryPath`: `./<project-name>_obs`.
+- New init must write `sourcePath`: `"."`.
+- Do not write Windows absolute paths into `.hayeos.json`.
+- Do not write JSON backslash paths into `.hayeos.json`.
+- Do not create or use a generic `memory` directory.
+- Use the `<project-name>_obs` vault naming standard.
 - Never initialize project memory inside `CLAUDE_PLUGIN_ROOT`.
 - If `memoryPath` resolves to the plugin root or under the HayeOS plugin repo, stop and warn in Turkish: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
 

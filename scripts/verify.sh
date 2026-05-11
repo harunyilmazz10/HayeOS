@@ -56,6 +56,12 @@ grep -q "/haye:start" README.md || { echo "README missing /haye:start"; exit 1; 
 grep -q "otomatik oluştur" README.md || { echo "README missing automatic memory setup"; exit 1; }
 grep -q "Bu projede Haye hafızası bulunamadı" commands/start.md skills/start/SKILL.md || { echo "start command does not ask Turkish init question"; exit 1; }
 grep -q "/haye:init-memory" commands/start.md skills/start/SKILL.md || { echo "start command does not route missing config to init-memory"; exit 1; }
+grep -q "Start Light Rule" commands/start.md || { echo "commands/start.md missing Start Light Rule"; exit 1; }
+grep -q "Start Light Rule" skills/start/SKILL.md || { echo "skills/start missing Start Light Rule"; exit 1; }
+grep -q "must not use subagents" skills/start/SKILL.md || { echo "skills/start must forbid subagents"; exit 1; }
+grep -q "must not enter plan mode" skills/start/SKILL.md || { echo "skills/start must forbid plan mode"; exit 1; }
+grep -q "ask before creating \`.hayeos.json\`" skills/start/SKILL.md || { echo "skills/start must ask before creating .hayeos.json"; exit 1; }
+if grep -q "project-map\\|token-audit" commands/start.md skills/start/SKILL.md; then echo "start must not route to heavy workflows"; exit 1; fi
 grep -q "package.json" commands/secure.md skills/secure/SKILL.md || { echo "secure command missing package.json guidance"; exit 1; }
 grep -q "lockfile" commands/secure.md skills/secure/SKILL.md || { echo "secure command missing lockfile guidance"; exit 1; }
 grep -q "current.md" commands/close.md skills/close/SKILL.md || { echo "close command missing memory update guidance"; exit 1; }
@@ -114,12 +120,20 @@ if grep -q "force" skills/update/SKILL.md commands/update.md README.md docs/comm
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })
-(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && mkdir -p "$tmpdir/final-e2e-test" && cd "$tmpdir/final-e2e-test" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && test -f .hayeos.json && test -d final-e2e-test_obs && test -f final-e2e-test_obs/HAYE.md && test -f final-e2e-test_obs/index.md && test -f final-e2e-test_obs/current.md && test -f final-e2e-test_obs/next.md && test -f final-e2e-test_obs/changelog.md && test -f final-e2e-test_obs/health.md && test -d final-e2e-test_obs/04-tasks && test -d final-e2e-test_obs/05-sessions && test -d final-e2e-test_obs/09-context-packs && python3 - <<'PY'
+(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && mkdir -p "$tmpdir/ytshorts" && cd "$tmpdir/ytshorts" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && test -f .hayeos.json && test -d ytshorts_obs && test ! -d memory && test -f ytshorts_obs/HAYE.md && test -f ytshorts_obs/index.md && test -f ytshorts_obs/current.md && test -f ytshorts_obs/next.md && test -f ytshorts_obs/changelog.md && test -f ytshorts_obs/health.md && test -d ytshorts_obs/04-tasks && test -d ytshorts_obs/05-sessions && test -d ytshorts_obs/09-context-packs && python3 - <<'PY'
 import json
 from pathlib import Path
 cfg=json.loads(Path('.hayeos.json').read_text())
-assert cfg['project']=='final-e2e-test'
-assert cfg['memoryPath']=='./final-e2e-test_obs'
+assert cfg == {
+    'project': 'ytshorts',
+    'memoryPath': './ytshorts_obs',
+    'sourcePath': '.',
+    'defaultWorkflow': 'memory-first',
+    'sessionCloseRequired': True,
+}
+assert not cfg['memoryPath'].startswith(('C:', 'c:', '/', '\\\\'))
+assert '\\' not in cfg['memoryPath']
+assert cfg['memoryPath'] != './memory'
 assert cfg['sourcePath']=='.'
 PY
 )

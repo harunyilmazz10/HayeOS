@@ -19,6 +19,25 @@ Start simple session
 - Use when the current project has `.hayeos.json` or an Obsidian memory vault.
 - Use instead of loading a huge old conversation or scanning the entire repository.
 
+## Start Light Rule
+`/haye:start` must stay lightweight. It may only:
+- check whether `.hayeos.json` exists
+- read `memoryPath` when config exists
+- read minimal memory files: `HAYE.md`, `current.md`, `next.md`, optional `04-tasks/active-task.md`, optional `05-sessions/latest-checkpoint.md`
+- provide a short recovery summary when a checkpoint exists
+- ask which task to continue when no checkpoint exists
+- ask before creating `.hayeos.json`
+
+`/haye:start` must not:
+- must not use subagents
+- must not enter plan mode
+- must not scan the whole repository
+- must not perform codebase exploration
+- must not search test patterns
+- must not produce an automatic project plan
+- must not create `.hayeos.json` without explicit user approval
+- must not write project files before the user says yes to init
+
 ## Inputs to inspect first
 1. `.hayeos.json` if present.
 2. Memory root from `memoryPath`.
@@ -38,10 +57,11 @@ Start simple session
 
 ## Workflow
 1. Locate project config and memory path.
-   - If `.hayeos.json` is missing and no `*_obs` vault exists, ask in Turkish: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+   - If `.hayeos.json` is missing, ask before creating `.hayeos.json`. Ask only in Turkish: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+   - Do not create files until the user explicitly says yes.
    - If the user says yes, run `/haye:init-memory`. Do not ask the user to find `bin/haye`, bash or Python paths.
    - If the CLI path fails, use the manual fallback from `skills/init-memory/SKILL.md`.
-   - After successful creation, automatically continue with `memory-start`.
+   - After successful creation, run only the lightweight `memory-start` read.
    - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
 3. Apply Safe Resume Rule:
@@ -101,8 +121,9 @@ Never start coding automatically from `/haye:start` when a checkpoint exists.
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## Team/Subagent Rule
+Subagent and Team Mode behavior is only allowed inside `/haye:work` for large or risky tasks. `/haye:start` must not use subagents, must not enter plan mode and must not trigger Team Mode.
+
 ## Smart routing
-This simplified command may route internally to:
+This simplified command may route internally only to:
 - `memory-start`
-- `project-map`
-- `token-audit`

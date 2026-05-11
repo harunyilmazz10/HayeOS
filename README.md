@@ -131,7 +131,7 @@ If the project does not have `.hayeos.json` or an Obsidian vault yet, `/haye:sta
 Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
 ```
 
-When you approve, Haye automatically creates `.hayeos.json` and the `<project-name>_obs` vault, then continues with memory-start. You can also run the setup directly:
+`/haye:start` is intentionally light: it does not use subagents, does not enter plan mode, does not scan the whole repository and does not create `.hayeos.json` until you approve. When you approve, Haye creates `.hayeos.json` and the `<project-name>_obs` vault, then performs only the lightweight memory-start read. You can also run the setup directly:
 
 ```text
 /haye:init-memory
@@ -153,11 +153,8 @@ At the root of your project, create or let Haye create `.hayeos.json`:
   "project": "Arb21",
   "memoryPath": "./Arb21_obs",
   "sourcePath": ".",
-  "stack": ["Next.js", "TypeScript", "Postgres", "Prisma", "Coolify", "Cloudflare"],
-  "riskLevel": "high",
   "defaultWorkflow": "memory-first",
-  "sessionCloseRequired": true,
-  "rawReadPolicy": "explicit-only"
+  "sessionCloseRequired": true
 }
 ```
 

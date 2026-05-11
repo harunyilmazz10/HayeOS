@@ -49,7 +49,7 @@ def write_if_missing(p, content):
 def init_config():
     p=config_path()
     if p.exists(): print('.hayeos.json already exists'); return
-    cfg={'project':cwd().name,'memoryPath':f'./{cwd().name}_obs','sourcePath':'.','stack':[],'riskLevel':'medium','defaultWorkflow':'memory-first','sessionCloseRequired':True,'rawReadPolicy':'explicit-only'}
+    cfg={'project':cwd().name,'memoryPath':f'./{cwd().name}_obs','sourcePath':'.','defaultWorkflow':'memory-first','sessionCloseRequired':True}
     p.write_text(json.dumps(cfg,indent=2), encoding='utf-8')
     print('created .hayeos.json')
 

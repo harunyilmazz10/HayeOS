@@ -10,6 +10,20 @@ Never write project memory into the plugin repository. Context packs belong in `
 
 Generated vaults must contain useful starter content, not empty placeholders:
 
+New project init must create `.hayeos.json` with a relative vault path:
+
+```json
+{
+  "project": "<project-name>",
+  "memoryPath": "./<project-name>_obs",
+  "sourcePath": ".",
+  "defaultWorkflow": "memory-first",
+  "sessionCloseRequired": true
+}
+```
+
+Do not write Windows absolute paths or JSON backslash paths into `.hayeos.json`. Do not create a generic `memory` directory; use `<project-name>_obs`.
+
 - `HAYE.md` records operating rules, simple commands, raw-read policy and dependency security policy.
 - `index.md` links core files, active task, dependency checklist, risk log and safe-version decisions.
 - `current.md` records project state, configured source path and constraints.
