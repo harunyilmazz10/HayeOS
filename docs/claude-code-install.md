@@ -36,6 +36,14 @@ Plugin root and project memory vault are different. The installed HayeOS directo
 
 If Claude Code crashes before `/haye:close`, open a new session and run `/haye:start`. HayeOS reads `05-sessions/latest-checkpoint.md`, shows a short recovery summary, and waits for your approval before continuing.
 
+To update an installed HayeOS plugin from inside Claude Code, run:
+
+```text
+/haye:update
+```
+
+It updates the plugin repo with a safe fast-forward pull, stops if local changes exist, validates the plugin, and then recommends restarting Claude Code.
+
 The marketplace manifest lives at `.claude-plugin/marketplace.json`, and the `haye` plugin source points to the repository root with `./`.
 
 ## C. GitHub marketplace install

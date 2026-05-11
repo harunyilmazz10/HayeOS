@@ -26,6 +26,7 @@ Use these first. They are smart routers over the advanced HayeOS workflows.
 /haye:secure  # security, dependency and safe version checks
 /haye:ship    # deploy/release readiness
 /haye:close   # update Obsidian memory and close the session
+/haye:update  # update the installed HayeOS plugin safely
 ```
 
 ### /haye:work Smart Modes
@@ -50,6 +51,8 @@ Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden 
 
 Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root. All project memory is stored under the current project's `.hayeos.json` `memoryPath`; HayeOS must not write context packs, checkpoints, `current.md`, `next.md` or `changelog.md` into the plugin repository.
 
+`/haye:update` updates the installed HayeOS plugin repo from GitHub. It stops when local changes exist, does not commit or push, validates the plugin after updating, and recommends restarting Claude Code.
+
 Recommended daily flow:
 
 ```text
@@ -58,6 +61,7 @@ Recommended daily flow:
 /haye:secure
 /haye:ship
 /haye:close
+/haye:update
 ```
 
 ## Advanced commands

@@ -24,15 +24,15 @@ for f in $(find skills -name SKILL.md); do
   sed -n '1,8p' "$f" | grep -q '^name:' || { echo "missing skill name $f"; exit 1; }
   sed -n '1,8p' "$f" | grep -q '^description:' || { echo "missing skill description $f"; exit 1; }
 done
-for cmd in start work fix secure ship close init-memory; do
+for cmd in start work fix secure ship close init-memory update; do
   test -f "commands/$cmd.md" || { echo "missing command: $cmd"; exit 1; }
   grep -q "skills/$cmd/SKILL.md" "commands/$cmd.md" || { echo "command does not route to skill: $cmd"; exit 1; }
   sed -n '1,8p' "commands/$cmd.md" | grep -q '^description:' || { echo "command missing description: $cmd"; exit 1; }
 done
-for cmd in start work fix secure ship close init-memory; do
+for cmd in start work fix secure ship close init-memory update; do
   grep -q "User Response Language Rule" "commands/$cmd.md" || { echo "commands/$cmd.md missing language rule"; exit 1; }
 done
-for skill in start work fix secure ship close init-memory memory-start session-close context-pack dependency-security react-nextjs-security; do
+for skill in start work fix secure ship close init-memory update memory-start session-close context-pack dependency-security react-nextjs-security; do
   grep -q "User Response Language Rule" "skills/$skill/SKILL.md" || { echo "skills/$skill/SKILL.md missing language rule"; exit 1; }
 done
 grep -q "User Response Language Rule" commands/init-memory.md skills/init-memory/SKILL.md || { echo "init-memory missing language rule"; exit 1; }
@@ -92,6 +92,11 @@ grep -q "Plugin root" skills/start/SKILL.md || { echo "start missing Plugin root
 grep -q "Memory vault" skills/start/SKILL.md || { echo "start missing Memory vault distinction"; exit 1; }
 grep -q "Plugin root and project memory vault are different" docs/obsidian-vault-standard.md || { echo "vault docs missing plugin/project distinction"; exit 1; }
 grep -q "Plugin root vs project vault" skills/init-memory/templates/HAYE.md || { echo "HAYE template missing plugin/project distinction"; exit 1; }
+test -f commands/update.md || { echo "missing commands/update.md"; exit 1; }
+test -f skills/update/SKILL.md || { echo "missing skills/update/SKILL.md"; exit 1; }
+grep -q "git pull --ff-only" skills/update/SKILL.md || { echo "update skill missing ff-only pull"; exit 1; }
+if grep -q "reset --hard" skills/update/SKILL.md; then echo "update skill must not mention reset --hard"; exit 1; fi
+grep -q "/haye:update" docs/commands.md || { echo "docs/commands missing /haye:update"; exit 1; }
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })

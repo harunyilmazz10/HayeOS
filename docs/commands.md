@@ -11,6 +11,7 @@ The simple command layer stays user-facing and routes to advanced skills instead
 /haye:secure
 /haye:ship
 /haye:close
+/haye:update
 ```
 
 Internal routing:
@@ -22,6 +23,20 @@ Internal routing:
 - `/haye:secure` -> `secure`, `security`, `dependency-security`, `dependency-audit`, `version-policy`, `react-nextjs-security`, `secrets-audit`, `auth-audit`, `exposed-port-audit`
 - `/haye:ship` -> `ship`, `deploy`, `review`, `security`, `dependency-security`, `cloudflare-doctor`, `coolify-doctor`, `docker-doctor`
 - `/haye:close` -> `close`, `session-close`, `memory-lint`, `token-audit`
+- `/haye:update` -> `update`
+
+# /haye:update
+
+HayeOS plugin'ini GitHub'dan günceller. Plugin root'u `CLAUDE_PLUGIN_ROOT`, marketplace install path veya mevcut plugin path bilgisinden bulur.
+
+Davranış:
+- `.git` yoksa durur ve yeniden clone gerektiğini Türkçe açıklar.
+- `origin` URL beklenen repo değilse kullanıcıya gösterir ve onay almadan değiştirmez.
+- Local değişiklik varsa durur; otomatik pull yapmaz ve değişiklikleri göstermeyi teklif eder.
+- Temiz repo'da `git fetch origin` ve `git pull --ff-only origin main` çalıştırır.
+- Güncelleme sonrası `claude plugin validate .`, varsa `./scripts/verify.sh`, mümkünse `bin/haye --help` çalıştırır.
+- Commit/push yapmaz, project vault dosyalarına dokunmaz, context pack veya checkpoint üretmez.
+- Güncelleme tamamlandıysa Claude Code'u kapatıp yeniden açmayı önerir.
 
 # /haye:work Smart Modes
 
