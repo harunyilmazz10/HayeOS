@@ -27,6 +27,6 @@ Update the relevant memory files explicitly:
 - `05-sessions/` for the session handoff when useful.
 
 ## Checkpoint finalization
-If `05-sessions/latest-checkpoint.md` exists, read it, fold it into the session summary, update `changelog.md`, `current.md`, `next.md`, and `active-task.md`, then mark the checkpoint as `closed`. Do not delete it. Chat output stays short: yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım, memory updated files.
+If `05-sessions/latest-checkpoint.md` exists, read it, fold it into the session summary, update `changelog.md`, `current.md`, `next.md`, and `active-task.md`, then mark the checkpoint as `closed`. Do not delete it. Chat output stays short/kısa: yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım, memory updated files.
 
 All close/session memory updates must target the resolved `.hayeos.json` `memoryPath`. Never write project memory into `CLAUDE_PLUGIN_ROOT` or the HayeOS plugin repository.

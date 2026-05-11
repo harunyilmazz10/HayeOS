@@ -41,7 +41,7 @@ Run from plugin root.
    - If origin is missing or different, show the current value and ask before changing anything.
 4. Check branch:
    - `git branch --show-current`
-   - If branch is not `main`, report it and behave conservatively. Do not force branch changes.
+   - If branch is not `main`, report it and behave conservatively. Do not change branches automatically.
 5. Check local changes:
    - `git status --porcelain`
    - If output is not empty, do not pull. Ask in Turkish: "HayeOS klasöründe local değişiklikler var. Güncellemeden önce bunları çözmelisin. Değişiklikleri göstereyim mi?"

@@ -236,10 +236,10 @@ Phase sonunda rapor:
 HayeOS `/haye:work` sırasında `/haye:close` beklemeden checkpoint yazar.
 
 Checkpoint file locations:
-- `<vault>/05-sessions/latest-checkpoint.md`
-- `<vault>/04-tasks/active-task.md`
-- `<vault>/current.md`
-- `<vault>/next.md`
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
+- `<resolved memoryPath>/04-tasks/active-task.md`
+- `<resolved memoryPath>/current.md`
+- `<resolved memoryPath>/next.md`
 
 Checkpoint şu durumlarda mutlaka yazılır:
 1. phase başında

@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT_DIR="$(pwd)"
+
+check_plugin_root_clean() {
+  for path in .hayeos.json 09-context-packs 05-sessions/latest-checkpoint.md 04-tasks/active-task.md current.md next.md; do
+    test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
+  done
+  if find "$ROOT_DIR" -maxdepth 1 -type d -name '*_obs' | grep -q .; then
+    echo "plugin root polluted with project vault directory"; exit 1
+  fi
+}
+
+check_plugin_root_clean
 python3 -m json.tool .claude-plugin/plugin.json >/dev/null
 for key in name version description commands skills; do
   grep -q "\"$key\"" .claude-plugin/plugin.json || { echo "plugin manifest missing $key"; exit 1; }
@@ -88,6 +99,8 @@ grep -q "Quality Preservation Rule" skills/init-memory/templates/HAYE.md || { ec
 grep -q "memoryPath" skills/context-pack/SKILL.md || { echo "context-pack missing memoryPath rule"; exit 1; }
 grep -q "Never write project context packs to \`CLAUDE_PLUGIN_ROOT\`" skills/context-pack/SKILL.md || { echo "context-pack missing plugin root guard"; exit 1; }
 grep -q "memoryPath" skills/checkpoint/SKILL.md || { echo "checkpoint missing memoryPath rule"; exit 1; }
+grep -q "<resolved memoryPath>/05-sessions/latest-checkpoint.md" skills/checkpoint/SKILL.md skills/work/SKILL.md docs/commands.md docs/obsidian-vault-standard.md || { echo "missing resolved memoryPath checkpoint target"; exit 1; }
+grep -q "<resolved memoryPath>/04-tasks/active-task.md" skills/checkpoint/SKILL.md skills/work/SKILL.md || { echo "missing resolved memoryPath active task target"; exit 1; }
 grep -q "Plugin root" skills/start/SKILL.md || { echo "start missing Plugin root distinction"; exit 1; }
 grep -q "Memory vault" skills/start/SKILL.md || { echo "start missing Memory vault distinction"; exit 1; }
 grep -q "Plugin root and project memory vault are different" docs/obsidian-vault-standard.md || { echo "vault docs missing plugin/project distinction"; exit 1; }
@@ -97,9 +110,21 @@ test -f skills/update/SKILL.md || { echo "missing skills/update/SKILL.md"; exit 
 grep -q "git pull --ff-only" skills/update/SKILL.md || { echo "update skill missing ff-only pull"; exit 1; }
 if grep -q "reset --hard" skills/update/SKILL.md; then echo "update skill must not mention reset --hard"; exit 1; fi
 grep -q "/haye:update" docs/commands.md || { echo "docs/commands missing /haye:update"; exit 1; }
+if grep -q "force" skills/update/SKILL.md commands/update.md README.md docs/commands.md; then echo "update docs must not recommend force behavior"; exit 1; fi
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })
+(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && mkdir -p "$tmpdir/final-e2e-test" && cd "$tmpdir/final-e2e-test" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && test -f .hayeos.json && test -d final-e2e-test_obs && test -f final-e2e-test_obs/HAYE.md && test -f final-e2e-test_obs/index.md && test -f final-e2e-test_obs/current.md && test -f final-e2e-test_obs/next.md && test -f final-e2e-test_obs/changelog.md && test -f final-e2e-test_obs/health.md && test -d final-e2e-test_obs/04-tasks && test -d final-e2e-test_obs/05-sessions && test -d final-e2e-test_obs/09-context-packs && python3 - <<'PY'
+import json
+from pathlib import Path
+cfg=json.loads(Path('.hayeos.json').read_text())
+assert cfg['project']=='final-e2e-test'
+assert cfg['memoryPath']=='./final-e2e-test_obs'
+assert cfg['sourcePath']=='.'
+PY
+)
+check_plugin_root_clean
 (cd examples/sample-project && ../../bin/haye deps-audit || true)
 (cd examples/sample-project && ../../bin/haye react-nextjs-audit || true)
+check_plugin_root_clean
 echo "verification OK"
