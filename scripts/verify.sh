@@ -12,6 +12,12 @@ check_plugin_root_clean() {
 }
 
 check_plugin_root_clean
+bad_project="yt""shorts"
+bad_vault="${bad_project}_obs"
+bad_path='C:\Users\hayed\Desktop\Projeler\'"$bad_project"
+if rg -F "$bad_project" . >/dev/null || rg -F "$bad_vault" . >/dev/null || rg -F "$bad_path" . >/dev/null; then
+  echo "project-specific hardcoded name found"; exit 1
+fi
 python3 -m json.tool .claude-plugin/plugin.json >/dev/null
 for key in name version description commands skills; do
   grep -q "\"$key\"" .claude-plugin/plugin.json || { echo "plugin manifest missing $key"; exit 1; }
@@ -120,13 +126,15 @@ if grep -q "force" skills/update/SKILL.md commands/update.md README.md docs/comm
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })
-(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && mkdir -p "$tmpdir/ytshorts" && cd "$tmpdir/ytshorts" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && test -f .hayeos.json && test -d ytshorts_obs && test ! -d memory && test -f ytshorts_obs/HAYE.md && test -f ytshorts_obs/index.md && test -f ytshorts_obs/current.md && test -f ytshorts_obs/next.md && test -f ytshorts_obs/changelog.md && test -f ytshorts_obs/health.md && test -d ytshorts_obs/04-tasks && test -d ytshorts_obs/05-sessions && test -d ytshorts_obs/09-context-packs && python3 - <<'PY'
+(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && project_name=final-start-test && mkdir -p "$tmpdir/$project_name" && cd "$tmpdir/$project_name" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && vault="${project_name}_obs" && test -f .hayeos.json && test -d "$vault" && test ! -d memory && test -f "$vault/HAYE.md" && test -f "$vault/index.md" && test -f "$vault/current.md" && test -f "$vault/next.md" && test -f "$vault/changelog.md" && test -f "$vault/health.md" && test -d "$vault/04-tasks" && test -d "$vault/05-sessions" && test -d "$vault/09-context-packs" && python3 - <<'PY'
 import json
+import os
 from pathlib import Path
 cfg=json.loads(Path('.hayeos.json').read_text())
+project_name=Path.cwd().name
 assert cfg == {
-    'project': 'ytshorts',
-    'memoryPath': './ytshorts_obs',
+    'project': project_name,
+    'memoryPath': f'./{project_name}_obs',
     'sourcePath': '.',
     'defaultWorkflow': 'memory-first',
     'sessionCloseRequired': True,
