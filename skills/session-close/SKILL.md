@@ -51,6 +51,13 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 6. Verify with real commands when possible.
 7. Update memory through `/haye:close` or session-close rules.
 
+## Checkpoint finalization
+- `05-sessions/latest-checkpoint.md` varsa oku.
+- Session summary dosyasına checkpoint'in current task, phase, completed steps, changed files, verification status, blockers, risks ve next 3 actions alanlarını taşı.
+- `latest-checkpoint.md` dosyasını silme; `Status` alanını `closed` yap.
+- `active-task.md` dosyasını kapatılan göreve göre temizle veya sıradaki görevle güncelle.
+- Chat'te uzun session log basma; detayları memory dosyalarına yaz.
+
 ## Output format
 - What I found
 - What I will do / did

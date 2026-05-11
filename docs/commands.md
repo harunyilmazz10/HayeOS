@@ -82,6 +82,42 @@ Detaylar için `docs/` veya HayeOS vault dosyaları kullanılır. Full Architect
 
 Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu verilir. Eğer çıktı çok uzayacaksa bölümlere ayrılır ve kullanıcıdan devam onayı istenir.
 
+# Auto Checkpoint Rule
+
+HayeOS `/haye:work`, `/haye:fix`, `/haye:ship` ve büyük işlemler sırasında `/haye:close` beklemeden checkpoint yazar.
+
+Checkpoint dosyaları:
+- `05-sessions/latest-checkpoint.md`
+- `04-tasks/active-task.md`
+- `current.md`
+- `next.md`
+
+Checkpoint phase başında/sonunda, 5+ dosya değiştiğinde, dependency/security/deploy işleminden önce, docker/build/test/lint/typecheck öncesi/sonrası, hata alındığında, büyük kod üretimi bittiğinde, output çok uzayacaksa ve riskli işlemden önce yazılır.
+
+Chat'e uzun checkpoint basılmaz; sadece `Checkpoint güncellendi: 05-sessions/latest-checkpoint.md` denir.
+
+# Safe Resume Rule
+
+`/haye:start` `.hayeos.json` dosyasını okur, vault path'ini bulur ve `HAYE.md`, `index.md`, `current.md`, `next.md`, varsa `04-tasks/active-task.md` ve varsa `05-sessions/latest-checkpoint.md` dosyalarını okur.
+
+Checkpoint varsa kısa recovery özeti verir ve otomatik kodlamaya başlamaz. Türkçe onay ister:
+
+```text
+Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?
+```
+
+# What happens if Claude Code crashes?
+
+`/haye:close` çalıştırılamadan oturum giderse sorun değil. Yeni oturumda `/haye:start` checkpoint'i okur, kısa recovery özeti verir ve kullanıcı "evet", "devam et" veya "kaldığın yerden devam" demeden implementation'a devam etmez.
+
+# How /haye:start resumes safely
+
+Recovery summary kısa tutulur: current task, current phase, last successful step, changed files, current blocker, next 3 actions ve recommended next mode.
+
+# How /haye:close finalizes checkpoint
+
+`/haye:close` `latest-checkpoint.md` dosyasını okur, session summary'ye taşır, `changelog.md`, `current.md`, `next.md`, `health.md` ve `active-task.md` dosyalarını günceller. Checkpoint silinmez; `closed` olarak işaretlenir veya son kapanış durumu yazılır.
+
 # When HayeOS asks for approval
 
 - destructive işlem

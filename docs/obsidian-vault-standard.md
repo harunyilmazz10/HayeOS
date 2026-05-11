@@ -22,5 +22,19 @@ The `08-raw/` area is for explicit ingestion only. Normal start/work commands sh
 - Smart Work Router summary for `/haye:work`.
 - Approval Friction Rule.
 - No Fake Completion Rule.
+- Output Budget Rule.
+- Auto Checkpoint Rule.
+- Safe Resume Rule.
 - Scope Control Rule.
 - Token discipline for Team Mode and large tasks.
+
+## Checkpoint files
+
+Long or risky sessions should maintain:
+
+- `05-sessions/latest-checkpoint.md`
+- `04-tasks/active-task.md`
+- `current.md`
+- `next.md`
+
+`latest-checkpoint.md` preserves current task, phase, last successful step, changed files, commands run, verification status, blockers, risks and next 3 actions. `/haye:start` uses it for Safe Resume and must not continue implementation without user approval.

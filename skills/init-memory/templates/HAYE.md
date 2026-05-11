@@ -39,6 +39,17 @@ This project uses Haye memory-first workflow.
 - Chat'te kısa özet, dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
 - `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
 
+## Auto Checkpoint Rule
+- HayeOS uzun veya riskli işlerde `/haye:close` beklemeden checkpoint yazar.
+- Checkpoint dosyası: `05-sessions/latest-checkpoint.md`
+- Active task dosyası: `04-tasks/active-task.md`
+- Checkpoint detayları chat'e basılmaz; dosyaya yazılır.
+
+## Safe Resume Rule
+- `/haye:start` latest checkpoint'i okur.
+- Kısa recovery özeti verir.
+- Kullanıcıdan onay almadan implementation'a devam etmez.
+
 ## Scope Control Rule
 - Stay inside the approved phase and scope.
 - If extra scope is needed, ask: "Bu işlem mevcut scope dışında. Ekleyeyim mi?"

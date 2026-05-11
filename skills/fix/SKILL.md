@@ -45,6 +45,15 @@ Smart router for debugging
 6. Verify with real commands when possible.
 7. Update memory through `/haye:close` or session-close rules.
 
+## Auto Checkpoint Rule
+Bug/debug sırasında:
+- hata görüldüğünde `05-sessions/latest-checkpoint.md` yaz
+- root-cause denemelerini checkpoint'e kısa yaz
+- son başarılı komutu kaydet
+- current blocker alanını güncelle
+- çözüm bulunursa verification status yaz
+- `/haye:close` beklemeden latest checkpoint güncel kalsın
+
 ## Output format
 - What I found
 - What I will do / did

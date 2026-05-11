@@ -17,3 +17,6 @@ Route to advanced workflows when needed:
 - `nextjs-doctor`, `prisma-doctor`, `docker-doctor`, `coolify-doctor`, `cloudflare-doctor` or `database-doctor` for platform-specific failures.
 
 Capture symptoms, identify likely cause, make the smallest safe fix, and report verification output or the limitation.
+
+## Auto Checkpoint Rule
+Bug/debug sırasında hata görüldüğünde `05-sessions/latest-checkpoint.md` güncelle. Root-cause denemelerini, son başarılı komutu, current blocker alanını ve verification status bilgisini kısa olarak checkpoint'e yaz. Chat'e uzun log basma.

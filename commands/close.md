@@ -25,3 +25,6 @@ Update the relevant memory files explicitly:
 - `changelog.md` for completed changes.
 - `health.md` for verification status.
 - `05-sessions/` for the session handoff when useful.
+
+## Checkpoint finalization
+If `05-sessions/latest-checkpoint.md` exists, read it, fold it into the session summary, update `changelog.md`, `current.md`, `next.md`, and `active-task.md`, then mark the checkpoint as `closed`. Do not delete it. Chat output stays short: yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım, memory updated files.

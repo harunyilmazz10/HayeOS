@@ -63,6 +63,15 @@ grep -q "No Fake Completion Rule" skills/work/SKILL.md || { echo "skills/work mi
 grep -q "Output Budget Rule" skills/work/SKILL.md || { echo "skills/work missing Output Budget Rule"; exit 1; }
 grep -q "token-economist" skills/work/SKILL.md || { echo "skills/work missing token-economist"; exit 1; }
 test -f skills/team-mode/SKILL.md || { echo "missing internal team-mode skill"; exit 1; }
+test -f skills/checkpoint/SKILL.md || { echo "missing checkpoint skill"; exit 1; }
+test -f skills/checkpoint/templates/latest-checkpoint.md || { echo "missing latest checkpoint template"; exit 1; }
+grep -q "Auto Checkpoint Rule" skills/work/SKILL.md || { echo "skills/work missing Auto Checkpoint Rule"; exit 1; }
+grep -q "Safe Resume Rule" skills/start/SKILL.md || { echo "skills/start missing Safe Resume Rule"; exit 1; }
+grep -q "latest-checkpoint.md" skills/start/SKILL.md || { echo "skills/start missing latest-checkpoint.md"; exit 1; }
+grep -q "latest-checkpoint.md" skills/close/SKILL.md || { echo "skills/close missing latest-checkpoint.md"; exit 1; }
+grep -q "Auto Checkpoint Rule" docs/commands.md || { echo "docs/commands missing Auto Checkpoint Rule"; exit 1; }
+grep -q "Safe Resume Rule" docs/commands.md || { echo "docs/commands missing Safe Resume Rule"; exit 1; }
+grep -q "Auto Checkpoint Rule" skills/init-memory/templates/HAYE.md || { echo "HAYE template missing Auto Checkpoint Rule"; exit 1; }
 grep -q "Fast Mode" docs/commands.md || { echo "docs/commands missing Fast Mode"; exit 1; }
 grep -q "Standard Mode" docs/commands.md || { echo "docs/commands missing Standard Mode"; exit 1; }
 grep -q "Team Mode" docs/commands.md || { echo "docs/commands missing Team Mode"; exit 1; }

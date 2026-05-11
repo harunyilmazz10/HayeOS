@@ -32,6 +32,8 @@ Expected commands after install:
 
 In normal use, you do not need to run `bin/haye` manually. Open Claude Code in a project and use `/haye:start`. If Haye memory is missing, `/haye:start` offers to create it automatically; `/haye:init-memory` can also be run directly.
 
+If Claude Code crashes before `/haye:close`, open a new session and run `/haye:start`. HayeOS reads `05-sessions/latest-checkpoint.md`, shows a short recovery summary, and waits for your approval before continuing.
+
 The marketplace manifest lives at `.claude-plugin/marketplace.json`, and the `haye` plugin source points to the repository root with `./`.
 
 ## C. GitHub marketplace install

@@ -46,4 +46,13 @@ Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "prod
 - Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
 - Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
 
+## Auto Checkpoint Rule
+- `/haye:work` başladığında `04-tasks/active-task.md` oluştur/güncelle.
+- Büyük işlerde `05-sessions/latest-checkpoint.md` oluştur.
+- Her phase başında ve sonunda checkpoint yaz.
+- 5+ dosya değiştiyse checkpoint yaz.
+- Hata alınırsa checkpoint yaz.
+- Dependency/security/deploy veya riskli işlem öncesinde checkpoint yaz.
+- Checkpoint detayını dosyaya yaz; chat'te sadece "Checkpoint güncellendi: 05-sessions/latest-checkpoint.md" de.
+
 Respect `.hayeos.json`, keep scope narrow, verify with real commands, and leave memory updates for `/haye:close`.

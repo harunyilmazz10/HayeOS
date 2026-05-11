@@ -51,6 +51,14 @@ Close session and update memory
    - `05-sessions/` for a dated session handoff when useful.
    - `12-risks/` and `02-decisions/` when security or dependency decisions changed.
 
+## Checkpoint finalization
+- `05-sessions/latest-checkpoint.md` varsa oku.
+- Checkpoint içeriğini session summary'ye taşı.
+- `changelog.md`, `current.md`, `next.md`, `health.md` dosyalarını güncelle.
+- `04-tasks/active-task.md` dosyasını temizle veya sıradaki göreve güncelle.
+- `latest-checkpoint.md` dosyasını silme; `Status` alanını `closed` olarak işaretle veya son kapanış durumunu yaz.
+- Chat'e uzun log basma; sadece yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım ve memory updated files ver.
+
 ## Output format
 - What I found
 - What I will do / did

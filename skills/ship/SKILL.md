@@ -45,6 +45,15 @@ Smart router for release and deploy readiness
 6. Verify with real commands when possible.
 7. Update memory through `/haye:close` or session-close rules.
 
+## Auto Checkpoint Rule
+Deploy/release sırasında:
+- pre-ship checkpoint yaz
+- build/test/deploy öncesi checkpoint yaz
+- build/test/deploy sonrası checkpoint yaz
+- failure olursa current blocker yaz
+- rollback gerekiyorsa next 3 actions içine yaz
+- uzun deploy loglarını chat'e basma; checkpoint ve `health.md` içine özetle
+
 ## Output format
 - What I found
 - What I will do / did

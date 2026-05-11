@@ -44,11 +44,39 @@ Start simple session
    - After successful creation, automatically continue with `memory-start`.
    - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+3. Apply Safe Resume Rule:
+   - Read `05-sessions/latest-checkpoint.md` if present.
+   - If it exists, provide a short `HayeOS Recovery Summary`.
+   - Do not automatically continue implementation.
+   - Ask in Turkish: "Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?"
+   - Continue only after explicit user approval.
+4. If no `latest-checkpoint.md` exists, show a short start summary from `next.md` and ask: "Hangi görevle devam edelim?"
+
+## Safe Resume Rule
+`/haye:start` reads `.hayeos.json`, locates the vault, then reads:
+- `HAYE.md`
+- `index.md`
+- `current.md`
+- `next.md`
+- `04-tasks/active-task.md` when present
+- `05-sessions/latest-checkpoint.md` when present
+
+Recovery summary format:
+```markdown
+# HayeOS Recovery Summary
+
+## Current Task
+## Current Phase
+## Last Successful Step
+## Changed Files
+## Current Blocker
+## Next 3 Actions
+## Recommended Next Mode
+
+Kaldığımız yerden devam edeyim mi?
+```
+
+Never start coding automatically from `/haye:start` when a checkpoint exists.
 
 ## Output format
 - What I found

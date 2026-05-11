@@ -217,6 +217,43 @@ Phase sonunda rapor:
 - Full Architecture Mode detayları `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazmalı; chat'e tamamını basmamalı.
 - `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
 
+## Auto Checkpoint Rule
+HayeOS `/haye:work` sırasında `/haye:close` beklemeden checkpoint yazar.
+
+Checkpoint file locations:
+- `<vault>/05-sessions/latest-checkpoint.md`
+- `<vault>/04-tasks/active-task.md`
+- `<vault>/current.md`
+- `<vault>/next.md`
+
+Checkpoint şu durumlarda mutlaka yazılır:
+1. phase başında
+2. phase sonunda
+3. 5 veya daha fazla dosya oluşturulduğunda/değiştirildiğinde
+4. dependency/security/deploy işlemi öncesinde
+5. docker/build/test/lint/typecheck komutundan önce ve sonra
+6. hata alındığında
+7. büyük kod üretimi bittikten sonra
+8. output çok uzayacaksa chat'e basmadan önce
+9. riskli işlemden önce
+10. kullanıcı uzun/büyük proje promptu verdiyse ilk plan tamamlandığında
+
+Checkpoint içeriği:
+- current task
+- current phase
+- last successful step
+- completed steps
+- files created or changed
+- commands run
+- verification status
+- current blocker
+- risks
+- next 3 actions
+- notes for next session
+
+Chat'e uzun checkpoint basma. Sadece kısa bilgi ver:
+`Checkpoint güncellendi: 05-sessions/latest-checkpoint.md`
+
 ## Token discipline
 Büyük işlerde:
 - önce HayeOS memory kullan
