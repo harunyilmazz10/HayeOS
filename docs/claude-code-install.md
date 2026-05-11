@@ -5,7 +5,7 @@
 Use this when editing or validating the local checkout:
 
 ```bash
-claude --plugin-dir /Users/haye/Desktop/HayeeOS
+claude --plugin-dir <hayeos-plugin-root>
 ```
 
 ## B. Permanent local marketplace install
@@ -14,7 +14,7 @@ Use this when you want Haye commands available in normal `claude` sessions witho
 
 ```text
 claude
-/plugin marketplace add /Users/haye/Desktop/HayeeOS
+/plugin marketplace add <hayeos-plugin-root>
 /plugin install haye@haye-marketplace
 ```
 
@@ -61,13 +61,13 @@ claude
 Manual CLI use should be rare. If you need it on Windows, do not run `bin/haye` through bash. Use:
 
 ```text
-C:\Users\hayed\Desktop\HayeOS\bin\haye.cmd init
+C:\Path\To\HayeOS\bin\haye.cmd init
 ```
 
 or:
 
 ```text
-powershell -ExecutionPolicy Bypass -File C:\Users\hayed\Desktop\HayeOS\bin\haye.ps1 init
+powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
 ```
 
 If your Claude Code build requires GitHub shorthand instead of a full URL, use:

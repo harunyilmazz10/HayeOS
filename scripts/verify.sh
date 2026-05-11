@@ -14,9 +14,15 @@ check_plugin_root_clean() {
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"
-bad_path='C:\Users\hayed\Desktop\Projeler\'"$bad_project"
-if rg -F "$bad_project" . >/dev/null || rg -F "$bad_vault" . >/dev/null || rg -F "$bad_path" . >/dev/null; then
+bad_win_user='C:\Us'"ers\hayed"
+bad_mac_user='/Us'"ers/haye"
+bad_proj_desktop='Desktop\'"Projeler"
+bad_desktop_hayeos='Desktop/'"HayeOS"
+if rg -F "$bad_project" . >/dev/null || rg -F "$bad_vault" . >/dev/null; then
   echo "project-specific hardcoded name found"; exit 1
+fi
+if rg -F "$bad_win_user" . >/dev/null || rg -F "$bad_mac_user" . >/dev/null || rg -F "$bad_proj_desktop" . >/dev/null || rg -F "$bad_desktop_hayeos" . >/dev/null; then
+  echo "user-specific hardcoded path found"; exit 1
 fi
 python3 -m json.tool .claude-plugin/plugin.json >/dev/null
 for key in name version description commands skills; do
@@ -77,7 +83,7 @@ if grep -R "/hayeos:" README.md docs skills commands CODEX_AUDIT_PROMPT.md CHANG
   echo "old /hayeos:* command reference found"; exit 1
 fi
 grep -q "Permanent Install" README.md || { echo "README missing permanent install section"; exit 1; }
-grep -q "/plugin marketplace add /Users/haye/Desktop/HayeeOS" README.md docs/claude-code-install.md || { echo "docs missing local marketplace install command"; exit 1; }
+grep -q "/plugin marketplace add <hayeos-plugin-root>" README.md docs/claude-code-install.md || { echo "docs missing generic local marketplace install command"; exit 1; }
 grep -q "/plugin install haye@haye-marketplace" README.md docs/claude-code-install.md || { echo "docs missing plugin install command"; exit 1; }
 grep -q "Smart Work Router" commands/work.md || { echo "commands/work.md missing Smart Work Router"; exit 1; }
 grep -q "Team Mode" skills/work/SKILL.md || { echo "skills/work missing Team Mode"; exit 1; }

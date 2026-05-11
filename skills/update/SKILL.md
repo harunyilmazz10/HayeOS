@@ -77,7 +77,7 @@ If `./scripts/verify.sh` or `bin/haye` is missing, report that it was not run an
 Windows PowerShell:
 
 ```powershell
-cd C:\Users\hayed\Desktop\HayeOS
+cd C:\Path\To\HayeOS
 git pull
 claude plugin validate .
 ```
@@ -85,7 +85,7 @@ claude plugin validate .
 Mac/Linux:
 
 ```bash
-cd ~/Desktop/HayeOS
+cd /path/to/HayeOS
 git pull
 claude plugin validate .
 ```

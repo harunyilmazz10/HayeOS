@@ -216,6 +216,6 @@ If approved, Haye runs the `/haye:init-memory` flow. That flow writes a relative
 On Windows, manual fallback commands are:
 
 ```text
-C:\Users\hayed\Desktop\HayeOS\bin\haye.cmd init
-powershell -ExecutionPolicy Bypass -File C:\Users\hayed\Desktop\HayeOS\bin\haye.ps1 init
+C:\Path\To\HayeOS\bin\haye.cmd init
+powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
 ```

@@ -23,13 +23,13 @@ Users normally do not need to run `bin/haye` manually.
 Manual fallback commands for Windows:
 
 ```text
-C:\Users\hayed\Desktop\HayeOS\bin\haye.cmd init
+C:\Path\To\HayeOS\bin\haye.cmd init
 ```
 
 or:
 
 ```text
-powershell -ExecutionPolicy Bypass -File C:\Users\hayed\Desktop\HayeOS\bin\haye.ps1 init
+powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
 ```
 
 Do not run the Python `bin/haye` file through bash on Windows. Use `haye.cmd`, `haye.ps1`, `/haye:start`, or `/haye:init-memory`.

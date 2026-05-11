@@ -96,7 +96,7 @@ Use this when you want the Haye commands to appear in normal `claude` sessions w
 
 ```text
 claude
-/plugin marketplace add /Users/haye/Desktop/HayeeOS
+/plugin marketplace add <hayeos-plugin-root>
 /plugin install haye@haye-marketplace
 ```
 
@@ -114,7 +114,7 @@ After install, new Claude Code sessions should expose:
 For one-off development testing, keep using:
 
 ```bash
-claude --plugin-dir /Users/haye/Desktop/HayeeOS
+claude --plugin-dir <hayeos-plugin-root>
 ```
 
 ## Memory Setup
@@ -140,8 +140,8 @@ Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
 Manual CLI use is only a fallback. On Windows, use one of these instead of trying to run the Python script through bash:
 
 ```text
-C:\Users\hayed\Desktop\HayeOS\bin\haye.cmd init
-powershell -ExecutionPolicy Bypass -File C:\Users\hayed\Desktop\HayeOS\bin\haye.ps1 init
+C:\Path\To\HayeOS\bin\haye.cmd init
+powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
 ```
 
 ## Project setup
