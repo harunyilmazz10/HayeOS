@@ -85,17 +85,17 @@ Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "prod
 - If there is a conflict between speed and safety, safety wins.
 
 ## Auto Checkpoint Rule
-- `/haye:work` başladığında `04-tasks/active-task.md` oluştur/güncelle.
-- Büyük işlerde `05-sessions/latest-checkpoint.md` oluştur.
+- `/haye:work` başladığında `<resolved memoryPath>/04-tasks/active-task.md` oluştur/güncelle.
+- Büyük işlerde `<resolved memoryPath>/05-sessions/latest-checkpoint.md` oluştur.
 - Her phase başında ve sonunda checkpoint yaz.
 - 5+ dosya değiştiyse checkpoint yaz.
 - Hata alınırsa checkpoint yaz.
 - Dependency/security/deploy veya riskli işlem öncesinde checkpoint yaz.
-- Checkpoint detayını dosyaya yaz; chat'te sadece "Checkpoint güncellendi: 05-sessions/latest-checkpoint.md" de.
+- Checkpoint detayını dosyaya yaz; chat'te sadece "Checkpoint güncellendi: <resolved memoryPath>/05-sessions/latest-checkpoint.md" de.
 
 ## Project vault write rule
 - Project memory dosyaları her zaman `.hayeos.json` içindeki resolved `memoryPath` altına yazılır.
-- `context-pack`, `checkpoint`, `active-task`, `current.md`, `next.md`, `changelog.md` plugin repo içine yazılmaz.
+- `context-pack`, `checkpoint`, `active-task`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `changelog.md` plugin repo içine yazılmaz.
 - Hedef path `CLAUDE_PLUGIN_ROOT` altındaysa yazmayı durdur ve Türkçe uyar: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
 Respect `.hayeos.json`, keep scope narrow, verify with real commands, and leave memory updates for `/haye:close`.

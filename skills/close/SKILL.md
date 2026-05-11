@@ -25,9 +25,9 @@ Close session and update memory
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.
@@ -44,18 +44,18 @@ Close session and update memory
 5. Execute the smallest safe step.
 6. Verify with real commands when possible.
 7. Update memory through `/haye:close` or session-close rules:
-   - `current.md` for current state.
-   - `next.md` for the next five actions.
-   - `changelog.md` for completed changes.
-   - `health.md` for verification status.
+   - `<resolved memoryPath>/current.md` for current state.
+   - `<resolved memoryPath>/next.md` for the next five actions.
+   - `<resolved memoryPath>/changelog.md` for completed changes.
+   - `<resolved memoryPath>/health.md` for verification status.
    - `05-sessions/` for a dated session handoff when useful.
    - `12-risks/` and `02-decisions/` when security or dependency decisions changed.
 
 ## Checkpoint finalization
-- `05-sessions/latest-checkpoint.md` varsa oku.
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md` varsa oku.
 - Checkpoint içeriğini session summary'ye taşı.
-- `changelog.md`, `current.md`, `next.md`, `health.md` dosyalarını güncelle.
-- `04-tasks/active-task.md` dosyasını temizle veya sıradaki göreve güncelle.
+- `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/health.md` dosyalarını güncelle.
+- `<resolved memoryPath>/04-tasks/active-task.md` dosyasını temizle veya sıradaki göreve güncelle.
 - `latest-checkpoint.md` dosyasını silme; `Status` alanını `closed` olarak işaretle veya son kapanış durumunu yaz.
 - Chat'e uzun log basma; sadece yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım ve memory updated files ver.
 

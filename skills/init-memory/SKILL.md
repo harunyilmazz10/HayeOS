@@ -26,9 +26,9 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 4. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.
@@ -39,12 +39,14 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 
 ## Workflow
 1. Locate the current project root.
-2. If `.hayeos.json` and the configured vault already exist, report that memory is ready and run the minimal memory-start flow.
-3. If memory is missing, initialize it automatically. Do not ask the user to find `bin/haye`, bash, Python or plugin paths.
-4. First try CLI commands through `${CLAUDE_PLUGIN_ROOT}`.
-5. If every CLI command fails, use the mandatory manual fallback below.
-6. Verify that `.hayeos.json`, `HAYE.md`, `index.md`, `current.md`, `next.md`, `changelog.md` and `health.md` exist.
-7. Continue to `memory-start` after successful creation.
+2. If `.hayeos.json` and the configured vault already exist, report that memory is ready. Do not ask a second memory-start question.
+3. If this skill was invoked from `/haye:start`, it may run only after the user answered yes to: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+4. If memory is missing and the user has approved init, initialize it without asking the user to find `bin/haye`, bash, Python or plugin paths.
+5. First try CLI commands through `${CLAUDE_PLUGIN_ROOT}`.
+6. If every CLI command fails, use the mandatory manual fallback below.
+7. Verify that `.hayeos.json`, `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `changelog.md` and `health.md` exist.
+8. After successful creation, memory is already started. Do not ask "Şimdi hafızayı başlatmamı ister misiniz?"
+9. Do not load `/haye:work`, do not start a task classification wizard, and do not move into implementation from init-memory.
 
 ## Cross-platform CLI init order
 Never recommend only `bin/haye init` as a relative command. Use `${CLAUDE_PLUGIN_ROOT}` first.
@@ -88,35 +90,34 @@ Create `.hayeos.json`:
 }
 ```
 
-Create this vault structure:
+Create this vault structure under `<resolved memoryPath>`:
 
 ```text
-<project-name>_obs/
-  HAYE.md
-  index.md
-  current.md
-  next.md
-  changelog.md
-  health.md
-  00-system/
-  01-project/
-  02-decisions/
-  03-bugs/open/
-  03-bugs/solved/
-  03-bugs/recurring/
-  04-tasks/
-  05-sessions/
-  06-prompts/
-  07-checklists/
-  08-raw/claude-sessions/
-  08-raw/terminal-logs/
-  08-raw/screenshots/
-  08-raw/old-prompts/
-  09-context-packs/
-  10-reviews/
-  11-metrics/
-  12-risks/
-  99-archive/
+<resolved memoryPath>/HAYE.md
+<resolved memoryPath>/index.md
+<resolved memoryPath>/current.md
+<resolved memoryPath>/next.md
+<resolved memoryPath>/changelog.md
+<resolved memoryPath>/health.md
+<resolved memoryPath>/00-system/
+<resolved memoryPath>/01-project/
+<resolved memoryPath>/02-decisions/
+<resolved memoryPath>/03-bugs/open/
+<resolved memoryPath>/03-bugs/solved/
+<resolved memoryPath>/03-bugs/recurring/
+<resolved memoryPath>/04-tasks/
+<resolved memoryPath>/05-sessions/
+<resolved memoryPath>/06-prompts/
+<resolved memoryPath>/07-checklists/
+<resolved memoryPath>/08-raw/claude-sessions/
+<resolved memoryPath>/08-raw/terminal-logs/
+<resolved memoryPath>/08-raw/screenshots/
+<resolved memoryPath>/08-raw/old-prompts/
+<resolved memoryPath>/09-context-packs/
+<resolved memoryPath>/10-reviews/
+<resolved memoryPath>/11-metrics/
+<resolved memoryPath>/12-risks/
+<resolved memoryPath>/99-archive/
 ```
 
 Core markdown files must not be empty. Use useful Turkish starter content:
@@ -135,7 +136,7 @@ Project: <project-name>
 
 ## Proje kuralları
 - Oturum başında `/haye:start`, oturum sonunda `/haye:close` kullan.
-- Önce minimal hafıza oku: `HAYE.md`, `index.md`, `current.md`, `next.md`.
+- Önce minimal hafıza oku: `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`.
 - `08-raw/` klasörünü kullanıcı istemedikçe okuma.
 
 ## Token kuralları
@@ -162,7 +163,7 @@ Project: <project-name>
 - [[12-risks/dependency-risks]]
 ```
 
-`current.md`:
+`<resolved memoryPath>/current.md`:
 ```markdown
 # Mevcut Durum
 
@@ -174,7 +175,7 @@ Project: <project-name>
 - Henüz belirlenmedi.
 ```
 
-`next.md`:
+`<resolved memoryPath>/next.md`:
 ```markdown
 # Sıradaki İşler
 

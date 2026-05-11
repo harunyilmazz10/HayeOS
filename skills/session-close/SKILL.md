@@ -25,12 +25,12 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Project vault write rule
-- Session summaries, checkpoint finalization, `current.md`, `next.md`, `changelog.md`, `health.md` and `active-task.md` are written only under resolved `.hayeos.json` `memoryPath`.
+- Session summaries, checkpoint finalization, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md` and `<resolved memoryPath>/04-tasks/active-task.md` are written only under resolved `.hayeos.json` `memoryPath`.
 - Never write session memory into `CLAUDE_PLUGIN_ROOT`.
 - If a target path resolves under the plugin installation directory, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
@@ -43,7 +43,7 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 
 ## Output Budget Rule
 - `/haye:close` sırasında uzun session log basma.
-- Uzun ayrıntıları HayeOS memory dosyalarına yaz: `current.md`, `next.md`, `changelog.md`, `health.md`, `05-sessions/`, `02-decisions/`, `12-risks/`.
+- Uzun ayrıntıları HayeOS memory dosyalarına yaz: `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`, `05-sessions/`, `02-decisions/`, `12-risks/`.
 - Chat'te kısa özet, değişen dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
 - Büyük kapanış raporu 5000-6000 tokenı geçecekse dosyaya yaz ve chat'te dosya yolunu göster.
 
@@ -57,10 +57,10 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 7. Update memory through `/haye:close` or session-close rules.
 
 ## Checkpoint finalization
-- `05-sessions/latest-checkpoint.md` varsa oku.
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md` varsa oku.
 - Session summary dosyasına checkpoint'in current task, phase, completed steps, changed files, verification status, blockers, risks ve next 3 actions alanlarını taşı.
 - `latest-checkpoint.md` dosyasını silme; `Status` alanını `closed` yap.
-- `active-task.md` dosyasını kapatılan göreve göre temizle veya sıradaki görevle güncelle.
+- `<resolved memoryPath>/04-tasks/active-task.md` dosyasını kapatılan göreve göre temizle veya sıradaki görevle güncelle.
 - Chat'te uzun session log basma; detayları memory dosyalarına yaz.
 
 ## Output format

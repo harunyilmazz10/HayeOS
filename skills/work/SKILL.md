@@ -21,13 +21,13 @@ description: Smart Work Router for development, Team Mode planning, low-friction
 4. Minimal memory only:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 5. Task prompt and any explicit scope/phase limits.
 
 ## Project vault write rule
-- Project memory, context packs, checkpoints, active task, `current.md`, `next.md`, `changelog.md` and session summaries must be written only under resolved `.hayeos.json` `memoryPath`.
+- Project memory, context packs, checkpoints, active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `changelog.md` and session summaries must be written only under resolved `.hayeos.json` `memoryPath`.
 - Never write project memory into `CLAUDE_PLUGIN_ROOT` or the HayeOS plugin repository.
 - If any target path resolves under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
@@ -394,7 +394,7 @@ Phase sonunda rapor:
 ## Auto Checkpoint Rule
 HayeOS `/haye:work` sırasında `/haye:close` beklemeden checkpoint yazar.
 
-Checkpoint file locations:
+Checkpoint file locations under resolved `memoryPath`:
 - `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
 - `<resolved memoryPath>/04-tasks/active-task.md`
 - `<resolved memoryPath>/current.md`
@@ -426,7 +426,7 @@ Checkpoint içeriği:
 - notes for next session
 
 Chat'e uzun checkpoint basma. Sadece kısa bilgi ver:
-`Checkpoint güncellendi: 05-sessions/latest-checkpoint.md`
+`Checkpoint güncellendi: <resolved memoryPath>/05-sessions/latest-checkpoint.md`
 
 ## Token discipline
 Büyük işlerde:

@@ -25,9 +25,9 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Plugin root vs project vault
 - `CLAUDE_PLUGIN_ROOT` or HayeOS install path is the plugin code root only.
@@ -48,7 +48,7 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 
 ## Output Budget Rule
 - Chat cevabını kısa tut; varsayılan 1500-3000 token hedefle.
-- Büyük context pack içeriklerini chat'e basma; HayeOS vault içinde `09-context-packs/` altına yaz.
+- Büyük context pack içeriklerini chat'e basma; HayeOS vault içinde `<resolved memoryPath>/09-context-packs/` altına yaz.
 - Chat'te context pack dosya yolu, kısa özet, kritik kararlar, doğrulama durumu ve sıradaki 3 adımı ver.
 - Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
 

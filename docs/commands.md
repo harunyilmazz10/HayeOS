@@ -192,18 +192,18 @@ Detailed technical artifacts gerektiğinde dosyalara yazılır. Chat concise kal
 HayeOS `/haye:work`, `/haye:fix`, `/haye:ship` ve büyük işlemler sırasında `/haye:close` beklemeden checkpoint yazar.
 
 Checkpoint dosyaları:
-- `05-sessions/latest-checkpoint.md`
-- `04-tasks/active-task.md`
-- `current.md`
-- `next.md`
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
+- `<resolved memoryPath>/04-tasks/active-task.md`
+- `<resolved memoryPath>/current.md`
+- `<resolved memoryPath>/next.md`
 
 Checkpoint phase başında/sonunda, 5+ dosya değiştiğinde, dependency/security/deploy işleminden önce, docker/build/test/lint/typecheck öncesi/sonrası, hata alındığında, büyük kod üretimi bittiğinde, output çok uzayacaksa ve riskli işlemden önce yazılır.
 
-Chat'e uzun checkpoint basılmaz; sadece `Checkpoint güncellendi: 05-sessions/latest-checkpoint.md` denir.
+Chat'e uzun checkpoint basılmaz; sadece `Checkpoint güncellendi: <resolved memoryPath>/05-sessions/latest-checkpoint.md` denir.
 
 # Safe Resume Rule
 
-`/haye:start` `.hayeos.json` dosyasını okur, vault path'ini bulur ve `HAYE.md`, `index.md`, `current.md`, `next.md`, varsa `04-tasks/active-task.md` ve varsa `05-sessions/latest-checkpoint.md` dosyalarını okur.
+`/haye:start` `.hayeos.json` dosyasını okur, vault path'ini bulur ve `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, varsa `<resolved memoryPath>/04-tasks/active-task.md` ve varsa `<resolved memoryPath>/05-sessions/latest-checkpoint.md` dosyalarını okur.
 
 Checkpoint varsa kısa recovery özeti verir ve otomatik kodlamaya başlamaz. Türkçe onay ister:
 
@@ -221,7 +221,7 @@ Recovery summary kısa tutulur: current task, current phase, last successful ste
 
 # How /haye:close finalizes checkpoint
 
-`/haye:close` `latest-checkpoint.md` dosyasını okur, session summary'ye taşır, `changelog.md`, `current.md`, `next.md`, `health.md` ve `active-task.md` dosyalarını günceller. Checkpoint silinmez; `closed` olarak işaretlenir veya son kapanış durumu yazılır.
+`/haye:close` `latest-checkpoint.md` dosyasını okur, session summary'ye taşır, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/health.md` ve `<resolved memoryPath>/04-tasks/active-task.md` dosyalarını günceller. Checkpoint silinmez; `closed` olarak işaretlenir veya son kapanış durumu yazılır.
 
 # When HayeOS asks for approval
 
@@ -265,7 +265,7 @@ Plugin root and project memory vault are different:
 - `.hayeos.json` `sourcePath` is the current project's source root.
 - Context packs are written only to `<resolved memoryPath>/09-context-packs/`.
 - Checkpoints are written only to `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
-- Active task, `current.md`, `next.md` and `changelog.md` are updated only inside the resolved project vault.
+- Active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `<resolved memoryPath>/changelog.md` are updated only inside the resolved project vault.
 - HayeOS must stop before writing any project memory file under `CLAUDE_PLUGIN_ROOT` and warn: `Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı.`
 
 Do not read `08-raw/` unless the user asks or a context pack names specific raw files.

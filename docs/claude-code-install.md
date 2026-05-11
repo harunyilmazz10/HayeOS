@@ -34,7 +34,7 @@ In normal use, you do not need to run `bin/haye` manually. Open Claude Code in a
 
 Plugin root and project memory vault are different. The installed HayeOS directory is plugin code only; all project memory, context packs and checkpoints are written under the current project's `.hayeos.json` `memoryPath`.
 
-If Claude Code crashes before `/haye:close`, open a new session and run `/haye:start`. HayeOS reads `05-sessions/latest-checkpoint.md`, shows a short recovery summary, and waits for your approval before continuing.
+If Claude Code crashes before `/haye:close`, open a new session and run `/haye:start`. HayeOS reads `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, shows a short recovery summary, and waits for your approval before continuing.
 
 To update an installed HayeOS plugin from inside Claude Code, run:
 

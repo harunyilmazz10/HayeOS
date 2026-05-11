@@ -50,9 +50,9 @@ Output Budget Rule: large outputs go to files. HayeOS büyük mimari, roadmap, s
 
 Quality Preservation Rule: token discipline must never reduce implementation quality. HayeOS token tasarrufunu uzun chat, tekrar, gereksiz repo taraması ve dev logları azaltarak yapar; gerekli kod okuma, test, validation, security check, error handling ve mimari akıl yürütmeden ödün vermez. Doğruluk hızdan ve token tasarrufundan önce gelir.
 
-Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden `05-sessions/latest-checkpoint.md`, `04-tasks/active-task.md`, `current.md` ve `next.md` dosyalarını günceller. Claude Code API 400, output limit veya bağlantı hatasıyla kapanırsa yeni oturumda `/haye:start` latest checkpoint'i okur, kısa recovery özeti verir ve kullanıcı onayı olmadan kodlamaya devam etmez.
+Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, `<resolved memoryPath>/04-tasks/active-task.md`, `<resolved memoryPath>/current.md` ve `<resolved memoryPath>/next.md` dosyalarını günceller. Claude Code API 400, output limit veya bağlantı hatasıyla kapanırsa yeni oturumda `/haye:start` latest checkpoint'i okur, kısa recovery özeti verir ve kullanıcı onayı olmadan kodlamaya devam etmez.
 
-Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root. All project memory is stored under the current project's `.hayeos.json` `memoryPath`; HayeOS must not write context packs, checkpoints, `current.md`, `next.md` or `changelog.md` into the plugin repository.
+Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root. All project memory is stored under the current project's `.hayeos.json` `memoryPath`; HayeOS must not write context packs, checkpoints, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` or `<resolved memoryPath>/changelog.md` into the plugin repository.
 
 `/haye:update` updates the installed HayeOS plugin repo from GitHub. It stops when local changes exist, does not commit or push, validates the plugin after updating, and recommends restarting Claude Code.
 
@@ -153,8 +153,8 @@ At the root of your project, create or let Haye create `.hayeos.json`:
 
 ```json
 {
-  "project": "Arb21",
-  "memoryPath": "./Arb21_obs",
+  "project": "<project-name>",
+  "memoryPath": "./<project-name>_obs",
   "sourcePath": ".",
   "defaultWorkflow": "memory-first",
   "sessionCloseRequired": true

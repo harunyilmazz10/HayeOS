@@ -19,4 +19,4 @@ Route to advanced workflows when needed:
 Confirm tests, dependency risk, deployment assumptions and rollback notes before claiming release readiness.
 
 ## Auto Checkpoint Rule
-Deploy/release sırasında pre-ship checkpoint yaz. Build/test/deploy öncesi ve sonrası `05-sessions/latest-checkpoint.md` güncelle. Failure olursa current blocker yaz; rollback gerekiyorsa next 3 actions içine ekle.
+Deploy/release sırasında pre-ship checkpoint yaz. Build/test/deploy öncesi ve sonrası `<resolved memoryPath>/05-sessions/latest-checkpoint.md` güncelle. Failure olursa current blocker yaz; rollback gerekiyorsa next 3 actions içine ekle.

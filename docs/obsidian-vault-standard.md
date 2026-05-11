@@ -1,12 +1,12 @@
 # Obsidian Vault Standard
 
-Core files: `HAYE.md`, `index.md`, `current.md`, `next.md`, `changelog.md`, `health.md`.
+Core files: `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`.
 
 ## Plugin root vs project vault
 
 Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only where plugin commands, skills and CLI files live. Project memory must always be stored under the current project's `.hayeos.json` `memoryPath`, resolved relative to that project root.
 
-Never write project memory into the plugin repository. Context packs belong in `<resolved memoryPath>/09-context-packs/`; checkpoints belong in `<resolved memoryPath>/05-sessions/latest-checkpoint.md`; active task, `current.md`, `next.md` and `changelog.md` belong inside the resolved project vault.
+Never write project memory into the plugin repository. Context packs belong in `<resolved memoryPath>/09-context-packs/`; checkpoints belong in `<resolved memoryPath>/05-sessions/latest-checkpoint.md`; active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `<resolved memoryPath>/changelog.md` belong inside the resolved project vault.
 
 Generated vaults must contain useful starter content, not empty placeholders:
 
@@ -26,10 +26,10 @@ Do not write Windows absolute paths or JSON backslash paths into `.hayeos.json`.
 
 - `HAYE.md` records operating rules, simple commands, raw-read policy and dependency security policy.
 - `index.md` links core files, active task, dependency checklist, risk log and safe-version decisions.
-- `current.md` records project state, configured source path and constraints.
-- `next.md` keeps the top actions short.
-- `health.md` tracks memory lint, dependency audit and React/Next audit status.
-- `04-tasks/active-task.md` gives the next session a place to record goal, scope and verification.
+- `<resolved memoryPath>/current.md` records project state, configured source path and constraints.
+- `<resolved memoryPath>/next.md` keeps the top actions short.
+- `<resolved memoryPath>/health.md` tracks memory lint, dependency audit and React/Next audit status.
+- `<resolved memoryPath>/04-tasks/active-task.md` gives the next session a place to record goal, scope and verification.
 - `07-checklists/dependency-security-checklist.md`, `12-risks/dependency-risks.md` and `02-decisions/safe-dependency-versions.md` support safe dependency decisions.
 
 The `08-raw/` area is for explicit ingestion only. Normal start/work commands should prefer summarized memory and context packs.
@@ -52,9 +52,9 @@ The `08-raw/` area is for explicit ingestion only. Normal start/work commands sh
 
 Long or risky sessions should maintain:
 
-- `05-sessions/latest-checkpoint.md`
-- `04-tasks/active-task.md`
-- `current.md`
-- `next.md`
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
+- `<resolved memoryPath>/04-tasks/active-task.md`
+- `<resolved memoryPath>/current.md`
+- `<resolved memoryPath>/next.md`
 
 `latest-checkpoint.md` preserves current task, phase, last successful step, changed files, commands run, verification status, blockers, risks and next 3 actions. `/haye:start` uses it for Safe Resume and must not continue implementation without user approval.

@@ -2,6 +2,86 @@
 set -euo pipefail
 ROOT_DIR="$(pwd)"
 
+check_markdown_frontmatter() {
+  python3 - <<'PY'
+from pathlib import Path
+import sys
+
+errors = []
+files = sorted(Path("commands").glob("*.md")) + sorted(Path("skills").glob("*/SKILL.md"))
+for path in files:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].strip() != "---":
+        errors.append(f"{path}: frontmatter must start with standalone ---")
+        continue
+    try:
+        close_idx = next(i for i in range(1, min(len(lines), 20)) if lines[i].strip() == "---")
+    except StopIteration:
+        errors.append(f"{path}: frontmatter must close with standalone ---")
+        continue
+    fm = "\n".join(lines[1:close_idx])
+    if path.parts[0] == "commands":
+        if "description:" not in fm:
+            errors.append(f"{path}: command frontmatter missing description")
+    else:
+        if "name:" not in fm:
+            errors.append(f"{path}: skill frontmatter missing name")
+        if "description:" not in fm:
+            errors.append(f"{path}: skill frontmatter missing description")
+    if close_idx + 1 >= len(lines) or lines[close_idx + 1].strip() != "":
+        errors.append(f"{path}: frontmatter closing --- must be followed by a blank line")
+    if close_idx + 2 >= len(lines) or not lines[close_idx + 2].startswith("# "):
+        errors.append(f"{path}: markdown title must start after frontmatter")
+    if lines[0].strip() != "---" or " ---" in lines[0]:
+        errors.append(f"{path}: frontmatter marker must not share a line with metadata")
+
+if errors:
+    print("Markdown/frontmatter format errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
+check_memory_path_contract() {
+  python3 - <<'PY'
+from pathlib import Path
+import re
+import sys
+
+errors = []
+files = sorted(Path("commands").glob("*.md")) + sorted(Path("skills").glob("*/SKILL.md"))
+target_re = re.compile(r"(?<!<resolved memoryPath>/)(04-tasks/active-task\.md|05-sessions/latest-checkpoint\.md|09-context-packs/|current\.md|next\.md)")
+for path in files:
+    text = path.read_text(encoding="utf-8")
+    for match in target_re.finditer(text):
+        line = text.count("\n", 0, match.start()) + 1
+        errors.append(f"{path}:{line}: bare memory target `{match.group(1)}` must use <resolved memoryPath>/...")
+
+init_text = Path("skills/init-memory/SKILL.md").read_text(encoding="utf-8")
+if "./_obs" in init_text or '"project": ""' in init_text or '"memoryPath": "./_obs"' in init_text:
+    errors.append("skills/init-memory/SKILL.md: fallback must use <project-name> and ./<project-name>_obs, never ./_obs")
+if "If memory is missing, initialize it automatically" in init_text:
+    errors.append("skills/init-memory/SKILL.md: start flow must not say memory initializes automatically without approval")
+
+checkpoint = Path("skills/checkpoint/SKILL.md").read_text(encoding="utf-8")
+if "Checkpoint file locations under resolved `memoryPath`" not in checkpoint:
+    errors.append("skills/checkpoint/SKILL.md: checkpoint locations must be explicitly under resolved memoryPath")
+if "<resolved memoryPath>/05-sessions/latest-checkpoint.md" not in checkpoint:
+    errors.append("skills/checkpoint/SKILL.md: missing resolved checkpoint target")
+
+context = Path("skills/context-pack/SKILL.md").read_text(encoding="utf-8")
+if "Write context packs ONLY to `<resolved memoryPath>/09-context-packs/`" not in context:
+    errors.append("skills/context-pack/SKILL.md: context packs must target resolved memoryPath")
+
+if errors:
+    print("Memory path contract errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -11,6 +91,8 @@ check_plugin_root_clean() {
   fi
 }
 
+check_markdown_frontmatter
+check_memory_path_contract
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

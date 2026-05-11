@@ -25,9 +25,9 @@ Smart router for debugging
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.
@@ -47,7 +47,7 @@ Smart router for debugging
 
 ## Auto Checkpoint Rule
 Bug/debug sırasında:
-- hata görüldüğünde `05-sessions/latest-checkpoint.md` yaz
+- hata görüldüğünde `<resolved memoryPath>/05-sessions/latest-checkpoint.md` yaz
 - root-cause denemelerini checkpoint'e kısa yaz
 - son başarılı komutu kaydet
 - current blocker alanını güncelle

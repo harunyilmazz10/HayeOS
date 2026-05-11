@@ -21,7 +21,7 @@ This project uses Haye memory-first workflow.
 - `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is plugin code root only.
 - `.hayeos.json` `memoryPath` is this project's memory vault and is the single source of truth for memory writes.
 - `.hayeos.json` `sourcePath` is this project's source root.
-- Context packs, checkpoints, active task, `current.md`, `next.md` and `changelog.md` must stay inside the resolved project vault.
+- Context packs, checkpoints, active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `changelog.md` must stay inside the resolved project vault.
 - Never write project memory into the plugin repository.
 - If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
@@ -58,8 +58,8 @@ This project uses Haye memory-first workflow.
 
 ## Auto Checkpoint Rule
 - HayeOS uzun veya riskli işlerde `/haye:close` beklemeden checkpoint yazar.
-- Checkpoint dosyası: `05-sessions/latest-checkpoint.md`
-- Active task dosyası: `04-tasks/active-task.md`
+- Checkpoint dosyası: `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
+- Active task dosyası: `<resolved memoryPath>/04-tasks/active-task.md`
 - Checkpoint detayları chat'e basılmaz; dosyaya yazılır.
 
 ## Safe Resume Rule

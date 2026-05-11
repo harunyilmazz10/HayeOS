@@ -23,7 +23,7 @@ Start simple session
 `/haye:start` must stay lightweight. It may only:
 - check whether `.hayeos.json` exists
 - read `memoryPath` when config exists
-- read minimal memory files: `HAYE.md`, `current.md`, `next.md`, optional `04-tasks/active-task.md`, optional `05-sessions/latest-checkpoint.md`
+- read minimal memory files: `HAYE.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, optional `<resolved memoryPath>/04-tasks/active-task.md`, optional `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
 - provide a short recovery summary when a checkpoint exists
 - ask which task to continue when no checkpoint exists
 - ask before creating `.hayeos.json`
@@ -47,9 +47,9 @@ Start simple session
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.
@@ -68,21 +68,21 @@ Start simple session
    - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
 3. Apply Safe Resume Rule:
-   - Read `05-sessions/latest-checkpoint.md` if present.
+   - Read `<resolved memoryPath>/05-sessions/latest-checkpoint.md` if present.
    - If it exists, provide a short `HayeOS Recovery Summary`.
    - Do not automatically continue implementation.
    - Ask in Turkish: "Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?"
    - Continue only after explicit user approval.
-4. If no `latest-checkpoint.md` exists, show a short start summary from `next.md` and ask: "Hangi görevle devam edelim?"
+4. If no `latest-checkpoint.md` exists, show a short start summary from `<resolved memoryPath>/next.md` and ask: "Hangi görevle devam edelim?"
 
 ## Safe Resume Rule
 `/haye:start` reads `.hayeos.json`, locates the vault, then reads:
 - `HAYE.md`
 - `index.md`
-- `current.md`
-- `next.md`
-- `04-tasks/active-task.md` when present
-- `05-sessions/latest-checkpoint.md` when present
+- `<resolved memoryPath>/current.md`
+- `<resolved memoryPath>/next.md`
+- `<resolved memoryPath>/04-tasks/active-task.md` when present
+- `<resolved memoryPath>/05-sessions/latest-checkpoint.md` when present
 
 Recovery summary format:
 ```markdown

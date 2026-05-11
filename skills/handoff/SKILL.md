@@ -19,9 +19,9 @@ Create a compact handoff brief for another Claude/Codex session or a new convers
 3. Only minimal memory files:
    - `HAYE.md`
    - `index.md`
-   - `current.md`
-   - `next.md`
-   - `04-tasks/active-task.md` when present.
+   - `<resolved memoryPath>/current.md`
+   - `<resolved memoryPath>/next.md`
+   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.

@@ -22,10 +22,10 @@ HayeOS uzun, riskli veya çok adımlı işlerde `/haye:close` beklemeden checkpo
 - `.hayeos.json` `memoryPath` is the only source of truth for the current project memory vault.
 - Resolve `memoryPath` relative to current project root.
 - Never write project checkpoints to `CLAUDE_PLUGIN_ROOT`.
-- Never create `05-sessions`, `04-tasks`, `current.md` or `next.md` under the plugin installation directory.
+- Never create project memory directories or files under the plugin installation directory.
 - If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
-Checkpoint file locations:
+Checkpoint file locations under resolved `memoryPath`:
 - `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
 - `<resolved memoryPath>/04-tasks/active-task.md`
 - `<resolved memoryPath>/current.md`
@@ -34,7 +34,7 @@ Checkpoint file locations:
 Chat'e uzun checkpoint basma. Sadece şunu söyle:
 
 ```text
-Checkpoint güncellendi: 05-sessions/latest-checkpoint.md
+Checkpoint güncellendi: <resolved memoryPath>/05-sessions/latest-checkpoint.md
 ```
 
 ## When to checkpoint
@@ -76,7 +76,7 @@ open
 When `/haye:start` runs:
 1. Read `.hayeos.json`.
 2. Locate the HayeOS vault path.
-3. Read `HAYE.md`, `index.md`, `current.md`, `next.md`, optional `04-tasks/active-task.md`, and optional `05-sessions/latest-checkpoint.md`.
+3. Read `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, optional `<resolved memoryPath>/04-tasks/active-task.md`, and optional `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
 4. If `latest-checkpoint.md` exists, provide a short recovery summary.
 5. Do not automatically continue implementation.
 6. Ask in Turkish: "Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?"
@@ -100,7 +100,7 @@ Kaldığımız yerden devam edeyim mi?
 
 ## Output Budget Rule
 - Checkpoint and recovery outputs must be short.
-- Long details go to `latest-checkpoint.md`, `current.md`, `next.md`, or session summary files.
+- Long details go to `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, or session summary files under `<resolved memoryPath>/05-sessions/`.
 - Chat shows only recovery summary, next 3 actions and approval question.
 
 ## Quality Preservation Rule
