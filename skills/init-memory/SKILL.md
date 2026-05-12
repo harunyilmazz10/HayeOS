@@ -109,6 +109,7 @@ Create this vault structure under `<resolved memoryPath>`:
 <resolved memoryPath>/health.md
 <resolved memoryPath>/00-system/
 <resolved memoryPath>/01-project/
+<resolved memoryPath>/01-prompts/
 <resolved memoryPath>/02-decisions/
 <resolved memoryPath>/03-bugs/open/
 <resolved memoryPath>/03-bugs/solved/

@@ -26,6 +26,7 @@ Do not write Windows absolute paths or JSON backslash paths into `.hayeos.json`.
 
 - `HAYE.md` records operating rules, simple commands, raw-read policy and dependency security policy.
 - `index.md` links core files, active task, dependency checklist, risk log and safe-version decisions.
+- `<resolved memoryPath>/01-prompts/` stores preserved original `/haye:work` prompts for large, massive, architecture and full-system tasks.
 - `<resolved memoryPath>/current.md` records project state, configured source path and constraints.
 - `<resolved memoryPath>/next.md` keeps the top actions short.
 - `<resolved memoryPath>/health.md` tracks memory lint, dependency audit and React/Next audit status.
@@ -33,6 +34,15 @@ Do not write Windows absolute paths or JSON backslash paths into `.hayeos.json`.
 - `07-checklists/dependency-security-checklist.md`, `<resolved memoryPath>/12-risks/dependency-risks.md` and `<resolved memoryPath>/02-decisions/safe-dependency-versions.md` support safe dependency decisions.
 
 The `08-raw/` area is for explicit ingestion only. Normal start/work commands should prefer summarized memory and context packs.
+
+## Original Prompt Preservation
+
+Large, massive, architecture and full-system work requests must preserve the original user prompt verbatim under `<resolved memoryPath>/01-prompts/`.
+
+- First large master prompt: `<resolved memoryPath>/01-prompts/initial-master-prompt.md`
+- Later work prompts: `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md`
+- Required content: timestamp, task classification summary, original prompt verbatim and optional short normalized brief.
+- Prompt records must never be written to the plugin root or project root.
 
 ## Work discipline
 

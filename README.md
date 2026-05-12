@@ -42,6 +42,8 @@ Modes:
 
 Work Strategy Selection Rule: large, massive, high-risk veya belirsiz işlerde HayeOS önce önerilen çalışma modunu açıklar ve Türkçe onay ister; small + low-risk işlerde sormadan Fast Single Agent ile ilerler.
 
+Original Prompt Preservation Rule: large, massive, architecture ve full-system `/haye:work` isteklerinde HayeOS orijinal kullanıcı promptunu özetlemeden `<resolved memoryPath>/01-prompts/` altına kaydeder. İlk master prompt `<resolved memoryPath>/01-prompts/initial-master-prompt.md`, sonraki work promptları `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md` olur.
+
 HayeOS minimizes approval friction. It asks for approval at phase boundaries and risk gates, not after every small edit.
 
 No Fake Completion Rule: HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" demez. Build/test/lint/typecheck çalışmadıysa bunu açıkça yazar.

@@ -120,6 +120,23 @@ Do not ask for small + low-risk work such as tiny bug fixes, single-file edits, 
 ### If the user already selected a mode
 If the prompt explicitly says `Full Architecture Mode kullan`, `Team Mode kullan`, `tek agent ile yap`, `sadece plan çıkar`, `hızlıca düzelt` or `Phase 0/1 ile başla`, do not ask strategy again. Briefly confirm in Turkish, for example: "Full Architecture Mode ile ilerliyorum. Önce planı dosyalara yazacağım, kodlamaya başlamadan önce onay isteyeceğim."
 
+## Original Prompt Preservation Rule
+Large, massive, architecture and full-system `/haye:work` requests must preserve the original user prompt verbatim before planning, Team Mode synthesis, Full Architecture Mode docs or implementation.
+
+- Resolve `.hayeos.json` `memoryPath` relative to the current project root.
+- Write prompt records only under `<resolved memoryPath>/01-prompts/`.
+- For the first large master prompt, write `<resolved memoryPath>/01-prompts/initial-master-prompt.md`.
+- For later work prompts, write `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md`.
+- The prompt record must contain:
+  1. Timestamp
+  2. Task classification summary
+  3. Original prompt verbatim
+  4. Optional short normalized brief
+- The `Original prompt verbatim` section must preserve the user's prompt exactly, without summarizing, correcting, translating or normalizing it.
+- If the user prompt contains sensitive content, preserve only what the user provided; do not invent or enrich secrets.
+- Small one-line bugfix tasks do not require prompt preservation.
+- Never write prompt records to `CLAUDE_PLUGIN_ROOT`, the plugin repo, or project root.
+
 ## Mode selection
 - Fast Mode: `small` + `low risk`. Kısa planla direkt uygula. Kullanıcıya gereksiz onay sorma.
 - Standard Mode: `medium`. Kısa plan + implementation + verification yap. Sadece belirsiz veya riskli yerde sor.

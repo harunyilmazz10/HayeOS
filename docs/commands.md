@@ -201,6 +201,18 @@ Checkpoint phase başında/sonunda, 5+ dosya değiştiğinde, dependency/securit
 
 Chat'e uzun checkpoint basılmaz; sadece `Checkpoint güncellendi: <resolved memoryPath>/05-sessions/latest-checkpoint.md` denir.
 
+# Original Prompt Preservation Rule
+
+Large, massive, architecture and full-system `/haye:work` isteklerinde HayeOS kullanıcının orijinal promptunu aynen saklar.
+
+- Hedef klasör: `<resolved memoryPath>/01-prompts/`
+- İlk büyük master prompt: `<resolved memoryPath>/01-prompts/initial-master-prompt.md`
+- Sonraki work promptları: `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md`
+- Dosya içeriği: timestamp, task classification summary, original prompt verbatim ve optional short normalized brief.
+- Orijinal prompt özetlenmez, çevrilmez veya düzeltilmez; verbatim bölümünde aynen korunur.
+- Küçük tek satırlık bugfix görevlerinde zorunlu değildir.
+- Prompt kayıtları plugin root'a veya project root'a yazılmaz.
+
 # Safe Resume Rule
 
 `/haye:start` `.hayeos.json` dosyasını okur, vault path'ini bulur ve `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, varsa `<resolved memoryPath>/04-tasks/active-task.md` ve varsa `<resolved memoryPath>/05-sessions/latest-checkpoint.md` dosyalarını okur.

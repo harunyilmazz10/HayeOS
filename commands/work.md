@@ -47,6 +47,17 @@ Küçük ve low-risk işler için strateji sorma; Fast Single Agent ile kısa ö
 
 Kullanıcı modu açıkça belirtmişse tekrar sorma; seçilen modu kısa teyit et ve o moda göre ilerle.
 
+## Original Prompt Preservation Rule
+Large, massive, architecture and full-system `/haye:work` requests must preserve the original user prompt verbatim before planning or implementation.
+
+- Write only under the project vault: `<resolved memoryPath>/01-prompts/`.
+- First large master prompt target: `<resolved memoryPath>/01-prompts/initial-master-prompt.md`.
+- Later work prompt target: `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md`.
+- File content must include timestamp, task classification summary, original prompt verbatim and optional short normalized brief.
+- Do not summarize or rewrite the original prompt in the preserved section.
+- Small one-line bugfix tasks do not require prompt preservation.
+- Never write prompt records to `CLAUDE_PLUGIN_ROOT`.
+
 ## Mode behavior
 - Small + low risk: Fast Mode. Kısa planla direkt uygula, gereksiz onay sorma.
 - Medium: Standard Mode. Kısa plan, implementation ve verification yap; sadece gerekli yerde sor.
