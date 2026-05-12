@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Reminds Claude to run /haye:close if a meaningful work session is ending
-# without the memory being updated. Best-effort, never blocks.
+# Stop hook. Best-effort and non-blocking: remind only when the current
+# directory looks like a HayeOS project. This is not mandatory for tiny chats.
 if [ -f ".hayeos.json" ]; then
-  echo "Haye reminder: if real work happened this session, run /haye:close before /clear or quitting so memory/checkpoint stays current." >&2
+  echo "Haye reminder: If this was a meaningful work session, consider closing with /haye:close so Haye memory remains aligned." >&2
 fi
 exit 0

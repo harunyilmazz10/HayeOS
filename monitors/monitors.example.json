@@ -1,3 +1,22 @@
 {
-  "monitors": []
+  "monitors": [
+    {
+      "name": "coolify-build-log",
+      "recipe": "monitors/coolify-build-log.md",
+      "default": false,
+      "description": "Tek bir Coolify deploy'unun build log'unu vault'a yakalar"
+    },
+    {
+      "name": "docker-log",
+      "recipe": "monitors/docker-log.md",
+      "default": false,
+      "description": "Belirli bir container için docker logs penceresini yakalar"
+    },
+    {
+      "name": "nextjs-dev-log",
+      "recipe": "monitors/nextjs-dev-log.md",
+      "default": false,
+      "description": "Yerel next dev sırasındaki RSC/HMR hatalarını yakalar"
+    }
+  ]
 }

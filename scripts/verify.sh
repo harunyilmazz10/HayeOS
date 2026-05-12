@@ -467,6 +467,21 @@ for matcher in ["Bash", "Read"]:
 if "Stop" not in serialized:
     errors.append("hooks/hooks.json missing Stop hook for session-close reminder")
 
+dangerous = Path("hooks/dangerous-command-guard.sh").read_text(encoding="utf-8")
+if 'Haye guard: destructive command detected. Ask user for explicit approval." >&2' not in dangerous:
+    errors.append("hooks/dangerous-command-guard.sh must emit the destructive block message to stderr")
+
+large = Path("hooks/large-file-warning.sh").read_text(encoding="utf-8")
+for phrase in ["hookSpecificOutput", "hookEventName", "PreToolUse", "additionalContext"]:
+    if phrase not in large:
+        errors.append(f"hooks/large-file-warning.sh missing JSON hook output phrase {phrase}")
+
+session = Path("hooks/session-close-reminder.sh").read_text(encoding="utf-8")
+if "Best-effort and non-blocking" not in session:
+    errors.append("hooks/session-close-reminder.sh must document best-effort non-blocking behavior")
+if "meaningful work session" not in session:
+    errors.append("hooks/session-close-reminder.sh must avoid mandatory tiny-interaction wording")
+
 if errors:
     print("Wrapper / hook wiring errors:")
     for error in errors:
@@ -531,6 +546,60 @@ if errors:
 PY
 }
 
+check_release_polish() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import re
+import sys
+
+errors = []
+
+plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+match = re.search(r"^##\s+([0-9]+\.[0-9]+\.[0-9]+)", changelog, re.M)
+if not match:
+    errors.append("CHANGELOG.md missing latest release heading")
+elif plugin.get("version") != match.group(1):
+    errors.append(f"plugin.json version {plugin.get('version')} does not match CHANGELOG latest {match.group(1)}")
+
+monitors = json.loads(Path("monitors/monitors.example.json").read_text(encoding="utf-8"))
+names = {item.get("name") for item in monitors.get("monitors", []) if isinstance(item, dict)}
+for name in ["coolify-build-log", "docker-log", "nextjs-dev-log"]:
+    if name not in names:
+        errors.append(f"monitors.example.json missing monitor {name}")
+
+doc_requirements = {
+    "CONTRIBUTING.md": ["Skill authoring rules", "Agent authoring rules", "Pre-PR verification checklist", "Hard requirements for every PR", "<resolved memoryPath>/..."],
+    "ROADMAP.md": ["v1.1 - JSONL parsing", "v1.2 - Obsidian link graph linting", "v1.3 - Project dashboards", "Maintenance backlog"],
+    "SECURITY.md": ["Supported versions", "Coordinated disclosure", "Non-promises", "Defense in depth", "Cloudflare WAF"],
+}
+for filename, phrases in doc_requirements.items():
+    text = Path(filename).read_text(encoding="utf-8")
+    for phrase in phrases:
+        if phrase not in text:
+            errors.append(f"{filename} missing release polish phrase {phrase}")
+
+scan_paths = [Path(p) for p in ["bin", "commands", "skills", "docs", "hooks", "scripts", "agents", "monitors"]]
+scan_files = []
+for path in scan_paths:
+    scan_files.extend(p for p in path.rglob("*") if p.is_file())
+scan_files += [Path("README.md"), Path("CONTRIBUTING.md"), Path("ROADMAP.md"), Path("SECURITY.md"), Path(".claude-plugin/plugin.json"), Path("monitors/monitors.example.json")]
+for file in scan_files:
+    text = file.read_text(encoding="utf-8", errors="ignore")
+    for char in ["\u2018", "\u2019", "\u201c", "\u201d"]:
+        if char in text:
+            errors.append(f"{file}: smart quote found")
+            break
+
+if errors:
+    print("Release polish errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -548,6 +617,7 @@ check_work_consistency_and_template_failfast
 check_cli_failure_modes
 check_wrappers_and_hooks
 check_enriched_content
+check_release_polish
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

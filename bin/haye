@@ -224,7 +224,13 @@ def main():
         if cmd in ['--help','-h','help']: usage(); return 0
         if cmd=='init': return init_vault() or 0
         if cmd=='init-config': return init_config() or 0
-        if cmd=='find-vault': print(memory_path() or ''); return 0
+        if cmd=='find-vault':
+            mp = memory_path()
+            if not mp:
+                print('No vault')
+                return 1
+            print(mp)
+            return 0
         if cmd=='print-config': print(json.dumps(load_config(),indent=2)); return 0
         if cmd=='lint': return lint()
         if cmd=='health': return health()
