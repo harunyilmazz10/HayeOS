@@ -1,6 +1,6 @@
 ---
 name: memory-lint
-description: Audit the Obsidian memory vault for stale, bloated, contradictory, missing or orphaned files. Read-only; proposes cleanup actions.
+description: Use when the vault feels stale, contradictory, bloated, or hard to navigate - read-only audit with cleanup proposals
 ---
 
 # Haye Skill: memory-lint

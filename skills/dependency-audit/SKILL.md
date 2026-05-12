@@ -1,6 +1,6 @@
 ---
 name: dependency-audit
-description: Execute a dependency audit workflow using local manifests, lockfiles, Haye CLI helpers and approved audit commands.
+description: Use when running a dependency vulnerability audit - local manifests, lockfiles, official advisory databases
 ---
 
 # Haye Skill: dependency-audit

@@ -1,6 +1,6 @@
 ---
 name: session-close
-description: Close a session by updating Obsidian memory, changelog, next actions, decisions, bugs and verification notes.
+description: Use when actually closing a session via /haye:close - updates changelog, next, decisions, bugs, and current
 ---
 
 # Haye Skill: session-close

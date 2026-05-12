@@ -1,6 +1,6 @@
 ---
 name: test-plan
-description: Design a test plan for a change - what to test, how to test, what NOT to test, and how to detect a regression.
+description: Use when designing tests for a change - what to test, how, what NOT to test, regression detection
 ---
 
 # Haye Skill: test-plan

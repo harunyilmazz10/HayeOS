@@ -1,6 +1,6 @@
 ---
 name: checkpoint
-description: Internal Auto Checkpoint and Safe Resume workflow for preserving HayeOS work state during long or risky sessions.
+description: Use after 5 file modifications, before risky operations, before build/test runs, or every phase boundary - preserves work state in vault
 ---
 
 # Haye Skill: checkpoint

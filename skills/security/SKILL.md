@@ -1,6 +1,6 @@
 ---
 name: security
-description: Run a general security review across auth, secrets, admin routes, webhooks, API permissions, ports, dependencies and deployment.
+description: Use when running a general security review across auth, secrets, admin routes, webhooks, API permissions, ports, dependencies, deployment
 ---
 
 # Haye Skill: security

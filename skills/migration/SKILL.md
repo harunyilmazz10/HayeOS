@@ -1,6 +1,6 @@
 ---
 name: migration
-description: Plan and execute schema, data and infra migrations safely - dry-run, backup, reversible steps, rollback path.
+description: Use when planning database schema changes, data migrations, or infrastructure migrations - dry-run, backup, reversible steps required
 ---
 
 # Haye Skill: migration

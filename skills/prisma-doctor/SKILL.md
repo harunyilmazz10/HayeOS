@@ -1,6 +1,6 @@
 ---
 name: prisma-doctor
-description: Diagnose Prisma client, migrations, OpenSSL/libssl, connection, drift and schema problems against PostgreSQL.
+description: Use when diagnosing Prisma client errors, migration failures, OpenSSL/libssl mismatches, connection pool exhaustion, schema drift, or generator problems
 ---
 
 # Haye Skill: prisma-doctor

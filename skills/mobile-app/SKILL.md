@@ -1,6 +1,6 @@
 ---
 name: mobile-app
-description: Work on mobile app projects (React Native, Expo, Flutter, native) - auth, API compatibility, release flow, store submission, deep links.
+description: Use when working on mobile app projects (React Native, Expo, Flutter, native) - auth, API compatibility, release flow, store submission, deep links
 ---
 
 # Haye Skill: mobile-app

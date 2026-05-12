@@ -1,6 +1,6 @@
 ---
 name: fix
-description: Smart router for debugging
+description: Use when encountering any bug, test failure, build error, runtime crash, or unexpected behavior - smart router that selects between systematic-debugging, bugfix, and security investigation
 ---
 
 # Haye Skill: fix

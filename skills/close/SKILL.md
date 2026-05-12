@@ -1,6 +1,6 @@
 ---
 name: close
-description: Close session and update memory
+description: Use at the end of a meaningful work block before user runs /haye:close - or auto-invoke before context approaches 50% of budget
 ---
 
 # Haye Skill: close

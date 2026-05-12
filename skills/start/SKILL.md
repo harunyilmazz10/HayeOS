@@ -1,6 +1,6 @@
 ---
 name: start
-description: Start simple session
+description: Use when starting a new HayeOS session - detects vault, loads context, summarizes prior state
 ---
 
 # Haye Skill: start

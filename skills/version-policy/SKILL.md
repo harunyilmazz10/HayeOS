@@ -1,6 +1,6 @@
 ---
 name: version-policy
-description: Decide explicit dependency versions using semver, compatibility, lifecycle status and advisory evidence.
+description: Use when picking explicit version pins - semver evaluation, compatibility check, EOL/lifecycle evidence
 ---
 
 # Haye Skill: version-policy

@@ -1,6 +1,6 @@
 ---
 name: secure
-description: Smart router for security and safe versions
+description: Use when user mentions security, auth, secrets, exposure, hardening, vulnerability, or audit - smart router for security review skills
 ---
 
 # Haye Skill: secure

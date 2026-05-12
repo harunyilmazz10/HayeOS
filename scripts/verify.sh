@@ -676,6 +676,37 @@ if errors:
 PY
 }
 
+check_skill_descriptions_use_when_pattern() {
+  python3 - <<'PY'
+from pathlib import Path
+import re, sys
+
+errors = []
+for skill_md in Path("skills").rglob("SKILL.md"):
+    text = skill_md.read_text(encoding="utf-8")
+    m = re.search(r'^description:\s*(.+)$', text, re.MULTILINE)
+    if not m:
+        errors.append(f"{skill_md}: missing description")
+        continue
+    desc = m.group(1).strip().strip('"\'')
+    if not (
+        desc.startswith("Use when") or
+        desc.startswith("You MUST use this") or
+        desc.startswith("Use at") or
+        desc.startswith("Use after") or
+        desc.startswith("Use before") or
+        desc.startswith("Internal")
+    ):
+        errors.append(f"{skill_md}: description must start with 'Use when' / 'You MUST use this' / 'Use at/after/before' / 'Internal'")
+
+if errors:
+    print("Skill description format errors:")
+    for e in errors:
+        print("-", e)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -695,6 +726,7 @@ check_wrappers_and_hooks
 check_enriched_content
 check_release_polish
 check_path_separation_and_workflow_rules
+check_skill_descriptions_use_when_pattern
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

@@ -1,6 +1,6 @@
 ---
 name: project-map
-description: Build a project map - directory tree, route inventory, DB models, env vars, third-party services, key files - in one structured doc.
+description: Use when starting on an unfamiliar project, after major refactor, or before planning a cross-cutting change - one structured map of routes, models, env, services
 ---
 
 # Haye Skill: project-map

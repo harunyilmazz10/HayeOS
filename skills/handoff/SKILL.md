@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Produce a compact handoff brief - what's done, what's next, where the bodies are buried - for resuming later or for another assistant.
+description: Use when ending a session that another assistant or future-you will resume - produces compact brief of done/next/landmines
 ---
 
 # Haye Skill: handoff

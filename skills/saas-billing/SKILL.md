@@ -1,6 +1,6 @@
 ---
 name: saas-billing
-description: Work on SaaS auth, plans, billing, webhooks, entitlements, admin controls and payment security.
+description: Use when working on SaaS auth, plans, billing, webhooks, entitlements, admin controls, or payment security
 ---
 
 # Haye Skill: saas-billing

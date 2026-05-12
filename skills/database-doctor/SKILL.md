@@ -1,6 +1,6 @@
 ---
 name: database-doctor
-description: Diagnose PostgreSQL connectivity, schema, performance, locks, backups and exposure risks. Complements prisma-doctor.
+description: Use when diagnosing PostgreSQL connectivity issues, query performance, lock contention, backup failures, or exposure risks - complements prisma-doctor for raw DB issues
 ---
 
 # Haye Skill: database-doctor

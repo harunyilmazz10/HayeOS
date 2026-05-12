@@ -1,6 +1,6 @@
 ---
 name: docker-doctor
-description: Diagnose Dockerfile, Compose, image, build, port, volume, healthcheck and runtime container problems.
+description: Use when diagnosing Dockerfile build errors, Compose orchestration failures, image size/layer issues, port conflicts, volume mount problems, healthcheck failures
 ---
 
 # Haye Skill: docker-doctor

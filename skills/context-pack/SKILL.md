@@ -1,6 +1,6 @@
 ---
 name: context-pack
-description: Generate a minimal task-specific context pack before coding, debugging, deploying, or reviewing.
+description: Use before any non-trivial coding, debugging, or review task - generates minimal task-specific context to avoid loading the whole codebase
 ---
 
 # Haye Skill: context-pack

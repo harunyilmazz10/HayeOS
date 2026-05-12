@@ -1,6 +1,6 @@
 ---
 name: secrets-audit
-description: Find possible secret leaks in env files, code, logs, build artifacts, git history, CI settings and memory notes.
+description: Use when checking for leaked credentials in env files, source code, logs, build artifacts, git history, CI configuration, or memory vault entries
 ---
 
 # Haye Skill: secrets-audit

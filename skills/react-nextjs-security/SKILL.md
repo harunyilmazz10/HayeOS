@@ -1,6 +1,6 @@
 ---
 name: react-nextjs-security
-description: Audit React, React Server Components, Next.js and Cloudflare/WAF exposure against known advisory baselines and live sources when available.
+description: Use when checking React, RSC, Next.js, and Cloudflare/WAF exposure against current CVE advisories - live advisory check preferred
 ---
 
 # Haye Skill: react-nextjs-security

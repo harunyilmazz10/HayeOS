@@ -1,6 +1,6 @@
 ---
 name: api-integration
-description: Add or harden an external API integration with auth, retries, rate-limits, idempotency, observability and graceful failure.
+description: Use when adding or hardening an external API integration - auth, retries, rate limits, idempotency, observability, graceful failure
 ---
 
 # Haye Skill: api-integration

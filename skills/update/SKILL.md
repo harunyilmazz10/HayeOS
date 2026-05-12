@@ -1,6 +1,6 @@
 ---
 name: update
-description: Safely update the installed HayeOS Claude Code plugin from GitHub without touching project memory.
+description: Use when user wants to update the installed HayeOS plugin to a newer version - git-based safe pull, validation, restart recommendation
 ---
 
 # Haye Skill: update

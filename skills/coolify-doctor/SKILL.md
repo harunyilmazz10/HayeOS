@@ -1,6 +1,6 @@
 ---
 name: coolify-doctor
-description: Diagnose Coolify deployment, build pack, Traefik routing, env, healthcheck and container lifecycle on Hetzner-hosted Coolify.
+description: Use when diagnosing Coolify deployment failures, build pack mismatch, Traefik routing issues, env var leakage, healthcheck timeouts, or container lifecycle problems
 ---
 
 # Haye Skill: coolify-doctor

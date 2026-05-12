@@ -1,6 +1,6 @@
 ---
 name: dependency-security
-description: Check dependencies and version choices using package files, audit tools, official advisories and Haye safe-version policy.
+description: Use when choosing dependency versions or upgrading - safe-version policy, advisory check, lifecycle status
 ---
 
 # Haye Skill: dependency-security

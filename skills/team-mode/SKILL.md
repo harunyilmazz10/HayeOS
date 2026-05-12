@@ -1,6 +1,6 @@
 ---
 name: team-mode
-description: Internal HayeOS Team Mode planner used only by /haye:work for large, risky or cross-layer tasks.
+description: Internal sub-skill invoked only by work skill - never standalone. Coordinates specialist agent invocations for large or cross-layer tasks
 ---
 
 # Haye Skill: team-mode

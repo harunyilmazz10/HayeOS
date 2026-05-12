@@ -1,6 +1,6 @@
 ---
 name: cloudflare-doctor
-description: Diagnose Cloudflare DNS, proxy, SSL/TLS mode, WAF, page rules, cache rules, R2, Workers and tunnel issues.
+description: Use when diagnosing Cloudflare DNS resolution issues, proxy/origin problems, SSL/TLS mode misconfiguration, WAF false positives, cache rule issues, R2 access, or Workers errors
 ---
 
 # Haye Skill: cloudflare-doctor

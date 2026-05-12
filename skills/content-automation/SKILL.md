@@ -1,6 +1,6 @@
 ---
 name: content-automation
-description: Build automated content pipelines - source ingest, LLM rewrite, scheduling, multi-channel posting, analytics feedback.
+description: Use when building automated content pipelines - source ingest, LLM rewrite, scheduling, multi-channel posting, analytics feedback
 ---
 
 # Haye Skill: content-automation

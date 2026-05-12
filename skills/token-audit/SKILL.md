@@ -1,6 +1,6 @@
 ---
 name: token-audit
-description: Find Claude Code context/token waste and recommend /clear, context packs, session splits, summary updates and model selection.
+description: Use when chat feels slow, repetitive, or wasteful - identifies waste and recommends /clear, context packs, session splits, model changes
 ---
 
 # Haye Skill: token-audit

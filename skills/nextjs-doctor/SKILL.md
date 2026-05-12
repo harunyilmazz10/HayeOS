@@ -1,6 +1,6 @@
 ---
 name: nextjs-doctor
-description: Diagnose Next.js build, App Router, RSC, middleware, server actions, caching, image optimization and Coolify-deployed Next.js issues.
+description: Use when diagnosing Next.js build failures, App Router errors, RSC issues, middleware bugs, server action failures, caching anomalies, or Coolify-deployed Next.js problems
 ---
 
 # Haye Skill: nextjs-doctor

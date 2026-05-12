@@ -1,6 +1,6 @@
 ---
 name: deploy
-description: Execute a deploy with pre-flight checks, controlled rollout and rollback readiness. Coolify/Hetzner default; adaptable to other targets.
+description: Use when running a production deploy - pre-flight checks, controlled rollout, rollback readiness required
 ---
 
 # Haye Skill: deploy

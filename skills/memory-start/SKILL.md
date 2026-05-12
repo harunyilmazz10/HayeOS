@@ -1,6 +1,6 @@
 ---
 name: memory-start
-description: Start a Claude Code session from Haye Obsidian memory with minimal context. Use after /clear or at the beginning of work.
+description: Use after /clear or at the start of resumed work - loads minimal vault context without dumping the whole memory
 ---
 
 # Haye Skill: memory-start

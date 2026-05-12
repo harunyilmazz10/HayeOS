@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review a diff, a plan, or a design with structure - correctness, security, maintainability, scope discipline.
+description: Use when reviewing a diff, plan, or design - structured pass over correctness, security, maintainability, scope discipline
 ---
 
 # Haye Skill: review

@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Smart router for release and deploy readiness
+description: Use when user mentions deploy, release, production, go-live, rollout, or merge to main - smart router for release-readiness checks
 ---
 
 # Haye Skill: ship

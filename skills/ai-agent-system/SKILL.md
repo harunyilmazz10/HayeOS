@@ -1,6 +1,6 @@
 ---
 name: ai-agent-system
-description: Build manager/worker AI agent systems with approval gates, tool permissions, structured logs, memory, cost ceilings and safe loops.
+description: Use when building manager/worker AI agent systems - approval gates, tool permissions, structured logs, memory, cost ceilings, safe loops
 ---
 
 # Haye Skill: ai-agent-system

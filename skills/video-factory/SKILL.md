@@ -1,6 +1,6 @@
 ---
 name: video-factory
-description: Build or operate AI video factories - source ingest, OCR/filter, TTS, subtitles, ffmpeg pipeline, R2/storage, scheduling, multi-platform upload.
+description: Use when building or operating AI video factories - source ingest, OCR/filter, TTS, subtitles, ffmpeg pipeline, R2/storage, scheduling, multi-platform upload
 ---
 
 # Haye Skill: video-factory

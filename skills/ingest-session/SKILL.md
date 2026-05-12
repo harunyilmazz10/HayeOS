@@ -1,6 +1,6 @@
 ---
 name: ingest-session
-description: Summarize raw session logs, terminal output and chat transcripts into structured Obsidian memory entries.
+description: Use when raw chat transcripts, terminal logs, or session dumps need to be summarized into structured vault entries
 ---
 
 # Haye Skill: ingest-session

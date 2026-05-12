@@ -1,6 +1,6 @@
 ---
 name: init-memory
-description: Create or repair the Obsidian memory vault for the current project. Use when setting up Haye for a project or when core memory files are missing.
+description: Use when a project has no .hayeos.json or vault, or when core memory files are missing - creates the Obsidian vault structure
 ---
 
 # Haye Skill: init-memory

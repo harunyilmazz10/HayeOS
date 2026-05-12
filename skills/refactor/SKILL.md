@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Refactor code while preserving behavior. Bounded scope, tested before/after, rollback plan, memory of why.
+description: Use when changing code structure without changing behavior - bounded scope, tested before/after, rollback plan
 ---
 
 # Haye Skill: refactor

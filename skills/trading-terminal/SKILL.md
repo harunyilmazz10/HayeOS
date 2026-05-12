@@ -1,6 +1,6 @@
 ---
 name: trading-terminal
-description: Work on trading or prediction-market terminals with risk controls, exchange/market API adapters, position sizing, region constraints and safety boundaries.
+description: Use when working on trading or prediction-market terminals - risk controls, exchange/market API adapters, position sizing, region constraints, safety boundaries
 ---
 
 # Haye Skill: trading-terminal

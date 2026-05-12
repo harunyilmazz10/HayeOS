@@ -1,6 +1,6 @@
 ---
 name: exposed-port-audit
-description: Audit exposed network ports, firewall rules, reverse proxy boundaries and direct service exposure on Coolify/Hetzner hosts.
+description: Use when reviewing network exposure, firewall rules, reverse proxy boundaries, direct service exposure, especially on Coolify/Hetzner hosts
 ---
 
 # Haye Skill: exposed-port-audit

@@ -1,6 +1,6 @@
 ---
 name: auth-audit
-description: Audit authentication, session, cookie, admin guard, API authorization, RBAC, ownership and password/MFA flows.
+description: Use when reviewing authentication flows, session/cookie security, admin guards, API authorization, RBAC, ownership checks, password handling, or MFA implementation
 ---
 
 # Haye Skill: auth-audit

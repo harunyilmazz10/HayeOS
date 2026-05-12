@@ -1,6 +1,6 @@
 ---
 name: feature
-description: Ship a small, vertical feature slice end-to-end with a clear scope, a test, and a memory note. Not a redesign.
+description: You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores intent, requirements and design before implementation
 ---
 
 # Haye Skill: feature

@@ -1,6 +1,6 @@
 ---
 name: n8n-pipeline
-description: Build, review and harden n8n workflows - credentials, error branches, retries, webhooks, idempotency, observability and Coolify-hosted n8n.
+description: Use when building, reviewing, or hardening n8n workflows - credentials, error branches, retries, webhooks, idempotency, observability, Coolify-hosted n8n
 ---
 
 # Haye Skill: n8n-pipeline

@@ -1,6 +1,6 @@
 ---
 name: bugfix
-description: Reproduce, hypothesize, narrow, fix at root and add a regression test. The skill version of the bug-investigator agent.
+description: Use when reproducing a bug, narrowing scope, identifying root cause, and adding a regression test - the disciplined version of fix routing
 ---
 
 # Haye Skill: bugfix

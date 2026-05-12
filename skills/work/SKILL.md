@@ -1,6 +1,6 @@
 ---
 name: work
-description: Smart Work Router for development, Team Mode planning, low-friction execution and verification discipline.
+description: Use when user requests a feature, refactor, migration, deploy, or any non-trivial implementation work - smart router that selects mode (Full Architecture, Team Mode, MVP) and invokes brainstorming for unscoped requests
 ---
 
 # Haye Skill: work
