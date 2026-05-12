@@ -37,7 +37,7 @@ Modes:
 - Fast Single Agent: small + low risk işler için kısa planla direkt uygular.
 - Standard Single Agent: medium işler için plan + implementation + verification yapar.
 - Plan First: önce sadece plan çıkarır, kod yazmadan onay bekler.
-- Team Mode: large veya high risk işlerde uzman rollere böler; ayrı `/haye:team` komutu yoktur.
+- Team Mode: large veya high risk işlerde uzman rollere böler; ayrı user-facing team komutu yoktur.
 - Full Architecture Mode: massive veya sıfırdan production-grade sistemlerde kodlamadan önce mimari plan çıkarır ve onay ister.
 
 Work Strategy Selection Rule: large, massive, high-risk veya belirsiz işlerde HayeOS önce önerilen çalışma modunu açıklar ve Türkçe onay ister; small + low-risk işlerde sormadan Fast Single Agent ile ilerler.
@@ -69,22 +69,22 @@ Recommended daily flow:
 /haye:update
 ```
 
-## Advanced commands
+## Internal Skills / Routed Workflows
 
-The detailed skills remain available for direct use:
+These are internal skills and routed workflows, not user-facing slash commands. HayeOS invokes them through the daily commands such as `/haye:work`, `/haye:secure`, `/haye:ship`, `/haye:start` and `/haye:close` when needed.
 
 ```text
-/haye:memory-start
-/haye:context-pack
-/haye:session-close
-/haye:dependency-security
-/haye:react-nextjs-security
-/haye:cloudflare-doctor
-/haye:coolify-doctor
-/haye:bugfix
-/haye:deploy
-/haye:memory-lint
-/haye:token-audit
+memory-start
+context-pack
+session-close
+dependency-security
+react-nextjs-security
+cloudflare-doctor
+coolify-doctor
+bugfix
+deploy
+memory-lint
+token-audit
 ```
 
 ## Install locally
@@ -185,7 +185,7 @@ If internet/advisory access is unavailable, Haye must clearly say that live advi
 
 ### React / Next.js / Cloudflare rule
 
-For React Server Components, Next.js App Router, middleware/proxy, server actions, image optimization and cache components, Haye runs `/haye:react-nextjs-security` or routes through `/haye:secure`.
+For React Server Components, Next.js App Router, middleware/proxy, server actions, image optimization and cache components, Haye uses the internal `react-nextjs-security` skill or routes through `/haye:secure`.
 
 Known embedded baseline from the May 2026 React/Next.js advisory set:
 

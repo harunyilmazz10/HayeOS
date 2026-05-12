@@ -84,7 +84,7 @@ If `${CLAUDE_PLUGIN_ROOT}` is unavailable, infer the plugin root from the loaded
 - must only create or repair `.hayeos.json` and files under `<resolved memoryPath>`
 
 ## Mandatory manual fallback
-If the CLI cannot run for any reason, Claude Code must directly create the memory files in the current project root. This fallback is required on Windows, Mac and Linux.
+If the CLI cannot run for any reason, Claude Code must create `.hayeos.json` in the current project root and create all memory vault files only under `<resolved memoryPath>`. This fallback is required on Windows, Mac and Linux.
 
 Create `.hayeos.json`:
 
@@ -129,34 +129,21 @@ Create this vault structure under `<resolved memoryPath>`:
 <resolved memoryPath>/99-archive/
 ```
 
-Core markdown files must not be empty. Use useful Turkish starter content:
+Core markdown files must not be empty. Use useful Turkish starter content.
 
-`HAYE.md`:
-```markdown
-# HAYE.md
+For `<resolved memoryPath>/HAYE.md`, do not maintain a short fallback template in this skill. Use the canonical template content from `skills/init-memory/templates/HAYE.md` as the behavioral source of truth. The manual fallback HAYE.md must include the same critical sections as the canonical template, including:
 
-Project: <project-name>
+- Plugin root vs project vault
+- Approval Friction Rule
+- No Fake Completion Rule
+- Output Budget Rule
+- Quality Preservation Rule
+- Auto Checkpoint Rule
+- Safe Resume Rule
+- Scope Control Rule
+- Framework Security Rule
 
-## User Response Language Rule
-- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
-- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
-- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
-
-## Proje kuralları
-- Oturum başında `/haye:start`, oturum sonunda `/haye:close` kullan.
-- Önce minimal hafıza oku: `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`.
-- `08-raw/` klasörünü kullanıcı istemedikçe okuma.
-
-## Token kuralları
-- Büyük logları ve tüm repo çıktısını yapıştırma.
-- Özet, dosya yolu, karar ve doğrulama çıktısı kullan.
-
-## Dependency security
-- Dependency seçerken `latest` kullanma.
-- `package.json`, lockfile, audit çıktısı ve mümkünse resmi advisory kaynaklarını kontrol et.
-- Cloudflare WAF dependency patch yerine geçmez.
-```
+If the canonical template cannot be read directly, recreate `<resolved memoryPath>/HAYE.md` from that canonical content as faithfully as possible and preserve all critical rules above.
 
 `index.md`:
 ```markdown

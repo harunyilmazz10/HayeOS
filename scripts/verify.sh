@@ -170,6 +170,60 @@ if errors:
 PY
 }
 
+check_init_fallback_and_readme_commands() {
+  python3 - <<'PY'
+from pathlib import Path
+import re
+import sys
+
+errors = []
+
+init_text = Path("skills/init-memory/SKILL.md").read_text(encoding="utf-8")
+bad_root_phrases = [
+    "memory files in the current project root",
+    "create the memory files in the current project root",
+]
+for phrase in bad_root_phrases:
+    if phrase in init_text:
+        errors.append(f"skills/init-memory/SKILL.md: unsafe fallback wording remains: {phrase}")
+
+critical_haye_sections = [
+    "Plugin root vs project vault",
+    "Approval Friction Rule",
+    "No Fake Completion Rule",
+    "Output Budget Rule",
+    "Quality Preservation Rule",
+    "Auto Checkpoint Rule",
+    "Safe Resume Rule",
+    "Scope Control Rule",
+    "Framework Security Rule",
+]
+uses_canonical = "skills/init-memory/templates/HAYE.md" in init_text and "canonical template" in init_text
+if uses_canonical:
+    for section in critical_haye_sections:
+        if section not in init_text:
+            errors.append(f"skills/init-memory/SKILL.md: canonical fallback reference missing critical section name: {section}")
+else:
+    for section in critical_haye_sections:
+        if section not in init_text:
+            errors.append(f"skills/init-memory/SKILL.md: fallback HAYE content missing critical section: {section}")
+
+allowed = {path.stem for path in Path("commands").glob("*.md")}
+readme = Path("README.md").read_text(encoding="utf-8")
+unknown = sorted({match.group(1) for match in re.finditer(r"/haye:([A-Za-z0-9_-]+)", readme) if match.group(1) not in allowed})
+if unknown:
+    errors.append("README.md: unknown user-facing slash command references: " + ", ".join(f"/haye:{name}" for name in unknown))
+if "/haye:react-nextjs-security" in readme:
+    errors.append("README.md: internal react-nextjs-security skill must not be documented as /haye:react-nextjs-security")
+
+if errors:
+    print("Init fallback / README command accuracy errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -182,6 +236,7 @@ check_plugin_root_clean() {
 check_markdown_frontmatter
 check_memory_path_contract
 check_special_skill_contracts
+check_init_fallback_and_readme_commands
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"
