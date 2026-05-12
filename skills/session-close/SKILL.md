@@ -82,3 +82,12 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 - Do not run destructive commands without explicit approval.
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
+
+## Path Separation Rule (session close scope)
+
+Session close yalnızca memory consolidation yapar. Kapanış güncellemeleri `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/health.md`, `<resolved memoryPath>/04-tasks/active-task.md` ve `<resolved memoryPath>/05-sessions/latest-checkpoint.md` gibi vault hedeflerine gider.
+
+Kod, proje docs, infra, config, Docker ve test artifact'leri `sourcePath` altında kalır. Session close implementation artifact'lerini vault'a "archive" etmez, taşımaz veya kopyalamaz.
+
+Bir kapanış sırasında hedef path `<resolved memoryPath>` altında proje kodu/dökümanı gibi görünüyorsa DUR ve Türkçe uyar:
+"Bu dosya memory vault'una yazılmaya çalışılıyor ama bu proje kodu/dökümanı. Proje kök dizinine (sourcePath) yazılmalı."

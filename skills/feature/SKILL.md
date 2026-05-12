@@ -104,3 +104,49 @@ Ship a single, vertical feature slice: smallest piece of new behavior that a use
 - Don't claim "done" without manual smoke through the user flow.
 - Don't add `latest` deps for "one helper function"; the skill `dependency-audit` gates it.
 - Long feature designs go to `docs/features/<name>.md`; chat gets the summary.
+
+## Path Separation Rule (project source vs memory vault)
+
+Proje dosyaları ve memory dosyaları FARKLI dizinlerde yaşar. Birbirine karıştırılmaz.
+
+### sourcePath (proje kökü) - buraya yazılır
+Kullanıcının projesinin gerçekten çalıştığı her şey:
+- Kod: `.py`, `.ts`, `.tsx`, `.js`, `.jsx`, `.go`, `.rs`, `.java`, `.html`, `.css`
+- Infra: `Dockerfile`, `docker-compose*.yml`, `Procfile`, `.dockerignore`, helm/kustomize
+- Config: `.env.example`, `next.config.*`, `tsconfig.json`, `package.json`, `requirements.txt`, `pyproject.toml`, `Makefile`
+- Docs: `README.md`, `CHANGELOG.md`, `docs/`, `ADR/`, API specs
+- Klasörler: `services/`, `apps/`, `packages/`, `infra/`, `scripts/`, `tests/`, `public/`, `assets/`
+
+### memoryPath (vault) - SADECE memory için
+Yapısal proje hafızası:
+- `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`
+- `<resolved memoryPath>/01-prompts/`, `<resolved memoryPath>/02-decisions/`, `<resolved memoryPath>/03-bugs/`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/06-prompts/`, `<resolved memoryPath>/07-checklists/`, `<resolved memoryPath>/08-raw/`, `<resolved memoryPath>/09-context-packs/`, `<resolved memoryPath>/10-reviews/`, `<resolved memoryPath>/11-metrics/`, `<resolved memoryPath>/12-risks/`, `<resolved memoryPath>/99-archive/`
+
+### Hard rule
+Bir hedef path `<resolved memoryPath>` altındaysa VE şu isimlerden/uzantılardan biriyse -> DUR ve Türkçe uyar:
+- `.py`, `.ts`, `.tsx`, `.js`, `.jsx`, `.go`, `.rs`, `.java`, `.html`, `.css`, `.sh`, `.yaml`, `.yml`, `.toml`, `Dockerfile`, `docker-compose*`, `package.json`, `requirements.txt`, `pyproject.toml`, `next.config.*`
+- Memory subfolder olmayan klasörler: `services/`, `apps/`, `packages/`, `infra/`, `scripts/`, `tests/`, `public/`, `assets/`
+
+Uyarı mesajı:
+"Bu dosya memory vault'una yazılmaya çalışılıyor ama bu proje kodu/dökümanı. Proje kök dizinine (sourcePath) yazılmalı."
+
+Proje için `docs/` gerekiyorsa `<sourcePath>/docs/`'a yazılır, `<memoryPath>/docs/`'a değil.
+Proje `README.md`'si `<sourcePath>/README.md`'ye yazılır, `<memoryPath>/README.md`'ye değil.
+
+## Tech stack adherence
+
+Kullanıcı promptu spesifik teknoloji adlandırırsa (FastAPI, Postgres, Prisma, Redis, RabbitMQ, vb.), HayeOS onları kullanır.
+
+### Adı geçen stack'ten sapma
+- Açık kabul gerektirir: "Kullanıcı X istedi. Z sebebiyle Y kullanıyorum."
+- Kod yazılmadan önce kullanıcı onayı gerektirir
+- Sık görülen drift: prompt FastAPI istemiş, HayeOS "daha basit" diye Flask'a uzanmış - bu ihlaldir
+
+### Default safe versions (prompt sessizse)
+- Python: 3.12 (3.8/3.9/3.10 yeni projelerde yasak - EOL)
+- Node: 20 LTS veya 22 LTS (18 LTS sadece kilitlenmişse)
+- Postgres: 16 minimum, 17 tercih
+- Docker Compose: v2 syntax (top-level `version: '3'` YOK)
+
+### Sürüm karar kaynağı
+Her dependency seçimi ve version pin `<resolved memoryPath>/02-decisions/dependencies-<date>.md`'ye kaydedilir.

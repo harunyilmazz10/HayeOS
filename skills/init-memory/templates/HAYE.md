@@ -80,3 +80,13 @@ This project uses Haye memory-first workflow.
 
 ## Framework Security Rule
 For React/Next.js projects, Haye must check both dependency advisories and edge/WAF mitigation status. Cloudflare WAF may reduce exposure but vulnerable dependencies must still be patched. Do not mark safe unless dependency patch status and WAF status are documented.
+
+## Path Separation Rule
+- `sourcePath` is the project source area for code, infra, config, project README, and source docs.
+- `memoryPath` is structured HayeOS memory only.
+- Memory files live under `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, and HayeOS memory folders.
+- Project code, `Dockerfile`, `docker-compose*.yml`, project `README.md`, and source `docs/` must not be written into the vault.
+- If a target under `memoryPath` looks like project code or project infra, stop before writing.
+- Keep project artifacts under `sourcePath`.
+- Keep checkpoints, tasks, decisions, risks, prompts, context packs, and session handoff under `memoryPath`.
+- Turkish warning: "Bu dosya memory vault'una yazılmaya çalışılıyor ama bu proje kodu/dökümanı. Proje kök dizinine (sourcePath) yazılmalı."

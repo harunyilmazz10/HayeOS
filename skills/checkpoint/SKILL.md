@@ -118,3 +118,12 @@ Kaldığımız yerden devam edeyim mi?
 - Chat should be concise, but code and project files must remain complete, maintainable, secure, and production-quality.
 - If there is a conflict between token saving and correctness, correctness wins.
 - If there is a conflict between speed and safety, safety wins.
+
+## Path Separation Rule (checkpoint scope)
+
+Checkpoint yalnızca HayeOS memory state yazar. Checkpoint hedefleri `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, `<resolved memoryPath>/04-tasks/active-task.md`, `<resolved memoryPath>/current.md` ve `<resolved memoryPath>/next.md` ile sınırlıdır.
+
+Kod, proje docs, infra, config, Docker ve test artifact'leri `sourcePath` altında kalır. Session state veya active task güncellemek, implementation dosyalarını vault'a taşımak anlamına gelmez.
+
+Bir checkpoint sırasında hedef path `<resolved memoryPath>` altında proje kodu/dökümanı gibi görünüyorsa DUR ve Türkçe uyar:
+"Bu dosya memory vault'una yazılmaya çalışılıyor ama bu proje kodu/dökümanı. Proje kök dizinine (sourcePath) yazılmalı."

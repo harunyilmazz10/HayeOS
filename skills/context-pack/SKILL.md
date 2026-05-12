@@ -88,3 +88,15 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 - Do not run destructive commands without explicit approval.
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
+
+## Path Separation Rule (context packs)
+
+Context pack dosyaları vault içindeki `<resolved memoryPath>/09-context-packs/` altına yazılır. Context pack üretmek, analiz edilen source dosyalarını vault'a taşımak veya proje docs'larını vault içinde yeniden üretmek anlamına gelmez.
+
+- Source code, project docs, infra ve config dosyaları `sourcePath` altından okunur.
+- Context pack summary ve handoff içeriği `<resolved memoryPath>/09-context-packs/<task>.md` altına yazılır.
+- Proje kodu, `Dockerfile`, `docker-compose*.yml`, `package.json`, `requirements.txt`, `pyproject.toml`, source `docs/`, `services/`, `apps/`, `infra/`, `scripts/`, `tests/`, `public/` ve `assets/` vault'a yazılmaz.
+- Hedef path `<resolved memoryPath>` altında proje kodu/dökümanı gibi görünüyorsa DUR ve Türkçe uyar.
+
+Uyarı mesajı:
+"Bu dosya memory vault'una yazılmaya çalışılıyor ama bu proje kodu/dökümanı. Proje kök dizinine (sourcePath) yazılmalı."

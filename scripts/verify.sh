@@ -600,6 +600,75 @@ if errors:
 PY
 }
 
+check_path_separation_and_workflow_rules() {
+  python3 - <<'PY'
+from pathlib import Path
+import sys
+
+errors = []
+
+# Path Separation Rule must appear in key files
+path_sep_targets = [
+    "commands/work.md",
+    "skills/work/SKILL.md",
+    "skills/feature/SKILL.md",
+    "skills/init-memory/SKILL.md",
+    "skills/init-memory/templates/HAYE.md",
+    "skills/context-pack/SKILL.md",
+    "skills/checkpoint/SKILL.md",
+    "skills/session-close/SKILL.md",
+    "docs/commands.md",
+    "README.md",
+]
+for target in path_sep_targets:
+    text = Path(target).read_text(encoding="utf-8")
+    if "Path Separation Rule" not in text:
+        errors.append(f"{target}: missing Path Separation Rule reference")
+
+# Plan Depth Rule + Service count adherence in work
+work_skill = Path("skills/work/SKILL.md").read_text(encoding="utf-8")
+work_cmd = Path("commands/work.md").read_text(encoding="utf-8")
+combined = work_skill + work_cmd
+normalized_combined = combined.lower().replace("ı", "i")
+
+for marker in ["Plan Depth Rule", "Stub-plan refusal", "Service count adherence"]:
+    if marker not in combined:
+        errors.append(f"work skill/command missing Plan Depth marker: {marker}")
+
+# Strengthened No Fake Completion evidence requirements
+required_evidence_markers = [
+    "docker compose ps",
+    "echo endpoint",
+    "servisler baslatilmadi",
+]
+for marker in required_evidence_markers:
+    normalized_marker = marker.lower().replace("ı", "i")
+    if normalized_marker not in normalized_combined:
+        errors.append(f"work skill/command missing No Fake Completion evidence marker: {marker}")
+
+# Team Mode mandatory
+for marker in ["token-economist", "Team Mode mandatory"]:
+    if marker not in combined:
+        errors.append(f"work skill/command missing Team Mode mandatory marker: {marker}")
+
+# Loop / confirmation spam prevention
+for marker in ["confirmation spam prevention", "Aynı output tekrarı", "devam edelim"]:
+    if marker not in combined:
+        errors.append(f"work skill/command missing loop prevention marker: {marker}")
+
+# Tech stack adherence
+for marker in ["Tech stack adherence", "Adı geçen stack'ten sapma", "Default safe versions"]:
+    if marker not in combined:
+        errors.append(f"work skill/command missing tech stack adherence marker: {marker}")
+
+if errors:
+    print("Path separation and workflow rule errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -618,6 +687,7 @@ check_cli_failure_modes
 check_wrappers_and_hooks
 check_enriched_content
 check_release_polish
+check_path_separation_and_workflow_rules
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

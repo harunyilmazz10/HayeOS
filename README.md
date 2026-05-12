@@ -57,6 +57,10 @@ Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden 
 
 Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root. All project memory is stored under the current project's `.hayeos.json` `memoryPath`; HayeOS must not write context packs, checkpoints, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` or `<resolved memoryPath>/changelog.md` into the plugin repository.
 
+## Path Separation Rule
+
+Project source files (code, Dockerfile, docker-compose, docs/, infra/) live under `sourcePath`. Memory files (`<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/02-decisions/`, etc.) live under `memoryPath`. HayeOS must never write project source code into the memory vault. If a target path under `memoryPath` has a code/infra extension (.py, .ts, Dockerfile, docker-compose.yml, package.json, requirements.txt etc.) or a non-memory directory name (services/, apps/, infra/, scripts/), HayeOS halts and warns in Turkish. See `skills/work/SKILL.md` "Path Separation Rule" for the full list.
+
 `/haye:update` updates the installed HayeOS plugin repo from GitHub. It stops when local changes exist, does not commit or push, validates the plugin after updating, and recommends restarting Claude Code.
 
 Recommended daily flow:
