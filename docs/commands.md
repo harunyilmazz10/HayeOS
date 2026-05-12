@@ -164,7 +164,7 @@ Uzun içerikler chat'e değil dosyalara yazılır:
 
 Detaylar için `docs/` veya HayeOS vault dosyaları kullanılır. Full Architecture Mode detayları örneğin `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazılır.
 
-Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu verilir. Eğer çıktı çok uzayacaksa bölümlere ayrılır ve kullanıcıdan devam onayı istenir.
+Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu verilir. If output would become long, prefer writing the detailed content to `docs/` or the HayeOS vault and provide a concise chat summary. Ask for continuation only if the user explicitly requested a long multi-part chat response.
 
 # Quality Preservation Rule
 

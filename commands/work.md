@@ -19,7 +19,7 @@ Use `skills/work/SKILL.md`.
 - `task_type`: `feature`, `bugfix`, `refactor`, `architecture`, `security`, `deploy`, `research`, `bootstrap`, `documentation`, `media-pipeline`, `AI-system`
 - `risk_level`: `low`, `medium`, `high`
 - `affected_layers`: `frontend`, `backend`, `database`, `infra`, `AI`, `security`, `deployment`, `media pipeline`, `queue/event system`, `storage`, `analytics`
-- `recommended_mode`: `fast`, `standard`, `team`, `full-architecture`
+- `recommended_mode`: `Fast Single Agent`, `Standard Single Agent`, `Plan First`, `Team Mode`, `Full Architecture Mode`
 
 ## Work Strategy Selection Rule
 `/haye:work` büyük, belirsiz veya riskli işlerde kafasına göre tek agent/subagent seçmez. Önce `task_size`, `task_type`, `risk_level`, `affected_layers` ve `recommended_mode` sınıflandırmasını kısa verir, sonra Türkçe strateji onayı ister.
@@ -84,7 +84,7 @@ Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "prod
 - Büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun içerikleri chat'e değil dosyalara yaz.
 - Detaylı içerikler için `docs/` veya HayeOS vault içinde uygun dosyaları kullan.
 - Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu ver.
-- Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
+- If output would become long, prefer writing the detailed content to `docs/` or the HayeOS vault and provide a concise chat summary. Ask for continuation only if the user explicitly requested a long multi-part chat response.
 
 ## Quality Preservation Rule
 - Token discipline must never reduce implementation quality.
@@ -109,4 +109,4 @@ Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "prod
 - `context-pack`, `checkpoint`, `active-task`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md` plugin repo içine yazılmaz.
 - Hedef path `CLAUDE_PLUGIN_ROOT` altındaysa yazmayı durdur ve Türkçe uyar: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
 
-Respect `.hayeos.json`, keep scope narrow, verify with real commands, and leave memory updates for `/haye:close`.
+Respect `.hayeos.json`, keep scope narrow and verify with real commands. Checkpoint and active task state may be updated during `/haye:work` according to Auto Checkpoint Rule. Final session handoff and close-time memory consolidation belong to `/haye:close`.

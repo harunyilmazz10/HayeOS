@@ -50,7 +50,7 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 - Chat cevabını kısa tut; varsayılan 1500-3000 token hedefle.
 - Büyük context pack içeriklerini chat'e basma; HayeOS vault içinde `<resolved memoryPath>/09-context-packs/` altına yaz.
 - Chat'te context pack dosya yolu, kısa özet, kritik kararlar, doğrulama durumu ve sıradaki 3 adımı ver.
-- Çıktı çok uzayacaksa bölümlere ayır ve kullanıcıdan devam onayı iste.
+- If output would become long, prefer writing the detailed content to `docs/` or the HayeOS vault and provide a concise chat summary. Ask for continuation only if the user explicitly requested a long multi-part chat response.
 
 ## Quality Preservation Rule
 - Token discipline must never reduce implementation quality.

@@ -224,6 +224,77 @@ if errors:
 PY
 }
 
+check_work_consistency_and_template_failfast() {
+  python3 - <<'PY'
+from pathlib import Path
+import re
+import sys
+
+errors = []
+
+work_cmd = Path("commands/work.md").read_text(encoding="utf-8")
+required_modes = [
+    "Fast Single Agent",
+    "Standard Single Agent",
+    "Plan First",
+    "Team Mode",
+    "Full Architecture Mode",
+]
+recommended_lines = [line for line in work_cmd.splitlines() if "`recommended_mode`" in line]
+if not recommended_lines:
+    errors.append("commands/work.md: missing recommended_mode line")
+else:
+    combined = "\n".join(recommended_lines)
+    for mode in required_modes:
+        if mode not in combined:
+            errors.append(f"commands/work.md: recommended_mode line missing {mode}")
+old_enum = re.compile(r"`recommended_mode`:\s*`fa" + r"st`,\s*`stan" + r"dard`,\s*`te" + r"am`,\s*`full-archi" + r"tecture`")
+if old_enum.search(work_cmd):
+    errors.append("commands/work.md: old recommended_mode enum remains")
+
+bad_close_phrase = "leave memory updates" + " for `/haye:close`"
+bad_close_phrase_plain = "leave memory updates" + " for /haye:close"
+if bad_close_phrase in work_cmd or bad_close_phrase_plain in work_cmd:
+    errors.append("commands/work.md: checkpoint/update wording still conflicts with Auto Checkpoint Rule")
+for phrase in [
+    "Checkpoint and active task state may be updated during `/haye:work` according to Auto Checkpoint Rule",
+    "Final session handoff and close-time memory consolidation belong to `/haye:close`",
+]:
+    if phrase not in work_cmd:
+        errors.append(f"commands/work.md: missing checkpoint/close separation phrase: {phrase}")
+
+old_loop_phrase = "bölümlere ayır" + " ve kullanıcıdan devam onayı iste"
+old_loop_phrase_passive = "bölümlere ayrılır" + " ve kullanıcıdan devam onayı istenir"
+for path in [
+    Path("commands/work.md"),
+    Path("skills/work/SKILL.md"),
+    Path("skills/context-pack/SKILL.md"),
+    Path("docs/commands.md"),
+]:
+    text = path.read_text(encoding="utf-8")
+    if old_loop_phrase in text or old_loop_phrase_passive in text:
+        errors.append(f"{path}: old output continuation loop wording remains")
+    for phrase in [
+        "prefer writing the detailed content to `docs/` or the HayeOS vault",
+        "Ask for continuation only if the user explicitly requested a long multi-part chat response",
+    ]:
+        if phrase not in text:
+            errors.append(f"{path}: missing output budget anti-loop phrase: {phrase}")
+
+bin_text = Path("bin/haye").read_text(encoding="utf-8")
+if "Canonical HAYE template is missing; refusing to initialize an incomplete vault." not in bin_text:
+    errors.append("bin/haye: missing canonical template fail-fast error")
+if "return f'''# HAYE.md" in bin_text or 'return f"""# HAYE.md' in bin_text:
+    errors.append("bin/haye: short embedded fallback HAYE template remains")
+
+if errors:
+    print("Work consistency / output budget / template fail-fast errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -237,6 +308,7 @@ check_markdown_frontmatter
 check_memory_path_contract
 check_special_skill_contracts
 check_init_fallback_and_readme_commands
+check_work_consistency_and_template_failfast
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

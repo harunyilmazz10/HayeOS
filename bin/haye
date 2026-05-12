@@ -51,26 +51,8 @@ def haye_template(project):
     if template_path.exists():
         text = template_path.read_text(encoding='utf-8')
         return text.replace('<project-name>', project)
-    return f'''# HAYE.md
-
-Project: {project}
-
-## User Response Language Rule
-- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
-- Komutlar, dosya yolları, paket isimleri, config keyleri ve kod blokları orijinal dilinde kalabilir.
-- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
-
-## Plugin root vs project vault
-- CLAUDE_PLUGIN_ROOT or the HayeOS install path is plugin code root only.
-- .hayeos.json memoryPath is the project memory vault and the single source of truth for memory writes.
-
-## Quality Preservation Rule
-- Token discipline must never reduce implementation quality.
-
-## Auto Checkpoint Rule
-- Checkpoint file: <resolved memoryPath>/05-sessions/latest-checkpoint.md
-'''
+    print('Canonical HAYE template is missing; refusing to initialize an incomplete vault.', file=sys.stderr)
+    raise SystemExit(1)
 
 def init_config():
     p=config_path()
