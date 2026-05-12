@@ -5,6 +5,7 @@ from pathlib import Path
 CORE_FILES=['HAYE.md','index.md','current.md','next.md','changelog.md','health.md']
 DIRS=['00-system','01-project','01-prompts','02-decisions','03-bugs/open','03-bugs/solved','03-bugs/recurring','04-tasks','05-sessions','06-prompts','07-checklists','08-raw/claude-sessions','08-raw/terminal-logs','08-raw/screenshots','08-raw/old-prompts','08-raw/docs','09-context-packs','10-reviews','11-metrics','12-risks','99-archive']
 DEFAULT_CONFIG={'sourcePath':'.','riskLevel':'medium','defaultWorkflow':'memory-first','sessionCloseRequired':True,'rawReadPolicy':'explicit-only'}
+class ConfigError(Exception): pass
 
 def cwd(): return Path.cwd()
 def config_path(): return cwd()/'.hayeos.json'
@@ -14,8 +15,9 @@ def load_config():
         try:
             cfg=json.loads(p.read_text())
             if isinstance(cfg, dict): return {**DEFAULT_CONFIG, **cfg}
-            print('Invalid .hayeos.json: root must be an object', file=sys.stderr)
-        except Exception as e: print(f'Invalid .hayeos.json: {e}', file=sys.stderr)
+            raise ConfigError('Invalid .hayeos.json: root must be an object')
+        except json.JSONDecodeError as e:
+            raise ConfigError(f'Invalid .hayeos.json: {e}')
     return {}
 
 def source_path():
@@ -56,10 +58,14 @@ def haye_template(project):
 
 def init_config():
     p=config_path()
-    if p.exists(): print('.hayeos.json already exists'); return
+    if p.exists():
+        load_config()
+        print('.hayeos.json already exists')
+        return 0
     cfg={'project':cwd().name,'memoryPath':f'./{cwd().name}_obs','sourcePath':'.','defaultWorkflow':'memory-first','sessionCloseRequired':True}
     p.write_text(json.dumps(cfg,indent=2), encoding='utf-8')
     print('created .hayeos.json')
+    return 0
 
 def init_vault():
     cfg=load_config()
@@ -206,18 +212,22 @@ commands:
 """)
 
 def main():
-    cmd=sys.argv[1] if len(sys.argv)>1 else '--help'
-    if cmd in ['--help','-h','help']: usage(); return 0
-    if cmd=='init': init_config(); init_vault(); return 0
-    if cmd=='init-config': init_config(); return 0
-    if cmd=='find-vault': print(memory_path() or ''); return 0
-    if cmd=='print-config': print(json.dumps(load_config(),indent=2)); return 0
-    if cmd=='lint': return lint()
-    if cmd=='health': return health()
-    if cmd=='raw-status': raw_status(); return 0
-    if cmd=='context-pack': return context_pack(' '.join(sys.argv[2:]) or 'manual-task') or 0
-    if cmd in ['deps-audit','dependency-report']: return deps_audit()
-    if cmd in ['react-nextjs-audit','safe-version-check','cloudflare-framework-report']: return react_next_audit()
-    if cmd=='doctor': health(); deps_audit(); return react_next_audit()
-    usage(); return 1
+    try:
+        cmd=sys.argv[1] if len(sys.argv)>1 else '--help'
+        if cmd in ['--help','-h','help']: usage(); return 0
+        if cmd=='init': return init_vault() or 0
+        if cmd=='init-config': return init_config() or 0
+        if cmd=='find-vault': print(memory_path() or ''); return 0
+        if cmd=='print-config': print(json.dumps(load_config(),indent=2)); return 0
+        if cmd=='lint': return lint()
+        if cmd=='health': return health()
+        if cmd=='raw-status': raw_status(); return 0
+        if cmd=='context-pack': return context_pack(' '.join(sys.argv[2:]) or 'manual-task') or 0
+        if cmd in ['deps-audit','dependency-report']: return deps_audit()
+        if cmd in ['react-nextjs-audit','safe-version-check','cloudflare-framework-report']: return react_next_audit()
+        if cmd=='doctor': health(); deps_audit(); return react_next_audit()
+        usage(); return 1
+    except ConfigError as e:
+        print(e, file=sys.stderr)
+        return 1
 if __name__=='__main__': sys.exit(main())

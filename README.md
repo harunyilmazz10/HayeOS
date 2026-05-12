@@ -26,6 +26,7 @@ Use these first. They are smart routers over the advanced HayeOS workflows.
 /haye:secure  # security, dependency and safe version checks
 /haye:ship    # deploy/release readiness
 /haye:close   # update Obsidian memory and close the session
+/haye:init-memory # create or repair project memory after user approval
 /haye:update  # update the installed HayeOS plugin safely
 ```
 
@@ -114,6 +115,8 @@ After install, new Claude Code sessions should expose:
 /haye:secure
 /haye:ship
 /haye:close
+/haye:init-memory
+/haye:update
 ```
 
 For one-off development testing, keep using:

@@ -216,6 +216,19 @@ if unknown:
 if "/haye:react-nextjs-security" in readme:
     errors.append("README.md: internal react-nextjs-security skill must not be documented as /haye:react-nextjs-security")
 
+for cmd in sorted(allowed):
+    if f"/haye:{cmd}" not in readme:
+        errors.append(f"README.md: missing user-facing command reference /haye:{cmd}")
+
+after_install = re.search(r"After install, new Claude Code sessions should expose:\n\n```text\n(?P<body>.*?)\n```", readme, re.S)
+if not after_install:
+    errors.append("README.md: missing after-install exposed command list")
+else:
+    body = after_install.group("body")
+    for cmd in sorted(allowed):
+        if f"/haye:{cmd}" not in body:
+            errors.append(f"README.md: after-install command list missing /haye:{cmd}")
+
 if errors:
     print("Init fallback / README command accuracy errors:")
     for error in errors:
@@ -295,6 +308,63 @@ if errors:
 PY
 }
 
+check_cli_failure_modes() {
+  python3 - "$ROOT_DIR" <<'PY'
+from pathlib import Path
+import json
+import subprocess
+import sys
+import tempfile
+
+root = Path(sys.argv[1]).resolve()
+bin_haye = root / "bin" / "haye"
+errors = []
+
+with tempfile.TemporaryDirectory(prefix="hayeos-cli-failure-") as tmp:
+    project = Path(tmp) / "unsafe-project"
+    project.mkdir()
+    unsafe_target = str(root)
+    (project / ".hayeos.json").write_text(json.dumps({
+        "project": "unsafe-project",
+        "memoryPath": unsafe_target,
+        "sourcePath": ".",
+        "defaultWorkflow": "memory-first",
+        "sessionCloseRequired": True,
+    }), encoding="utf-8")
+    proc = subprocess.run([sys.executable, str(bin_haye), "init"], cwd=project, text=True, capture_output=True)
+    if proc.returncode == 0:
+        errors.append("bin/haye init returned 0 for unsafe memoryPath under plugin root")
+    if "vault ready" in (proc.stdout + proc.stderr):
+        errors.append("bin/haye init printed vault ready for unsafe memoryPath")
+
+with tempfile.TemporaryDirectory(prefix="hayeos-cli-invalid-json-") as tmp:
+    project = Path(tmp) / "invalid-json-project"
+    project.mkdir()
+    (project / ".hayeos.json").write_text("{ invalid json", encoding="utf-8")
+    proc = subprocess.run([sys.executable, str(bin_haye), "init"], cwd=project, text=True, capture_output=True)
+    if proc.returncode == 0:
+        errors.append("bin/haye init returned 0 for invalid .hayeos.json")
+    if (project / "invalid-json-project_obs").exists():
+        errors.append("bin/haye init created vault despite invalid .hayeos.json")
+
+with tempfile.TemporaryDirectory(prefix="hayeos-cli-nonobject-json-") as tmp:
+    project = Path(tmp) / "nonobject-json-project"
+    project.mkdir()
+    (project / ".hayeos.json").write_text("[]", encoding="utf-8")
+    proc = subprocess.run([sys.executable, str(bin_haye), "init"], cwd=project, text=True, capture_output=True)
+    if proc.returncode == 0:
+        errors.append("bin/haye init returned 0 for non-object .hayeos.json")
+    if (project / "nonobject-json-project_obs").exists():
+        errors.append("bin/haye init created vault despite non-object .hayeos.json")
+
+if errors:
+    print("CLI failure mode errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -309,6 +379,7 @@ check_memory_path_contract
 check_special_skill_contracts
 check_init_fallback_and_readme_commands
 check_work_consistency_and_template_failfast
+check_cli_failure_modes
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"
