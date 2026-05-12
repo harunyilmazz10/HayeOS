@@ -150,8 +150,17 @@ for phrase in [
     if phrase not in context:
         errors.append(f"skills/context-pack/SKILL.md missing contract phrase: {phrase}")
 
-if "HayeOS komutları Harun için varsayılan" in "\n".join(p.read_text(encoding="utf-8") for p in sorted(Path("commands").glob("*.md")) + sorted(Path("skills").glob("*/SKILL.md"))):
-    errors.append("Harun-specific default language hardcode found")
+forbidden_user_name = "Ha" + "run"
+for path in (
+    sorted(Path("bin").glob("*"))
+    + sorted(Path("commands").glob("*.md"))
+    + sorted(Path("skills").glob("*/SKILL.md"))
+    + sorted(Path("docs").rglob("*.md"))
+    + [Path("README.md")]
+    + sorted(Path(".claude-plugin").glob("*.json"))
+):
+    if path.is_file() and forbidden_user_name in path.read_text(encoding="utf-8", errors="ignore"):
+        errors.append(f"{path}: user-specific hardcode found")
 
 if errors:
     print("Special skill contract errors:")
@@ -350,7 +359,7 @@ if grep -q "force" skills/update/SKILL.md commands/update.md README.md docs/comm
 test -x bin/haye
 (cd examples/sample-project && ../../bin/haye find-vault >/dev/null && ../../bin/haye print-config >/dev/null && ../../bin/haye lint)
 (tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-verify-XXXXXX") && cp -R examples/sample-project "$tmpdir/sample-project" && out=$(cd "$tmpdir/sample-project" && "$ROOT_DIR/bin/haye" context-pack verify-target-path) && expected=$(cd "$tmpdir/sample-project/Sample_obs/09-context-packs" && pwd -P) && actual=$(dirname "$out") && actual=$(cd "$actual" && pwd -P) && test "$actual" = "$expected" || { echo "context-pack wrote outside sample memoryPath: $out"; exit 1; })
-(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && project_name=final-start-test && mkdir -p "$tmpdir/$project_name" && cd "$tmpdir/$project_name" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && vault="${project_name}_obs" && test -f .hayeos.json && test -d "$vault" && test -d "$vault/01-prompts" && test -d "$vault/04-tasks" && test -d "$vault/05-sessions" && test -d "$vault/09-context-packs" && test ! -d memory && test ! -d 01-prompts && test ! -d 04-tasks && test ! -d 05-sessions && test ! -d 09-context-packs && test ! -f current.md && test ! -f next.md && test -f "$vault/HAYE.md" && test -f "$vault/index.md" && test -f "$vault/current.md" && test -f "$vault/next.md" && test -f "$vault/changelog.md" && test -f "$vault/health.md" && python3 - <<'PY'
+(tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/hayeos-init-verify-XXXXXX") && project_name=final-start-test && mkdir -p "$tmpdir/$project_name" && cd "$tmpdir/$project_name" && python3 "$ROOT_DIR/bin/haye" init >/dev/null && python3 "$ROOT_DIR/bin/haye" health >/dev/null && vault="${project_name}_obs" && test -f .hayeos.json && test -d "$vault" && test -d "$vault/01-prompts" && test -d "$vault/04-tasks" && test -d "$vault/05-sessions" && test -d "$vault/09-context-packs" && test ! -d memory && test ! -d 01-prompts && test ! -d 04-tasks && test ! -d 05-sessions && test ! -d 09-context-packs && test ! -f current.md && test ! -f next.md && test -f "$vault/HAYE.md" && test -f "$vault/index.md" && test -f "$vault/current.md" && test -f "$vault/next.md" && test -f "$vault/changelog.md" && test -f "$vault/health.md" && ROOT_DIR_FOR_HAYE_VERIFY="$ROOT_DIR" python3 - <<'PY'
 import json
 import os
 from pathlib import Path
@@ -367,6 +376,23 @@ assert not cfg['memoryPath'].startswith(('C:', 'c:', '/', '\\\\'))
 assert '\\' not in cfg['memoryPath']
 assert cfg['memoryPath'] != './memory'
 assert cfg['sourcePath']=='.'
+vault=Path(f'{project_name}_obs')
+generated=(vault/'HAYE.md').read_text(encoding='utf-8')
+template=Path(os.environ.get('ROOT_DIR_FOR_HAYE_VERIFY','')).joinpath('skills/init-memory/templates/HAYE.md').read_text(encoding='utf-8')
+forbidden_user_name='Ha'+'run'
+assert forbidden_user_name not in generated
+assert 'HayeOS user-facing' in generated or 'varsayılan olarak Türkçe' in generated
+for phrase in ['Plugin root vs project vault','Auto Checkpoint Rule','Quality Preservation Rule']:
+    assert phrase in generated
+    assert phrase in template
+for phrase in [
+    'HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.',
+    'Plugin root vs project vault',
+    'Auto Checkpoint Rule',
+    'Quality Preservation Rule',
+]:
+    assert phrase in generated
+    assert phrase in template
 PY
 )
 check_plugin_root_clean
