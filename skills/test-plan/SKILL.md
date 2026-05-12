@@ -1,53 +1,99 @@
 ---
 name: test-plan
-description: Create or execute a practical test plan for the current project and update verification memory.
+description: Design a test plan for a change - what to test, how to test, what NOT to test, and how to detect a regression.
 ---
 
 # Haye Skill: test-plan
 
 ## Purpose
-Create or execute a practical test plan for the current project and update verification memory.
+Decide what tests are worth writing before writing code. Not "100% coverage" but "every behavior that matters and would silently break without a test".
 
-## When to use
-- Use when the user's request matches this workflow.
-- Use when the current project has `.hayeos.json` or an Obsidian memory vault.
-- Use instead of loading a huge old conversation or scanning the entire repository.
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa plan Türkçe verilir.
 
 ## Inputs to inspect first
-1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Only minimal memory files:
-   - `HAYE.md`
-   - `index.md`
-   - `<resolved memoryPath>/current.md`
-   - `<resolved memoryPath>/next.md`
-   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
+1. The change being planned (a feature, a refactor, a bug fix).
+2. Existing test layout: unit (Jest, Vitest, Pytest), integration, E2E (Playwright, Cypress).
+3. The CI config — what already runs?
+4. Coverage gaps in the area being changed.
 
 ## Token discipline
-- Do not scan the whole Obsidian vault.
-- Do not read `08-raw/` unless explicitly required.
-- Do not read the whole repo before a context pack is created.
-- Prefer summaries, file paths, root causes, decisions and verification outputs over pasted logs.
-- If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
+- Don't read every existing test; read the ones in the same module to match style.
+- Don't propose 50 tests; propose the 5 that matter most.
 
 ## Workflow
-1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+
+### Step 1 — Map behaviors to test
+For the change, list user-visible behaviors and internal invariants. Each one is a candidate test target.
+
+### Step 2 — Categorize each candidate
+- **Critical**: silent failure would damage data, money, or trust. MUST be tested.
+- **Important**: silent failure would degrade UX but is recoverable. SHOULD be tested.
+- **Cosmetic**: silent failure is noticeable and trivially fixable. SKIP automated tests; rely on smoke.
+
+### Step 3 — Pick the right level
+- **Unit**: pure functions, one piece of logic, deterministic.
+- **Integration**: API endpoint with DB, multi-module flow.
+- **E2E**: critical user paths only (signup, checkout, the main feature).
+- E2E is expensive; reserve for paths that would close the company if broken.
+
+### Step 4 — Write the testability requirements
+- Inputs that can vary; outputs that can be asserted.
+- Side effects that need a mock vs real boundary.
+- Test data: factory or fixture? Fresh per test or shared?
+- Test DB: per-test transaction roll-back, or migrated-and-truncated?
+
+### Step 5 — Identify what NOT to test
+- Framework behavior (React renders props; Prisma serializes JSON) — already tested by the framework.
+- Trivial getters/setters.
+- Snapshot tests on the entire UI — they catch noise, not regressions; use them surgically.
+- Implementation details (private methods) — test the public surface.
+
+### Step 6 — Regression test for known bug area
+- If a bug was fixed once in this area, the test that protects it must exist. If it doesn't, add it as part of this plan.
+
+### Step 7 — CI signal
+- New tests run in CI by default.
+- Flaky tests are not allowed; quarantine and fix.
+- Test names describe behavior, not implementation (`it("returns 401 when token is missing")`, not `it("calls getSession")`).
+
+## Anti-patterns to refuse
+- "Aim for X% coverage" as a goal — coverage isn't a quality metric on its own
+- Mocking what you're testing
+- Testing a single method by mocking every dependency — that's a unit test of the mocks, not the code
+- Tests that hit a real third-party API in CI
+- "We'll add tests later" — later doesn't happen
+- Asserting on log output as the main check
 
 ## Output format
-- What I found
-- What I will do / did
-- Risks
-- Files touched or to inspect
-- Verification command/result
-- Memory updates required
+```markdown
+## Behaviors and invariants
+- (behavior) — category: critical/important/cosmetic — level: unit/integration/e2e
+
+## Tests to write (prioritized)
+1. (name) — what it asserts — file location
+2. ...
+
+## Tests NOT to write (and why)
+- ...
+
+## Test data strategy
+- factories vs fixtures:
+- DB setup:
+- mocks:
+
+## Regression coverage
+- existing tests covering this area:
+- gaps to fill:
+
+## CI
+- where it runs:
+- expected runtime:
+```
 
 ## Safety rules
-- Do not run destructive commands without explicit approval.
-- Do not auto-upgrade dependencies without approval.
-- Do not claim safe/fixed/done without verification output or a clear limitation note.
+- Don't ship a critical-category change without at least one test in that category.
+- Don't push flaky tests; quarantine or fix.
+- Don't test against live paid APIs in CI; use sandboxes.
+- Don't propose deleting "all integration tests" to speed up CI — find the slow one.
+- Long test specs go to `docs/testing.md`; chat gets the prioritized list.

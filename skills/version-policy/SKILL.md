@@ -1,81 +1,61 @@
 ---
 name: version-policy
-description: Select safe dependency versions. Do not blindly use latest; prefer patched compatible versions and document decisions.
+description: Decide explicit dependency versions using semver, compatibility, lifecycle status and advisory evidence.
 ---
 
 # Haye Skill: version-policy
 
 ## Purpose
-Select safe dependency versions. Do not blindly use latest; prefer patched compatible versions and document decisions.
+Choose explicit dependency versions without blindly using `latest`. This skill is a decision framework; use `dependency-audit` to collect evidence and `dependency-security` to interpret security policy.
 
-## When to use
-- Use when the user's request matches this workflow.
-- Use when the current project has `.hayeos.json` or an Obsidian memory vault.
-- Use instead of loading a huge old conversation or scanning the entire repository.
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
+- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
+- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
-## Inputs to inspect first
-1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Only minimal memory files:
-   - `HAYE.md`
-   - `index.md`
-   - `<resolved memoryPath>/current.md`
-   - `<resolved memoryPath>/next.md`
-   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
+## Decision inputs
+1. Current manifest and lockfile versions.
+2. Framework compatibility matrix (`next`, `react`, `react-dom` together).
+3. Advisory evidence from package manager audit or official sources.
+4. Runtime compatibility: Node/Python version, Docker base image, platform constraints.
+5. Existing decisions in `<resolved memoryPath>/02-decisions/` or `docs/security/dependency-notes.md`.
 
-## Token discipline
-- Do not scan the whole Obsidian vault.
-- Do not read `08-raw/` unless explicitly required.
-- Do not read the whole repo before a context pack is created.
-- Prefer summaries, file paths, root causes, decisions and verification outputs over pasted logs.
-- If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
+## Version selection rules
+- Prefer the smallest stable patched explicit version that resolves the risk and remains compatible.
+- Avoid unplanned major upgrades unless the current major is EOL or vulnerable with no patched release.
+- Never recommend `latest`, floating Docker tags, or fake placeholder image tags.
+- Do not pin vulnerable EOL versions.
+- If live advisory/version access is unavailable, say: "current vulnerability status was not verified."
+- If the embedded React/Next.js baseline is older than 90 days, prefer a live advisory check before finalizing.
 
-## Workflow
-1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+## Semver decision framework
+```markdown
+## Version Decision
+- package:
+- current:
+- proposed:
+- change type: patch / minor / major
+- reason:
+- advisory evidence:
+- compatibility checks:
+- rollback plan:
+- install/update command: requires approval / not run
+- decision file: <resolved memoryPath>/02-decisions/<topic>.md
+```
 
-## Output format
-- What I found
-- What I will do / did
-- Risks
-- Files touched or to inspect
-- Verification command/result
-- Memory updates required
+## React / Next.js compatibility
+- Choose `next`, `react` and `react-dom` as a compatible explicit-version set.
+- Check known RSC, SSR, middleware/proxy, server action and image optimization advisories.
+- Do not upgrade only one package in the set unless official compatibility notes support it.
+- Record whether `npm audit`, `pnpm audit`, `yarn audit` or live advisory checks were run.
+
+## Docker/base images
+- Use supported explicit tags, for example a current `python:3.12-slim` only when compatible.
+- Do not use `python:3.8`, `image: latest`, `myapp:latest`, `your-*-image` or `placeholder-image`.
+- Check compose has no obsolete top-level `version` field before recommending Docker verification.
 
 ## Safety rules
-- Do not run destructive commands without explicit approval.
-- Do not auto-upgrade dependencies without approval.
-- Do not claim safe/fixed/done without verification output or a clear limitation note.
-
-
-## Embedded React / Next.js security baseline
-When a project uses React Server Components, Next.js App Router, middleware/proxy routes, server actions, image optimization or cache components:
-
-- Avoid `react-server-dom-webpack`, `react-server-dom-parcel`, `react-server-dom-turbopack` versions:
-  - `19.0.0` through `19.0.5`
-  - `19.1.0` through `19.1.6`
-  - `19.2.0` through `19.2.5`
-- Prefer compatible patched versions:
-  - `19.0.6+`
-  - `19.1.7+`
-  - `19.2.6+`
-- For Next.js:
-  - 15.x should be `15.5.16+`
-  - 16.x should be `16.2.5+`
-- Cloudflare WAF is defense-in-depth. It does not replace dependency patching.
-
-## Live advisory rule
-If internet is available, check official sources before recommending versions:
-- npm registry
-- npm audit / pnpm audit / yarn audit
-- GitHub Security Advisories
-- React advisories
-- Next.js/Vercel release notes
-- Cloudflare changelog
-
-If live checking is unavailable, state that the result is based on local files and embedded Haye rules only.
+- Version choice is not the same as installing it. Dependency install/update/remove remains an approval risk gate.
+- Record selected version decisions in `<resolved memoryPath>/02-decisions/` or `docs/security/dependency-notes.md`.
+- Do not claim a version is `secure` or `safe` without audit/advisory evidence.

@@ -26,5 +26,5 @@ if (Invoke-HayePython "py" $args) {
     exit $LASTEXITCODE
 }
 
-Write-Error "Python bulunamadı. Lütfen Python kurun veya PATH’e ekleyin."
+Write-Error "Python bulunamadı. Lütfen Python kurun veya PATH'e ekleyin."
 exit 1

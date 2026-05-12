@@ -39,7 +39,7 @@ def ensure_project_memory_target(p):
     root=plugin_root().resolve()
     try:
         target.relative_to(root)
-        print('Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı.', file=sys.stderr)
+        print("Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı.", file=sys.stderr)
         return False
     except ValueError:
         return True

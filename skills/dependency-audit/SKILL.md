@@ -1,81 +1,77 @@
 ---
 name: dependency-audit
-description: Run dependency audit workflow and produce a dependency security report.
+description: Execute a dependency audit workflow using local manifests, lockfiles, Haye CLI helpers and approved audit commands.
 ---
 
 # Haye Skill: dependency-audit
 
 ## Purpose
-Run dependency audit workflow and produce a dependency security report.
+Run the dependency audit workflow and produce an honest dependency security report. This skill is execution-focused; use `dependency-security` for policy and `version-policy` for version selection decisions.
 
-## When to use
-- Use when the user's request matches this workflow.
-- Use when the current project has `.hayeos.json` or an Obsidian memory vault.
-- Use instead of loading a huge old conversation or scanning the entire repository.
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
+- Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
+- Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
+- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
+
+## Scope
+- Inspect dependency manifests and lockfiles.
+- Run local read-only audit helpers when available.
+- Recommend the next verification command.
+- Record audit status and limitations.
+- Do not choose new versions by itself; route version selection to `version-policy` and policy interpretation to `dependency-security`.
 
 ## Inputs to inspect first
-1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Only minimal memory files:
-   - `HAYE.md`
-   - `index.md`
-   - `<resolved memoryPath>/current.md`
-   - `<resolved memoryPath>/next.md`
-   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
-
-## Token discipline
-- Do not scan the whole Obsidian vault.
-- Do not read `08-raw/` unless explicitly required.
-- Do not read the whole repo before a context pack is created.
-- Prefer summaries, file paths, root causes, decisions and verification outputs over pasted logs.
-- If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
+1. `.hayeos.json` and resolved `memoryPath`.
+2. `package.json`, lockfile name and package manager.
+3. Python, Go, Rust or Docker dependency files if present.
+4. `docs/security/dependency-notes.md` if present.
+5. `<resolved memoryPath>/02-decisions/safe-dependency-versions.md` when present.
 
 ## Workflow
-1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+1. Identify ecosystems: npm/pnpm/yarn, Python, Go, Rust, Docker.
+2. Inspect manifests and lockfiles without installing dependencies.
+3. Run Haye CLI helpers when available:
+   - `bin/haye deps-audit`
+   - `bin/haye react-nextjs-audit` for React/Next.js projects
+4. Propose package-manager audit commands, but do not run install/update/remove commands without explicit approval.
+5. If an audit command is already available and read-only, run it when safe; otherwise mark it `not run` with the reason.
+6. Summarize findings and route decisions:
+   - vulnerable range or `latest` policy issue -> `dependency-security`
+   - explicit version choice needed -> `version-policy`
 
-## Output format
-- What I found
-- What I will do / did
-- Risks
-- Files touched or to inspect
-- Verification command/result
-- Memory updates required
+## Report format
+```markdown
+## Dependency Audit
+- ecosystems:
+- package manager:
+- lockfile:
+
+## Commands run
+- command:
+- result:
+
+## Findings
+- vulnerable / unsafe policy:
+- missing lockfile:
+- React/Next.js baseline:
+- Docker/base image:
+
+## Not run
+- command:
+- reason:
+
+## Decisions to record
+- <resolved memoryPath>/02-decisions/...
+
+## Next actions
+1.
+2.
+3.
+```
 
 ## Safety rules
-- Do not run destructive commands without explicit approval.
-- Do not auto-upgrade dependencies without approval.
-- Do not claim safe/fixed/done without verification output or a clear limitation note.
-
-
-## Embedded React / Next.js security baseline
-When a project uses React Server Components, Next.js App Router, middleware/proxy routes, server actions, image optimization or cache components:
-
-- Avoid `react-server-dom-webpack`, `react-server-dom-parcel`, `react-server-dom-turbopack` versions:
-  - `19.0.0` through `19.0.5`
-  - `19.1.0` through `19.1.6`
-  - `19.2.0` through `19.2.5`
-- Prefer compatible patched versions:
-  - `19.0.6+`
-  - `19.1.7+`
-  - `19.2.6+`
-- For Next.js:
-  - 15.x should be `15.5.16+`
-  - 16.x should be `16.2.5+`
-- Cloudflare WAF is defense-in-depth. It does not replace dependency patching.
-
-## Live advisory rule
-If internet is available, check official sources before recommending versions:
-- npm registry
-- npm audit / pnpm audit / yarn audit
-- GitHub Security Advisories
-- React advisories
-- Next.js/Vercel release notes
-- Cloudflare changelog
-
-If live checking is unavailable, state that the result is based on local files and embedded Haye rules only.
+- Never run `npm install`, `pnpm add`, `yarn add`, `pip install`, `python -m pip install`, `py -m pip install`, `docker pull`, update or remove commands without explicit user approval.
+- Do not claim `secure` or `safe` unless audit/advisory verification was actually run.
+- If internet/advisory access is unavailable, say: "current vulnerability status was not verified."
+- Do not write project memory outside `<resolved memoryPath>`.

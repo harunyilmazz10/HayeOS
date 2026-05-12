@@ -29,7 +29,7 @@ description: Smart Work Router for development, Team Mode planning, low-friction
 ## Project vault write rule
 - Project memory, context packs, checkpoints, active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md` and session summaries must be written only under resolved `.hayeos.json` `memoryPath`.
 - Never write project memory into `CLAUDE_PLUGIN_ROOT` or the HayeOS plugin repository.
-- If any target path resolves under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+- If any target path resolves under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 
 ## Smart Work Router
 Classify every meaningful task before acting:

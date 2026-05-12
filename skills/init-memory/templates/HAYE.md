@@ -23,7 +23,7 @@ This project uses Haye memory-first workflow.
 - `.hayeos.json` `sourcePath` is this project's source root.
 - Context packs, checkpoints, active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `<resolved memoryPath>/changelog.md` must stay inside the resolved project vault.
 - Never write project memory into the plugin repository.
-- If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+- If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 
 ## Smart Work Router
 - `/haye:work` classifies `task_size`, `task_type`, `risk_level`, `affected_layers` and `recommended_mode`.

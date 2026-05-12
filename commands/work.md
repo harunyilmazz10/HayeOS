@@ -107,6 +107,6 @@ Verification çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "prod
 ## Project vault write rule
 - Project memory dosyaları her zaman `.hayeos.json` içindeki resolved `memoryPath` altına yazılır.
 - `context-pack`, `checkpoint`, `active-task`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md` plugin repo içine yazılmaz.
-- Hedef path `CLAUDE_PLUGIN_ROOT` altındaysa yazmayı durdur ve Türkçe uyar: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+- Hedef path `CLAUDE_PLUGIN_ROOT` altındaysa yazmayı durdur ve Türkçe uyar: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 
 Respect `.hayeos.json`, keep scope narrow and verify with real commands. Checkpoint and active task state may be updated during `/haye:work` according to Auto Checkpoint Rule. Final session handoff and close-time memory consolidation belong to `/haye:close`.

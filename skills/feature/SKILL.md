@@ -1,53 +1,106 @@
 ---
 name: feature
-description: Plan and implement a new feature using memory-first context, safety gates, tests and memory updates.
+description: Ship a small, vertical feature slice end-to-end with a clear scope, a test, and a memory note. Not a redesign.
 ---
 
 # Haye Skill: feature
 
 ## Purpose
-Plan and implement a new feature using memory-first context, safety gates, tests and memory updates.
+Ship a single, vertical feature slice: smallest piece of new behavior that a user can notice, fully wired from UI → API → DB → back.
 
-## When to use
-- Use when the user's request matches this workflow.
-- Use when the current project has `.hayeos.json` or an Obsidian memory vault.
-- Use instead of loading a huge old conversation or scanning the entire repository.
+## User Response Language Rule
+- Kullanıcı Türkçe yazıyorsa açıklamalar Türkçe verilir.
 
 ## Inputs to inspect first
-1. `.hayeos.json` if present.
-2. Memory root from `memoryPath`.
-3. Only minimal memory files:
-   - `HAYE.md`
-   - `index.md`
-   - `<resolved memoryPath>/current.md`
-   - `<resolved memoryPath>/next.md`
-   - `<resolved memoryPath>/04-tasks/active-task.md` when present.
+1. The user's prompt — what is the user-visible outcome?
+2. `<resolved memoryPath>/current.md` and `<resolved memoryPath>/04-tasks/active-task.md` — does this fit the active phase?
+3. Existing patterns: where does similar logic live? Match it.
+4. Data model — does this require schema change? If yes, this is also a `migration` task.
+5. Auth/RBAC — who can access this feature?
 
 ## Token discipline
-- Do not scan the whole Obsidian vault.
-- Do not read `08-raw/` unless explicitly required.
-- Do not read the whole repo before a context pack is created.
-- Prefer summaries, file paths, root causes, decisions and verification outputs over pasted logs.
-- If context is growing, recommend `/clear` plus `/haye:start` after `/haye:close`.
+- Read only the files in the vertical slice (UI component + route handler + service + maybe a model).
+- Do not read the whole repo to "get a feel" — pick the closest analog and read that.
 
 ## Workflow
-1. Locate project config and memory path.
-2. Read minimal memory.
-3. Identify task type, risks and affected files.
-4. Create or reuse a context pack when work is non-trivial.
-5. Execute the smallest safe step.
-6. Verify with real commands when possible.
-7. Update memory through `/haye:close` or session-close rules.
+
+### Step 1 — Scope cut
+- Smallest visible behavior change. If it can be split, split.
+- Out of scope (explicit): polish, edge-case states for unimplemented downstream flows, refactor adjacent code.
+- Phases (if even this slice is too big): scaffold → core path → error paths → polish.
+
+### Step 2 — Contract
+- API: request shape, response shape, error shape.
+- DB: any new column / table — that's a separate `migration` step that must happen first.
+- UI: states (loading, empty, error, success).
+- Permission rule: who can do this?
+
+### Step 3 — Implementation order
+1. Migration (if schema change) → applied locally first.
+2. Service / business logic with unit test.
+3. Route handler (API) with one happy-path integration test.
+4. UI wiring, all four states.
+5. Manual smoke through the full flow.
+
+### Step 4 — Verification
+- Build green.
+- Typecheck green.
+- Lint green.
+- New tests pass.
+- Existing tests still pass.
+- Manual flow: walk through it once as a user would.
+
+### Step 5 — Polish (only after the core works)
+- Loading skeleton, empty state copy, error retry button.
+- Accessibility: labels, aria, keyboard.
+- This step is bounded — do not re-design.
+
+### Step 6 — Memory and changelog
+- `<resolved memoryPath>/current.md`: shift the active task forward.
+- `<resolved memoryPath>/changelog.md`: one entry: "Added: <feature>".
+- `<resolved memoryPath>/04-tasks/`: archive if complete, else update.
+
+## Anti-patterns to refuse
+- "While I'm here, let me also..." — separate task, separate review
+- Adding three new dependencies for one feature — separate `dependency-audit` discussion
+- Skipping the empty / error states because "it usually works"
+- Writing the migration last (after the code is wired) — that's how you ship a feature that 500s in production
+- Shipping without one test — at minimum the happy-path integration test
 
 ## Output format
-- What I found
-- What I will do / did
-- Risks
-- Files touched or to inspect
-- Verification command/result
-- Memory updates required
+```markdown
+## Feature in one sentence
+
+## Slice
+- in scope:
+- out of scope:
+
+## Contract
+- API:
+- DB change (if any → migration first):
+- UI states:
+- permission:
+
+## Implementation order (file by file)
+1.
+2.
+3.
+
+## Verification
+- build: pass
+- tests: pass
+- typecheck: pass
+- lint: pass
+- manual smoke: pass
+
+## Memory updates
+- <resolved memoryPath>/current.md: ...
+- <resolved memoryPath>/changelog.md: Added: ...
+```
 
 ## Safety rules
-- Do not run destructive commands without explicit approval.
-- Do not auto-upgrade dependencies without approval.
-- Do not claim safe/fixed/done without verification output or a clear limitation note.
+- Don't ship without at least one test.
+- Don't push a schema change in the same commit as feature wiring; migration is separate.
+- Don't claim "done" without manual smoke through the user flow.
+- Don't add `latest` deps for "one helper function"; the skill `dependency-audit` gates it.
+- Long feature designs go to `docs/features/<name>.md`; chat gets the summary.

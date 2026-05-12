@@ -37,7 +37,7 @@ Generate a minimal task-specific context pack before coding, debugging, deployin
 - Never write project context packs to `CLAUDE_PLUGIN_ROOT`.
 - Never create `09-context-packs` under the plugin installation directory.
 - If `memoryPath` is missing, stop and ask to run `/haye:init-memory`.
-- Before writing, verify the target path is not under `CLAUDE_PLUGIN_ROOT`. If it is, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+- Before writing, verify the target path is not under `CLAUDE_PLUGIN_ROOT`. If it is, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.

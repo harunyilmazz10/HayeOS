@@ -23,7 +23,7 @@ HayeOS uzun, riskli veya çok adımlı işlerde `/haye:close` beklemeden checkpo
 - Resolve `memoryPath` relative to current project root.
 - Never write project checkpoints to `CLAUDE_PLUGIN_ROOT`.
 - Never create project memory directories or files under the plugin installation directory.
-- If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+- If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn in Turkish: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 
 Checkpoint file locations under resolved `memoryPath`:
 - `<resolved memoryPath>/05-sessions/latest-checkpoint.md`

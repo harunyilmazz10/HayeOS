@@ -118,3 +118,14 @@ If internet is available, check official sources before recommending versions:
 - Cloudflare changelog
 
 If live checking is unavailable, state that the result is based on local files and embedded Haye rules only.
+
+## Baseline freshness rule
+The embedded version baseline above (React 19.0.6+ / 19.1.7+ / 19.2.6+, Next 15.5.16+ / 16.2.5+) was captured at plugin version 1.0.0 (May 2026). Treat it as a floor, not a ceiling:
+
+- If a newer minor or patch of React or Next has shipped, do a live advisory check before recommending the embedded version.
+- If the embedded baseline is older than 90 days from today's date, explicitly note this in the output and prefer the live check result.
+- This baseline is updated on plugin releases; check `CHANGELOG.md` for the date when this file was last revised.
+- Do NOT silently use the embedded baseline as the only source when the user has internet access; combine it with a live check.
+
+For other ecosystems (Python, Go, Rust) the embedded baseline does not apply — always run the ecosystem's audit tool (`pip-audit`, `go mod audit`, `cargo audit`) and reference the corresponding advisory database.
+

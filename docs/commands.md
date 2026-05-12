@@ -278,7 +278,7 @@ Plugin root and project memory vault are different:
 - Context packs are written only to `<resolved memoryPath>/09-context-packs/`.
 - Checkpoints are written only to `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
 - Active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `<resolved memoryPath>/changelog.md` are updated only inside the resolved project vault.
-- HayeOS must stop before writing any project memory file under `CLAUDE_PLUGIN_ROOT` and warn: `Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı.`
+- HayeOS must stop before writing any project memory file under `CLAUDE_PLUGIN_ROOT` and warn: `Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı.`
 
 Do not read `08-raw/` unless the user asks or a context pack names specific raw files.
 

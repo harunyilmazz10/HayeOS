@@ -9,6 +9,25 @@
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/large-file-warning.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-close-reminder.sh"
+          }
+        ]
       }
     ]
   }

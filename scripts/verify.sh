@@ -2,6 +2,42 @@
 set -euo pipefail
 ROOT_DIR="$(pwd)"
 
+RG_BIN=""
+if command -v rg >/dev/null 2>&1; then
+  RG_BIN="$(command -v rg)"
+fi
+
+rg() {
+  if [ -n "$RG_BIN" ]; then
+    "$RG_BIN" "$@"
+    return $?
+  fi
+  local fixed=0
+  if [ "${1:-}" = "-F" ]; then
+    fixed=1
+    shift
+  fi
+  local pattern="${1:-}"
+  shift || true
+  if [ "$#" -eq 0 ]; then
+    set -- .
+  fi
+  if [ "$fixed" -eq 1 ]; then
+    grep -RInF --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build --exclude-dir=coverage --exclude-dir=.cache -- "$pattern" "$@"
+  else
+    grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build --exclude-dir=coverage --exclude-dir=.cache -- "$pattern" "$@"
+  fi
+}
+
+validate_plugin_if_available() {
+  local target="${1:-.}"
+  if command -v claude >/dev/null 2>&1; then
+    claude plugin validate "$target" >/dev/null
+  else
+    echo "SKIPPED: claude CLI not installed; plugin validation was not run in this environment."
+  fi
+}
+
 check_markdown_frontmatter() {
   python3 - <<'PY'
 from pathlib import Path
@@ -391,6 +427,110 @@ if errors:
 PY
 }
 
+check_wrappers_and_hooks() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import sys
+
+errors = []
+expected_wrappers = {
+    "bin/haye-init": 'exec "$DIR/haye" init "$@"',
+    "bin/haye-find-vault": 'exec "$DIR/haye" find-vault "$@"',
+    "bin/haye-raw-status": 'exec "$DIR/haye" raw-status "$@"',
+    "bin/haye-lint-basic": 'exec "$DIR/haye" lint "$@"',
+}
+for filename, expected in expected_wrappers.items():
+    text = Path(filename).read_text(encoding="utf-8")
+    if expected not in text:
+        errors.append(f"{filename}: wrapper does not route to expected subcommand")
+
+hooks_path = Path("hooks/hooks.json")
+try:
+    hooks = json.loads(hooks_path.read_text(encoding="utf-8"))
+except Exception as exc:
+    errors.append(f"hooks/hooks.json invalid JSON: {exc}")
+    hooks = {}
+serialized = json.dumps(hooks)
+for script in [
+    "dangerous-command-guard.sh",
+    "large-file-warning.sh",
+    "session-close-reminder.sh",
+]:
+    if script not in serialized:
+        errors.append(f"hooks/hooks.json does not wire retained hook {script}")
+    if not Path("hooks", script).exists():
+        errors.append(f"missing retained hook script hooks/{script}")
+for matcher in ["Bash", "Read"]:
+    if matcher not in serialized:
+        errors.append(f"hooks/hooks.json missing matcher {matcher}")
+if "Stop" not in serialized:
+    errors.append("hooks/hooks.json missing Stop hook for session-close reminder")
+
+if errors:
+    print("Wrapper / hook wiring errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
+check_enriched_content() {
+  python3 - <<'PY'
+from pathlib import Path
+import sys
+
+errors = []
+agent_requirements = {
+    "agents/security-reviewer.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Auth", "Secrets", "Dependencies"],
+    "agents/database-architect.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Migration safety", "Indexes"],
+    "agents/deployment-doctor.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Dockerfile", "Coolify"],
+    "agents/token-economist.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Quality Preservation Rule"],
+}
+for filename, phrases in agent_requirements.items():
+    text = Path(filename).read_text(encoding="utf-8")
+    for phrase in phrases:
+        if phrase not in text:
+            errors.append(f"{filename}: missing enriched agent phrase {phrase}")
+
+skill_requirements = {
+    "skills/nextjs-doctor/SKILL.md": ["Common symptoms", "App Router / RSC", "Verification commands"],
+    "skills/video-factory/SKILL.md": ["Pipeline shape", "ffmpeg", "Cost guardrails"],
+    "skills/ai-agent-system/SKILL.md": ["planner", "worker", "arbiter", "Cost / Risk Gate"],
+    "skills/api-integration/SKILL.md": ["Output format", "Safety rules"],
+}
+for filename, phrases in skill_requirements.items():
+    text = Path(filename).read_text(encoding="utf-8")
+    if len(text.splitlines()) < 70:
+        errors.append(f"{filename}: domain skill is too shallow after archive merge")
+    for phrase in phrases:
+        if phrase not in text:
+            errors.append(f"{filename}: missing domain-specific phrase {phrase}")
+
+for filename in [
+    "docs/recipes/video-factory.md",
+    "docs/recipes/nextjs-coolify.md",
+    "docs/recipes/prisma-postgres.md",
+    "docs/recipes/cloudflare-r2.md",
+    "monitors/coolify-build-log.md",
+    "monitors/docker-log.md",
+    "monitors/nextjs-dev-log.md",
+    "monitors/README.md",
+]:
+    path = Path(filename)
+    if not path.exists():
+        errors.append(f"{filename}: missing enriched doc/monitor")
+    elif len(path.read_text(encoding="utf-8").splitlines()) < 20:
+        errors.append(f"{filename}: doc/monitor remains too shallow")
+
+if errors:
+    print("Enriched content errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -406,6 +546,8 @@ check_special_skill_contracts
 check_init_fallback_and_readme_commands
 check_work_consistency_and_template_failfast
 check_cli_failure_modes
+check_wrappers_and_hooks
+check_enriched_content
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"
@@ -429,10 +571,10 @@ if grep -q '"hooks"' .claude-plugin/plugin.json; then
   echo "plugin manifest must not reference standard hooks/hooks.json; Claude Code loads it automatically"; exit 1
 fi
 test -f hooks/hooks.json || { echo "missing hooks/hooks.json"; exit 1; }
-claude plugin validate . >/dev/null
+validate_plugin_if_available .
 test -f .claude-plugin/marketplace.json || { echo "missing .claude-plugin/marketplace.json"; exit 1; }
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null
-claude plugin validate .claude-plugin/marketplace.json >/dev/null
+validate_plugin_if_available .claude-plugin/marketplace.json
 grep -q '"name": "haye-marketplace"' .claude-plugin/marketplace.json || { echo "marketplace name mismatch"; exit 1; }
 grep -q '"name": "haye"' .claude-plugin/marketplace.json || { echo "marketplace missing haye plugin"; exit 1; }
 grep -q '"source": "./"' .claude-plugin/marketplace.json || { echo "marketplace source must point to plugin root"; exit 1; }

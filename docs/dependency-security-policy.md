@@ -46,3 +46,11 @@ If internet/advisory access is unavailable, write: "current vulnerability status
 - Next.js 15.x baseline is `15.5.16+`.
 - Next.js 16.x baseline is `16.2.5+`.
 - Cloudflare WAF is defense-in-depth. It does not replace dependency patching.
+
+## Baseline lifecycle
+
+- Embedded React/Next.js baseline last refreshed: May 2026.
+- Review embedded baselines at least every 90 days.
+- If the baseline is materially stale, perform live advisory/version verification when internet access is available.
+- If live advisory access is unavailable, write: "current vulnerability status was not verified."
+- Treat embedded baselines as a minimum floor, not a guarantee that no newer patched version exists.

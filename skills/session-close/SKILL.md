@@ -32,7 +32,7 @@ Close a session by updating Obsidian memory, changelog, next actions, decisions,
 ## Project vault write rule
 - Session summaries, checkpoint finalization, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md` and `<resolved memoryPath>/04-tasks/active-task.md` are written only under resolved `.hayeos.json` `memoryPath`.
 - Never write session memory into `CLAUDE_PLUGIN_ROOT`.
-- If a target path resolves under the plugin installation directory, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault’u kullanılmalı."
+- If a target path resolves under the plugin installation directory, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 
 ## Token discipline
 - Do not scan the whole Obsidian vault.
