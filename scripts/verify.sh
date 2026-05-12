@@ -456,6 +456,7 @@ for script in [
     "dangerous-command-guard.sh",
     "large-file-warning.sh",
     "session-close-reminder.sh",
+    "session-start.sh",
 ]:
     if script not in serialized:
         errors.append(f"hooks/hooks.json does not wire retained hook {script}")
@@ -466,6 +467,12 @@ for matcher in ["Bash", "Read"]:
         errors.append(f"hooks/hooks.json missing matcher {matcher}")
 if "Stop" not in serialized:
     errors.append("hooks/hooks.json missing Stop hook for session-close reminder")
+if "SessionStart" not in serialized:
+    errors.append("hooks/hooks.json missing SessionStart orchestrator hook")
+if "startup|clear|compact" not in serialized:
+    errors.append("hooks/hooks.json missing SessionStart startup|clear|compact matcher")
+if not Path("skills/using-hayeos/SKILL.md").exists():
+    errors.append("missing master orchestrator skill skills/using-hayeos/SKILL.md")
 
 dangerous = Path("hooks/dangerous-command-guard.sh").read_text(encoding="utf-8")
 if 'Haye guard: destructive command detected. Ask user for explicit approval." >&2' not in dangerous:
