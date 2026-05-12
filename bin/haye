@@ -48,13 +48,19 @@ def write_if_missing(p, content):
     p.parent.mkdir(parents=True, exist_ok=True)
     if not p.exists(): p.write_text(content, encoding='utf-8')
 
-def haye_template(project):
-    template_path = plugin_root()/'skills'/'init-memory'/'templates'/'HAYE.md'
+def haye_template_path():
+    return plugin_root()/'skills'/'init-memory'/'templates'/'HAYE.md'
+
+def ensure_haye_template_available():
+    template_path = haye_template_path()
     if template_path.exists():
-        text = template_path.read_text(encoding='utf-8')
-        return text.replace('<project-name>', project)
+        return template_path
     print('Canonical HAYE template is missing; refusing to initialize an incomplete vault.', file=sys.stderr)
     raise SystemExit(1)
+
+def haye_template(project):
+    text = ensure_haye_template_available().read_text(encoding='utf-8')
+    return text.replace('<project-name>', project)
 
 def init_config():
     p=config_path()
@@ -68,6 +74,7 @@ def init_config():
     return 0
 
 def init_vault():
+    ensure_haye_template_available()
     cfg=load_config()
     if not cfg: init_config(); cfg=load_config()
     mp=memory_path() or (cwd()/f'{cwd().name}_obs')

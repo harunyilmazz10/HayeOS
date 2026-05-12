@@ -313,6 +313,7 @@ check_cli_failure_modes() {
 from pathlib import Path
 import json
 import subprocess
+import shutil
 import sys
 import tempfile
 
@@ -356,6 +357,31 @@ with tempfile.TemporaryDirectory(prefix="hayeos-cli-nonobject-json-") as tmp:
         errors.append("bin/haye init returned 0 for non-object .hayeos.json")
     if (project / "nonobject-json-project_obs").exists():
         errors.append("bin/haye init created vault despite non-object .hayeos.json")
+
+with tempfile.TemporaryDirectory(prefix="hayeos-cli-missing-template-") as tmp:
+    tmp_path = Path(tmp)
+    plugin_copy = tmp_path / "plugin-copy"
+    shutil.copytree(
+        root,
+        plugin_copy,
+        ignore=shutil.ignore_patterns(".git", "node_modules", "dist", "build", "coverage", ".cache", "*.zip", ".DS_Store"),
+    )
+    template = plugin_copy / "skills" / "init-memory" / "templates" / "HAYE.md"
+    template.unlink()
+    project = tmp_path / "missing-template-project"
+    project.mkdir()
+    proc = subprocess.run([sys.executable, str(plugin_copy / "bin" / "haye"), "init"], cwd=project, text=True, capture_output=True)
+    combined = proc.stdout + proc.stderr
+    if proc.returncode == 0:
+        errors.append("bin/haye init returned 0 when canonical HAYE template was missing")
+    if "Canonical HAYE template is missing" not in combined:
+        errors.append("bin/haye init did not report missing canonical HAYE template")
+    if "vault ready" in combined:
+        errors.append("bin/haye init printed vault ready when canonical HAYE template was missing")
+    if (project / ".hayeos.json").exists():
+        errors.append("bin/haye init created .hayeos.json despite missing canonical HAYE template")
+    if (project / "missing-template-project_obs").exists():
+        errors.append("bin/haye init created vault despite missing canonical HAYE template")
 
 if errors:
     print("CLI failure mode errors:")
