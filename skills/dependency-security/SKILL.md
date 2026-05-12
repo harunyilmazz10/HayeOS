@@ -58,6 +58,18 @@ Check dependencies and version choices using package files, audit tools, officia
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## Dependency version selection contract
+- Do not use `latest` for application dependencies, framework packages, Docker images or package manager commands.
+- Select a stable patched explicit version that is compatible with the current project.
+- Check package files and lockfiles before recommending a version.
+- If internet/advisory access is available, verify against live advisory/version sources before saying a version is secure or safe.
+- If internet/advisory access is unavailable, say: "current vulnerability status was not verified."
+- Do not say `secure`, `safe`, `güvenli` or `temiz` unless audit/advisory verification was actually run and supports that claim.
+- Dependency install/update/remove is an approval risk gate. Ask before `npm install`, `npm update`, `pnpm add`, `pnpm update`, `yarn add`, `pip install`, `python -m pip install`, `py -m pip install`, package removal or Docker image pulls.
+- Never run package manager install/update/remove commands without explicit user approval.
+- Record selected version decisions in `<resolved memoryPath>/02-decisions/` or in project `docs/security/dependency-notes.md`.
+- If verification was not run, write `not run` and explain why.
+
 ## Dependency / Base Image Safety Rule
 - Do not use latest tags in Docker images.
 - Do not use placeholder image names like `myapp:latest`.
@@ -78,6 +90,11 @@ Check dependencies and version choices using package files, audit tools, officia
 ## Embedded React / Next.js security baseline
 When a project uses React Server Components, Next.js App Router, middleware/proxy routes, server actions, image optimization or cache components:
 
+- Choose `next`, `react` and `react-dom` as a compatible set; do not upgrade one without checking the others.
+- Package manifests must use explicit versions, not `latest`.
+- Check known RSC, SSR, middleware/proxy, server action, image optimization and cache-related advisories.
+- Do not use vulnerable version ranges.
+- Run `npm audit`, `pnpm audit`, `yarn audit` or an equivalent package manager audit when approval and tooling are available; if not run, report `not run`.
 - Avoid `react-server-dom-webpack`, `react-server-dom-parcel`, `react-server-dom-turbopack` versions:
   - `19.0.0` through `19.0.5`
   - `19.1.0` through `19.1.6`

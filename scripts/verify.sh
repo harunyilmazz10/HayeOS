@@ -294,6 +294,15 @@ grep -q "npm install" skills/work/SKILL.md docs/commands.md skills/dependency-se
 grep -q "docker pull" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing docker pull risk gate"; exit 1; }
 grep -q "docker compose up" skills/work/SKILL.md docs/commands.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing docker compose preflight rule"; exit 1; }
 grep -q "Do not assume \`pip\` exists on Windows" skills/work/SKILL.md skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "missing Windows pip rule"; exit 1; }
+grep -q "Do not use \`latest\`" skills/dependency-security/SKILL.md || { echo "dependency-security missing latest ban"; exit 1; }
+grep -q "stable patched explicit version" skills/dependency-security/SKILL.md || { echo "dependency-security missing stable patched explicit version rule"; exit 1; }
+grep -q "current vulnerability status was not verified" skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "dependency-security missing not verified rule"; exit 1; }
+grep -q "Do not say \`secure\`, \`safe\`" skills/dependency-security/SKILL.md || { echo "dependency-security missing no unverified secure/safe claim rule"; exit 1; }
+grep -q "Never run package manager install/update/remove commands without explicit user approval" skills/dependency-security/SKILL.md docs/dependency-security-policy.md || { echo "dependency-security missing package manager approval rule"; exit 1; }
+grep -q "React / Next.js dependency contract" skills/react-nextjs-security/SKILL.md || { echo "react-nextjs-security missing dependency contract"; exit 1; }
+grep -q "Choose \`next\`, \`react\` and \`react-dom\` as a compatible" skills/dependency-security/SKILL.md skills/react-nextjs-security/SKILL.md docs/dependency-security-policy.md || { echo "missing Next/React compatibility rule"; exit 1; }
+grep -q "known RSC, SSR, middleware/proxy, server action" skills/dependency-security/SKILL.md skills/react-nextjs-security/SKILL.md docs/dependency-security-policy.md || { echo "missing React/Next advisory coverage rule"; exit 1; }
+grep -q "Record selected version decisions in \`<resolved memoryPath>/02-decisions/\`" skills/dependency-security/SKILL.md skills/react-nextjs-security/SKILL.md || { echo "missing dependency decision memory rule"; exit 1; }
 test -f skills/team-mode/SKILL.md || { echo "missing internal team-mode skill"; exit 1; }
 test -f skills/checkpoint/SKILL.md || { echo "missing checkpoint skill"; exit 1; }
 test -f skills/checkpoint/templates/latest-checkpoint.md || { echo "missing latest checkpoint template"; exit 1; }

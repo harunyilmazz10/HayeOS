@@ -1,6 +1,8 @@
 # Dependency Security Policy
 
-Do not blindly use latest. Check package files, lockfiles, audit output and official advisories when available. Prefer patched compatible versions. Document live-check limitations.
+Do not blindly use latest. Check package files, lockfiles, audit output and official advisories when available. Prefer patched compatible explicit versions. Document live-check limitations.
+
+If internet/advisory access is unavailable, write: "current vulnerability status was not verified." Do not claim a dependency choice is secure or safe unless advisory/audit verification was actually run and supports that claim.
 
 ## Required behavior
 
@@ -24,6 +26,15 @@ Do not blindly use latest. Check package files, lockfiles, audit output and offi
 - If unsure, write the decision to dependency/security notes and mark as pending verification.
 - Do not install dependencies blindly.
 - Dependency install/update/remove is a risk gate: ask before `pip install`, `python -m pip install`, `py -m pip install`, `npm install`, `pnpm add`, `yarn add`, `docker pull` or Docker commands that pull unknown images.
+- Never run package manager install/update/remove commands without explicit user approval.
+- Record selected dependency decisions in `<resolved memoryPath>/02-decisions/` or project `docs/security/dependency-notes.md`.
+
+## React / Next.js policy
+- Choose `next`, `react` and `react-dom` as a compatible explicit-version set.
+- Do not use `latest` in `package.json`.
+- Check known RSC, SSR, middleware/proxy, server action, image optimization and cache-related advisories.
+- Do not use vulnerable version ranges.
+- Run `npm audit`, `pnpm audit`, `yarn audit` or equivalent when approval and tooling are available; if not run, report `not run`.
 - Before `docker compose up`, check compose has no fake images, build contexts exist, referenced Dockerfiles exist, no top-level obsolete `version` field and no `latest` tags unless explicitly justified.
 - Do not assume `pip` exists on Windows; prefer `py -m pip` or `python -m pip` after checking, and still require approval.
 - Do not pin vulnerable EOL versions.

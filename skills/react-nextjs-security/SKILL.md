@@ -58,6 +58,15 @@ Audit React, React Server Components, Next.js and Cloudflare/WAF exposure agains
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## React / Next.js dependency contract
+- Choose `next`, `react` and `react-dom` as a compatible explicit-version set.
+- Do not use `latest` in `package.json`.
+- Check known RSC, SSR, middleware/proxy, server action, image optimization and cache-related advisories.
+- If internet/advisory access is available, verify against live sources before saying versions are secure or safe.
+- If live advisory access is unavailable, say: "current vulnerability status was not verified."
+- Dependency install/update/remove is an approval risk gate; do not run `npm install`, `pnpm add`, `yarn add` or package manager update/remove commands without explicit user approval.
+- If `npm audit`, `pnpm audit`, `yarn audit` or equivalent was not run, report `not run`.
+- Record selected version decisions in `<resolved memoryPath>/02-decisions/` or project `docs/security/dependency-notes.md`.
 
 ## Embedded React / Next.js security baseline
 When a project uses React Server Components, Next.js App Router, middleware/proxy routes, server actions, image optimization or cache components:
