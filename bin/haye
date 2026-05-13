@@ -9,6 +9,14 @@ class ConfigError(Exception): pass
 
 def cwd(): return Path.cwd()
 def config_path(): return cwd()/'.hayeos.json'
+def is_claude_internal_project_storage(path):
+    parts=[p.lower() for p in Path(path).resolve().parts]
+    return any(parts[i]=='.claude' and i+1 < len(parts) and parts[i+1]=='projects' for i in range(len(parts)-1))
+def ensure_real_project_root_for_init():
+    if is_claude_internal_project_storage(cwd()):
+        print("Refusing to initialize HayeOS inside Claude internal project storage (~/.claude/projects). Launch Claude from the real project folder and run init there.", file=sys.stderr)
+        return False
+    return True
 def load_config():
     p=config_path()
     if p.exists():
@@ -96,6 +104,7 @@ def haye_template(project):
     return text.replace('<project-name>', project)
 
 def init_config():
+    if not ensure_real_project_root_for_init(): return 1
     p=config_path()
     if p.exists():
         load_config()
@@ -108,6 +117,7 @@ def init_config():
 
 def init_vault():
     ensure_haye_template_available()
+    if not ensure_real_project_root_for_init(): return 1
     cfg=load_config()
     if not cfg: init_config(); cfg=load_config()
     mp=memory_path() or (cwd()/f'{cwd().name}_obs')

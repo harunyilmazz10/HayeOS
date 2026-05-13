@@ -155,7 +155,7 @@ Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
 /haye:init-memory
 ```
 
-By default, HayeOS creates a project-local Obsidian vault named `<project-name>_obs`. It does not store a project's main memory under `~/.claude/projects/.../memory`.
+By default, HayeOS creates a project-local Obsidian vault named `<project-name>_obs` inside the real project folder. It must not use Claude Code's internal `~/.claude/projects/...` storage as the project root or default vault location. It does not default memory to `~/.claude/projects/.../memory`.
 
 Manual CLI use is only a fallback. On Windows, use one of these instead of trying to run the Python script through bash:
 

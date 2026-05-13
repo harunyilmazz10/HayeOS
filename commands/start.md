@@ -78,6 +78,14 @@ Do NOT manually write `.hayeos.json`.
 
 `/haye:start` must not manually write `.hayeos.json`, manually synthesize `memoryPath`, choose `.claude/projects/.../memory`, or use raw Windows backslash paths.
 
+### Internal Claude project storage is forbidden as HayeOS init target
+
+`~/.claude/projects/<encoded-project-path>/` is Claude Code internal state, not the user's project root.
+
+`/haye:start` must never place `.hayeos.json` or `<project-name>_obs/` there.
+
+The HayeOS project root is the real current working directory where Claude Code was launched. If Claude was launched from `C:\Path\To\Project`, initialization belongs in that folder, not in `~/.claude/projects/...`.
+
 ## Safe Resume Rule
 If memory exists, read `<resolved memoryPath>/05-sessions/latest-checkpoint.md` when present. Give a short `HayeOS Recovery Summary` with current task, phase, last successful step, changed files, blocker, next 3 actions and recommended next mode. Do not automatically start implementation. Ask: "Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?" If no checkpoint exists, show a short start summary from `<resolved memoryPath>/next.md` and ask: "Hangi görevle devam edelim?"
 

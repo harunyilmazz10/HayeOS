@@ -342,6 +342,8 @@ Canonical init config:
 
 `/haye:start` and `init-memory` must not manually synthesize alternate `.hayeos.json` layouts, must not choose `~/.claude/projects/.../memory`, and must show a full semantic version label such as `HayeOS v2.0.2 aktif.` after successful start.
 
+The real current working directory is the HayeOS project root. Claude internal project storage under `~/.claude/projects/<encoded-project-path>/` is forbidden as an init target. HayeOS must not write `.hayeos.json` or `<project-name>_obs/` there.
+
 On Windows, manual fallback commands are:
 
 ```text

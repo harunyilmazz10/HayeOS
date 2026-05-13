@@ -1,8 +1,10 @@
 # Changelog
 
 ## 2.0.2
+- Fixed `/haye:start` regression that wrote `.hayeos.json` and `<project-name>_obs` into Claude internal `~/.claude/projects/...` storage instead of the real project root
 - Restored canonical project-local vault initialization: `./<project-name>_obs`
 - Fixed `/haye:start` / init-memory regression that manually synthesized invalid Windows `.hayeos.json`
+- Re-established the real current working directory as the only default project root for HayeOS init
 - Re-established `bin/haye init` as the single source of truth for default config generation
 - Prevented accidental fallback to `~/.claude/projects/.../memory` as the default project memory path
 - Updated `/haye:start` to show the full active semantic version, e.g. `HayeOS v2.0.2 aktif`

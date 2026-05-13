@@ -957,6 +957,138 @@ if errors:
 PY
 }
 
+check_canonical_real_project_root_init_contract() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import re
+import sys
+import tempfile
+import subprocess
+import os
+
+errors = []
+
+required_markers = {
+    "commands/start.md": [
+        "Internal Claude project storage is forbidden as HayeOS init target",
+        "_obs",
+    ],
+    "skills/start/SKILL.md": [
+        "Canonical Project Root and Vault",
+        "~/.claude/projects",
+        "./<project-name>_obs",
+    ],
+    "skills/init-memory/SKILL.md": [
+        "Canonical Project Root and Vault Rule",
+        "~/.claude/projects",
+        "./<project-name>_obs",
+    ],
+    "README.md": [
+        "./sample-project_obs",
+        "~/.claude/projects",
+    ],
+}
+
+for target, markers in required_markers.items():
+    text = Path(target).read_text(encoding="utf-8")
+    for marker in markers:
+        if marker not in text:
+            errors.append(f"{target}: missing canonical init marker: {marker}")
+
+scan_targets = [
+    Path("commands/start.md"),
+    Path("skills/start/SKILL.md"),
+    Path("skills/init-memory/SKILL.md"),
+    Path("README.md"),
+    Path("docs/commands.md"),
+]
+
+for path in scan_targets:
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    lowered = text.lower()
+    suspicious_patterns = [
+        "default memory path: ~/.claude/projects",
+        "write .hayeos.json to ~/.claude/projects",
+        "create vault under ~/.claude/projects",
+    ]
+    for pat in suspicious_patterns:
+        if pat in lowered:
+            errors.append(f"{path}: suspicious default Claude-internal init guidance: {pat}")
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp) / "sample-project"
+    root.mkdir()
+
+    result = subprocess.run(
+        [sys.executable, str(Path("bin/haye").resolve()), "init"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        env=dict(os.environ),
+        timeout=60,
+    )
+
+    if result.returncode != 0:
+        errors.append(f"bin/haye init temp test failed: rc={result.returncode}, stderr={result.stderr.strip()}")
+
+    config_path = root / ".hayeos.json"
+    vault_path = root / "sample-project_obs"
+
+    if not config_path.exists():
+        errors.append("temp init: .hayeos.json missing in actual cwd")
+
+    if not vault_path.exists():
+        errors.append("temp init: sample-project_obs missing in actual cwd")
+
+    if config_path.exists():
+        try:
+            cfg = json.loads(config_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            errors.append(f"temp init: invalid JSON: {exc}")
+        else:
+            expected = {
+                "project": "sample-project",
+                "memoryPath": "./sample-project_obs",
+                "sourcePath": ".",
+                "defaultWorkflow": "memory-first",
+                "sessionCloseRequired": True,
+            }
+            for key, value in expected.items():
+                if cfg.get(key) != value:
+                    errors.append(f"temp init: {key} expected {value!r}, got {cfg.get(key)!r}")
+
+with tempfile.TemporaryDirectory() as tmp:
+    internal = Path(tmp) / ".claude" / "projects" / "C--Users-example-Project"
+    internal.mkdir(parents=True)
+    result = subprocess.run(
+        [sys.executable, str(Path("bin/haye").resolve()), "init"],
+        cwd=internal,
+        capture_output=True,
+        text=True,
+        env=dict(os.environ),
+        timeout=60,
+    )
+    if result.returncode == 0:
+        errors.append("bin/haye init returned success inside simulated ~/.claude/projects storage")
+    if (internal / ".hayeos.json").exists():
+        errors.append("bin/haye init created .hayeos.json inside simulated ~/.claude/projects storage")
+    if (internal / "C--Users-example-Project_obs").exists():
+        errors.append("bin/haye init created _obs vault inside simulated ~/.claude/projects storage")
+
+bin_text = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
+suspicious = re.findall(r'\.claude[^"\']*projects[^"\']*(?:memory|hayeos)', bin_text, flags=re.IGNORECASE)
+if suspicious:
+    errors.append(f"bin/haye: suspicious Claude-internal path references in init-related code: {suspicious[:3]}")
+
+if errors:
+    print("Canonical real project-root init contract errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -981,6 +1113,7 @@ check_test_infrastructure_exists
 check_team_mode_agent_invocation_contract
 check_version_and_update_contract
 check_canonical_project_vault_contract
+check_canonical_real_project_root_init_contract
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

@@ -120,6 +120,23 @@ Any other default path is a regression unless explicitly approved by a future mi
 
 `/haye:start` and `init-memory` orchestrate approval and call the CLI. They do not manually synthesize alternate config layouts, do not choose `~/.claude/projects/.../memory`, and do not write raw Windows backslash paths into JSON.
 
+## Canonical Project Root and Vault
+
+The real project root is the current folder where Claude Code is running.
+
+Do NOT treat `~/.claude/projects/<encoded-project-path>/` as the project root. That directory is Claude internal storage only.
+
+After user approval:
+- do not hand-write `.hayeos.json`
+- delegate to the canonical HayeOS CLI init flow
+- the CLI must create:
+  - `<real-project-root>/.hayeos.json`
+  - `<real-project-root>/<project-name>_obs/`
+
+Default config:
+- `sourcePath`: `.`
+- `memoryPath`: `./<project-name>_obs`
+
 ## Plugin root vs project vault
 - `CLAUDE_PLUGIN_ROOT` or HayeOS install path is the Plugin root.
 - `.hayeos.json` `memoryPath` resolves to the Memory vault.

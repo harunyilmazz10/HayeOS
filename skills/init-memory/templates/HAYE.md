@@ -26,6 +26,7 @@ This project uses Haye memory-first workflow.
 - If a target path is under `CLAUDE_PLUGIN_ROOT`, stop and warn: "Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı."
 - Default generated config uses relative paths: `sourcePath` is `.` and `memoryPath` is `./<project-name>_obs`.
 - The default vault lives at `<project-root>/<project-name>_obs/`, not under machine-specific absolute paths or `~/.claude/projects/.../memory`.
+- The project root is the real current folder, not Claude internal project state under `~/.claude/projects/...`.
 
 ## Smart Work Router
 - `/haye:work` classifies `task_size`, `task_type`, `risk_level`, `affected_layers` and `recommended_mode`.
