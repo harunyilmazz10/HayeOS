@@ -190,3 +190,11 @@ Kullanıcı promptu spesifik teknoloji adlandırırsa (FastAPI, Postgres, Prisma
 
 ### Sürüm karar kaynağı
 Her dependency seçimi ve version pin `<resolved memoryPath>/02-decisions/dependencies-<date>.md`'ye kaydedilir.
+
+## Required Next Step
+
+When user approves the design and you transition to implementation:
+
+**REQUIRED SUB-SKILL:** Use haye:work to plan and execute the implementation.
+
+Do not start writing code directly from this skill.

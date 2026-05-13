@@ -650,3 +650,21 @@ Kullanıcı promptu spesifik teknoloji adlandırırsa (FastAPI, Postgres, Prisma
 
 ### Sürüm karar kaynağı
 Her dependency seçimi ve version pin `<resolved memoryPath>/02-decisions/dependencies-<date>.md`'ye kaydedilir.
+
+## Required Next Steps
+
+After plan approval and before writing code:
+
+**REQUIRED SUB-SKILL:** Use haye:checkpoint to write the active task to vault.
+
+After each meaningful chunk (>=5 files, or phase boundary, or before risky op):
+
+**REQUIRED SUB-SKILL:** Use haye:checkpoint.
+
+Before claiming work complete:
+
+**REQUIRED SUB-SKILL: Verification Gate** (see Gate Function above).
+
+At the end of meaningful work, before user asks:
+
+**REQUIRED SUB-SKILL:** Use haye:close.

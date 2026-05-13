@@ -79,6 +79,16 @@ Close session and update memory
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
+## Required Sub-Skills
+
+This skill orchestrates:
+
+1. **REQUIRED SUB-SKILL:** Use haye:session-close to update changelog, current, next.
+2. **OPTIONAL but recommended:** Use haye:handoff if another assistant or future-you will pick up.
+3. **OPTIONAL:** Use haye:memory-lint if vault has accumulated cruft.
+
+After session-close, the session can end. Tell user "memory updated, session can close."
+
 ## No Fake Completion Rule
 - Session close must distinguish files written, verification run, verification not run, runtime verified, runtime not verified, known gaps and next actions.
 - Do not mark work as "hazır", "başarıyla çalışıyor" or "production-ready" unless verification output supports it.
