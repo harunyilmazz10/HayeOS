@@ -766,13 +766,17 @@ for path in Path(".").rglob("*"):
     text = path.read_text(encoding="utf-8", errors="ignore")
     match = bad_pattern.search(text)
     if match:
-        errors.append(f"{path}: invalid agent-as-skill reference: {match.group(0)}")
+        if path.as_posix() == "skills/team-mode/SKILL.md" and "Forbidden - common mistakes" in text:
+            pass
+        else:
+            errors.append(f"{path}: invalid agent-as-skill reference: {match.group(0)}")
 
 required_markers = {
     "skills/team-mode/SKILL.md": [
         "Agent Invocation Rule",
-        "Specialist roles under `agents/` are not skills",
-        "Skills orchestrate. Agents investigate, design, review, and advise.",
+        "Specialist roles under `agents/` are subagents, dispatched via the **Task tool**",
+        "Task(",
+        "subagent_type",
     ],
     "skills/work/SKILL.md": [
         "Team Mode dispatch rule",
@@ -816,11 +820,11 @@ changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
 changelog_version = m.group(1) if m else None
 
-if plugin_version != "2.0.3":
-    errors.append(f"plugin.json version expected 2.0.3, got {plugin_version!r}")
+if plugin_version != "2.0.4":
+    errors.append(f"plugin.json version expected 2.0.4, got {plugin_version!r}")
 
-if changelog_version != "2.0.3":
-    errors.append(f"CHANGELOG top version expected 2.0.3, got {changelog_version!r}")
+if changelog_version != "2.0.4":
+    errors.append(f"CHANGELOG top version expected 2.0.4, got {changelog_version!r}")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 for marker in ["def version_cmd", "HayeOS version:", "Working tree:"]:
@@ -850,8 +854,10 @@ for concept in ["reload-plugins", "cache", "version", "previous", "new version"]
         errors.append(f"update command/skill missing concept: {concept}")
 
 combined_start = start_cmd + "\n" + start_skill
-if "hayeos v<full semantic plugin version> aktif" not in combined_start.lower():
-    errors.append("start command/skill missing visible version guidance")
+if "hayeos aktif. (sürüm için: `/haye:version`)" not in combined_start.lower():
+    errors.append("start command/skill missing non-placeholder version guidance")
+if "v<full semantic plugin version>" in combined_start:
+    errors.append("start command/skill still contains literal semantic version placeholder")
 
 if errors:
     print("Version/update contract errors:")
@@ -899,13 +905,13 @@ for target, markers in required_markers.items():
             errors.append(f"{target}: missing canonical vault marker: {marker}")
 
 plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
-if plugin.get("version") != "2.0.3":
-    errors.append(f"plugin.json version expected 2.0.3, got {plugin.get('version')!r}")
+if plugin.get("version") != "2.0.4":
+    errors.append(f"plugin.json version expected 2.0.4, got {plugin.get('version')!r}")
 
 changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
-if not m or m.group(1) != "2.0.3":
-    errors.append("CHANGELOG top version expected 2.0.3")
+if not m or m.group(1) != "2.0.4":
+    errors.append("CHANGELOG top version expected 2.0.4")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 suspicious = re.findall(r'\.claude[^"\']*projects[^"\']*memory', bin_haye, flags=re.IGNORECASE)
@@ -1175,17 +1181,112 @@ for marker in [
         errors.append(f"using-hayeos missing trap section: {marker}")
 
 plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
-if plugin.get("version") != "2.0.3":
-    errors.append(f"plugin.json version expected 2.0.3, got {plugin.get('version')!r}")
+if plugin.get("version") != "2.0.4":
+    errors.append(f"plugin.json version expected 2.0.4, got {plugin.get('version')!r}")
 
 changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
 top_ver = m.group(1) if m else None
-if top_ver != "2.0.3":
-    errors.append(f"CHANGELOG top version expected 2.0.3, got {top_ver!r}")
+if top_ver != "2.0.4":
+    errors.append(f"CHANGELOG top version expected 2.0.4, got {top_ver!r}")
 
 if errors:
-    print("v2.0.3 behavioral regression check errors:")
+    print("v2.0.3/v2.0.4 behavioral regression check errors:")
+    for e in errors:
+        print("-", e)
+    sys.exit(1)
+PY
+}
+
+check_stub_plan_phrases_banned() {
+  python3 - <<'PY'
+from pathlib import Path
+import sys
+
+banned_phrases = [
+    "burada oluşturulacak",
+    "burada belirtilecek",
+    "ileride detaylandırılacak",
+    "aşağıda detaylı olarak verilecek",
+    "Plan implementation will be defined",
+]
+
+errors = []
+using_hayeos = Path("skills/using-hayeos/SKILL.md")
+text = using_hayeos.read_text(encoding="utf-8")
+if "Stub Plan Trap" not in text:
+    errors.append("using-hayeos: missing 'Stub Plan Trap' section")
+for phrase in banned_phrases:
+    if phrase not in text:
+        errors.append(f"using-hayeos Stub Plan Trap: missing banned phrase example '{phrase}'")
+
+if errors:
+    print("Stub plan guard errors:")
+    for e in errors:
+        print("-", e)
+    sys.exit(1)
+PY
+}
+
+check_v204_hotfix_contract() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import re
+import sys
+
+errors = []
+
+team = Path("skills/team-mode/SKILL.md").read_text(encoding="utf-8")
+work = Path("skills/work/SKILL.md").read_text(encoding="utf-8")
+start = Path("commands/start.md").read_text(encoding="utf-8") + "\n" + Path("skills/start/SKILL.md").read_text(encoding="utf-8")
+init_memory = Path("skills/init-memory/SKILL.md").read_text(encoding="utf-8")
+session_hook = Path("hooks/session-close-reminder.sh").read_text(encoding="utf-8")
+
+for marker in ["Task(", "subagent_type", "haye:project-manager", "Forbidden - common mistakes"]:
+    if marker not in team:
+        errors.append(f"team-mode missing Task dispatch marker: {marker}")
+
+if "v<full semantic plugin version>" in start:
+    errors.append("start docs still contain version placeholder")
+if "HayeOS aktif. (Sürüm için: `/haye:version`)" not in start:
+    errors.append("start docs missing non-placeholder HayeOS active version guidance")
+
+for marker in [
+    "Next.js Project Initialization Defaults",
+    "npx create-next-app@latest",
+    "App Router",
+    "DO NOT manually create `pages/index.tsx`",
+    "Windows Shell Awareness",
+    "rmdir /S /Q",
+    "powershell -Command",
+    "File Modification Tool Preference",
+    "Preferred: Edit tool",
+    "Avoid: Update tool",
+]:
+    if marker not in work:
+        errors.append(f"work skill missing v2.0.4 marker: {marker}")
+
+for marker in ["Best-effort fake completion warning", "Always exit 0 so we never block stop"]:
+    if marker not in session_hook:
+        errors.append(f"session-close-reminder missing marker: {marker}")
+
+if "Path Resolution Rule" not in init_memory:
+    errors.append("init-memory missing Path Resolution Rule")
+for marker in ["NOT relative to `~`", "current working directory where `claude` was launched"]:
+    if marker not in init_memory:
+        errors.append(f"init-memory missing path resolution marker: {marker}")
+
+plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+if plugin.get("version") != "2.0.4":
+    errors.append(f"plugin.json version expected 2.0.4, got {plugin.get('version')!r}")
+changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
+if not m or m.group(1) != "2.0.4":
+    errors.append("CHANGELOG top version expected 2.0.4")
+
+if errors:
+    print("v2.0.4 hotfix contract errors:")
     for e in errors:
         print("-", e)
     sys.exit(1)
@@ -1218,6 +1319,8 @@ check_version_and_update_contract
 check_canonical_project_vault_contract
 check_canonical_real_project_root_init_contract
 check_v203_behavioral_regressions
+check_stub_plan_phrases_banned
+check_v204_hotfix_contract
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

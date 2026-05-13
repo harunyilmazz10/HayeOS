@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.4
+- Fixed agent dispatch failure mode: team-mode skill now shows explicit Task tool syntax (subagent_type, prompt) with concrete examples; banned Skill(haye:<agent-name>) shape that produces "Unknown skill"
+- Fixed `/haye:start` version placeholder bug (`HayeOS v<full semantic plugin version> aktif` was being literal-copied); replaced with `HayeOS aktif.` + pointer to `/haye:version`
+- Added Next.js Project Initialization Defaults to work skill: App Router default, Tailwind 4 PostCSS config, forbidden Pages Router after create-next-app
+- Added Windows Shell Awareness to work skill: rmdir /S /Q and del do not work in Bash tool; use POSIX or PowerShell wrapper
+- Added File Modification Tool Preference to work skill: prefer Edit over Update for existing files (Update can duplicate lines)
+- Updated session-close-reminder.sh as best-effort fake-completion-and-no-close warning (non-blocking)
+- Added Stub Plan Trap section to using-hayeos with banned phrase examples from test7 evidence
+- Added Path Resolution Rule to init-memory: memoryPath always resolves against cwd, never `~`
+- ANTI-REGRESSION: check_stub_plan_phrases_banned added to verify.sh
+
 ## 2.0.3
 - Fixed feature skill description that incorrectly used brainstorming-skill phrasing, causing wrong-skill routing after work mode selection
 - Fixed feature skill Verification template that emitted "build: pass / tests: pass" placeholder language; replaced with checklist requiring actual command output and exit codes

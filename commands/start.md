@@ -9,8 +9,26 @@ Use `skills/start/SKILL.md`.
 At the beginning or end of a successful start response, show one concise version line:
 
 ```text
-HayeOS v<full semantic plugin version> aktif.
+HayeOS aktif. (Sürüm için: `/haye:version`)
 ```
+
+### Version display
+
+If the user wants the active version inline, you may call:
+
+```text
+Bash: ${CLAUDE_PLUGIN_ROOT}/bin/haye.cmd version
+# (Windows)
+```
+
+or
+
+```text
+Bash: ${CLAUDE_PLUGIN_ROOT}/bin/haye version
+# (Mac/Linux)
+```
+
+Then quote the version line from that output. Do NOT fabricate a version number. Do NOT use a placeholder like `v<...>`.
 
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.

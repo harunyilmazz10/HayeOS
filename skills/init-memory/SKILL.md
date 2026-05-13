@@ -76,6 +76,28 @@ If `${CLAUDE_PLUGIN_ROOT}` is unavailable, infer the plugin root from the loaded
 - Never initialize project memory inside `CLAUDE_PLUGIN_ROOT`.
 - If `memoryPath` resolves to the plugin root or under the HayeOS plugin repo, stop and warn in Turkish: "Memory vault points to plugin root. This is unsafe. Fix .hayeos.json."
 
+### Path Resolution Rule
+
+The `memoryPath` from `.hayeos.json` (e.g. `./test7_obs`) MUST be resolved relative to:
+- The current working directory where `claude` was launched (the project root)
+- NOT relative to `~` (user home directory)
+- NOT relative to the parent of the project root
+
+### Test7 evidence
+
+In test7, `.hayeos.json` was written correctly to `C:\Path\To\Projeler\test7\` with `memoryPath: "./test7_obs"`. The `bin/haye init` CLI created the vault at the right place: `C:\Path\To\Projeler\test7\test7_obs\`.
+
+But later Sonnet wrote vault files to `~\Path\To\Projeler\test7_obs\` (parent directory - NOTE: `test7\` was skipped, the path was resolved against `~` instead of cwd).
+
+### Behavioral guard
+
+Before any Write call with a path containing `_obs/`:
+1. Verify the path is anchored at the current project root, not `~`
+2. If you find yourself typing `~\Desktop\...\<name>_obs\` or `~/Desktop/.../<name>_obs/`, STOP
+3. Use the cwd-anchored path: `./<name>_obs/...` or the absolute path that matches `.hayeos.json` resolution
+
+The vault must be a SIBLING of project files (under project root), not a SIBLING of the project itself.
+
 ## Init-memory boundaries
 - must not load `/haye:work`
 - must not start a task classification wizard

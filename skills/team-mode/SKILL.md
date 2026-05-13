@@ -10,17 +10,71 @@ Internal planning mode for `/haye:work`. Do not expose a separate `/haye:team` u
 
 ## Agent Invocation Rule
 
-Specialist roles under `agents/` are not skills. They are subagents/agents.
+Specialist roles under `agents/` are subagents, dispatched via the **Task tool**. They are NOT skills.
 
-NEVER attempt to call specialist roles through the Skill tool. Agent-as-skill calls such as using `project-manager`, `token-economist`, or `security-reviewer` with a `Skill(haye:<agent-name>)` shape are invalid and produce `Unknown skill`.
+### How to actually dispatch an agent (this is the rule)
 
-Team Mode must use the Claude Code agent/subagent execution mechanism for these roles.
-Skills orchestrate. Agents investigate, design, review, and advise.
+To invoke any specialist agent, use the Task tool with this exact shape:
+
+```text
+Task(
+  description: "<short 3-5 word task description>",
+  subagent_type: "<agent-name>",     # e.g. "project-manager", "security-reviewer"
+  prompt: "<full instructions for the subagent>"
+)
+```
+
+Plugin-namespaced form also works in Claude Code:
+- `subagent_type: "haye:project-manager"` (preferred for clarity)
+- or `subagent_type: "project-manager"` (works if no name collision)
+
+### Concrete dispatch example
+
+To dispatch the project-manager for a Next.js doctor landing page:
+
+```text
+Task(
+  description: "Scope and phase the landing page work",
+  subagent_type: "haye:project-manager",
+  prompt: |
+    You are the project-manager agent for HayeOS Team Mode.
+
+    Project: Premium doctor landing page (Next.js App Router, TypeScript, Tailwind, Framer Motion)
+    Current vault: <resolved memoryPath>
+
+    Read first: .hayeos.json, <resolved memoryPath>/current.md, <resolved memoryPath>/next.md
+
+    Output the agent format defined in agents/project-manager.md (max 7 bullets per section):
+    - Scope (in/out, explicit cuts)
+    - Phases (with goal, exit criteria)
+    - Risks (top 3-5)
+    - Blockers (missing decisions, credentials, approvals)
+    - Suggested next 3 actions
+)
+```
+
+### Forbidden - common mistakes
+
+NEVER call agents through:
+- `Skill(haye:project-manager)` - produces "Unknown skill" error (test7 evidence: 5 such errors)
+- `Bash(bin/haye project-manager)` - the CLI does not accept agent names as commands
+- `Bash(haye project-manager)` - same
+- Just writing "Now invoking project-manager" without an actual Task() call - this is the prose-instead-of-tool failure mode
+
+If you find yourself typing `Skill(haye:<agent-name>)`, STOP. Use Task instead.
+
+### Natural language form
+
+Claude Code also accepts natural language for subagent dispatch:
+
+> "Use the haye:project-manager subagent to scope and phase this work, then return findings."
+
+This is equivalent to the Task tool call above and Claude Code auto-routes. Either form is acceptable; the Task() form gives more control over the prompt.
 
 ### Namespace separation
-- Skills live under `skills/` and are invoked with the Skill tool, for example `haye:team-mode`, `haye:work`, `haye:feature`, `haye:checkpoint`.
-- Agents live under `agents/` and must be dispatched as agents/subagents, for example `project-manager`, `memory-architect`, `database-architect`, `api-integrator`, `security-reviewer`, `deployment-doctor`, `release-manager`, `token-economist`, `bug-investigator`, `ui-polisher`.
-- Team Mode coordinates skills plus agents; it must not confuse the two namespaces.
+- Skills live under `skills/` and are invoked with the Skill tool (e.g. `haye:team-mode`, `haye:work`, `haye:checkpoint`).
+- Agents live under `agents/` and must be dispatched with the **Task tool**.
+- Team Mode coordinates skills + agents; it must not confuse the two namespaces.
 
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
@@ -40,19 +94,23 @@ Skills orchestrate. Agents investigate, design, review, and advise.
 - performans/scaling işi
 - belirsiz veya çok geniş prompt
 
-## Required roles
-- Dispatch the `project-manager` agent.
-- Dispatch the `memory-architect` agent.
-- Dispatch the `security-reviewer` agent.
-- Dispatch the `release-manager` agent.
-- Dispatch the `token-economist` agent.
+## Required roles (always dispatched via Task tool)
 
-## Conditional roles
-- Dispatch the `database-architect` agent when data model, migration, indexing or retention matters.
-- Dispatch the `api-integrator` agent when APIs, service contracts, webhooks or queue/events matter.
-- Dispatch the `deployment-doctor` agent when Docker, Coolify, Cloudflare, env, healthcheck, rollback or observability matters.
-- Dispatch the `ui-polisher` agent when frontend/dashboard/UX matters.
-- Dispatch the `bug-investigator` agent when debugging/root-cause work is present.
+For every Team Mode invocation:
+
+- Task(subagent_type: "haye:project-manager", ...)
+- Task(subagent_type: "haye:memory-architect", ...)
+- Task(subagent_type: "haye:security-reviewer", ...)
+- Task(subagent_type: "haye:release-manager", ...)
+- Task(subagent_type: "haye:token-economist", ...)
+
+## Conditional roles (Task tool when relevant)
+
+- Task(subagent_type: "haye:database-architect", ...) - when data model, migration, indexing, retention matters
+- Task(subagent_type: "haye:api-integrator", ...) - when APIs, service contracts, webhooks, queues matter
+- Task(subagent_type: "haye:deployment-doctor", ...) - when Docker, Coolify, Cloudflare, env, healthcheck matters
+- Task(subagent_type: "haye:ui-polisher", ...) - when frontend/UX matters
+- Task(subagent_type: "haye:bug-investigator", ...) - when debugging/root-cause work is present
 
 ## Token-economist rule
 `token-economist` is always included. It limits repo scanning, prevents repeated findings, recommends context packs, splits large work into phases/sessions, avoids raw/log reads, and reminds `/haye:close` at phase boundaries.
@@ -60,7 +118,8 @@ Skills orchestrate. Agents investigate, design, review, and advise.
 ## Team Mode execution contract
 1. `haye:team-mode` skill loads as the orchestration skill.
 2. It selects specialist agents.
-3. It dispatches selected specialists as agents/subagents, not skills.
+3. It dispatches selected specialists USING THE TASK TOOL (not Skill, not Bash).
+   Each dispatch is a separate Task() call with subagent_type and prompt.
 4. It collects agent outputs sequentially or in parallel according to runtime support.
 5. It synthesizes outputs into one plan.
 6. It writes specialist summaries to `<resolved memoryPath>/10-reviews/team-mode/<agent>-<date>.md` when memory is active.

@@ -109,6 +109,44 @@ If you find yourself reaching for the Write tool to create `.hayeos.json` or `<p
 
 If `/haye:work` offered the user a choice between Full Architecture Mode, Team Mode, Plan First, Standard Single Agent, or Fast Single Agent, and the user picked one - your NEXT tool call depends on the choice. See `skills/work/SKILL.md` "Mandatory routing after mode selection" table. The most common error is dropping into `Skill(haye:feature)` because it has imperative description language. `feature` is for ONE small slice - NOT for routing out of mode selection.
 
+## Stub Plan Trap
+
+If you find yourself about to write a plan section like:
+
+```markdown
+## 3. Role Findings
+Belirlenen uzman rolleriyle yapılandırmalar ve görevler detaylandırılacak.
+
+## 4. Birleştirilmiş Uygulama Planı
+Uygulama planı burada oluşturulacak.
+
+## 6. Doğrulama Planı
+Her bir aşama tamamlandıkça doğrulama testleri yapılacak.
+```
+
+STOP. These are stub-plan phrases. Specifically banned in this skill:
+
+- "Uygulama planı burada oluşturulacak"
+- "burada belirtilecek"
+- "ileride detaylandırılacak"
+- "aşağıda detaylı olarak verilecek"
+- "X yapılandırılacaktır"
+- "(Devamı ... detaylı olarak belirtilmeli)"
+- "Plan implementation will be defined"
+- "TBD" / "TBA" / "..." as a section body
+
+A plan section must contain ACTUAL content (file names, decisions, risks, commands, exit criteria) or it must not be claimed complete.
+
+If you cannot fill a section with real content right now, mark it `[ ] (pending - needs <X>)` and do not check it off.
+
+### Test7 evidence
+
+Sonnet produced exactly this stub plan in test7:
+> "3. Rol Buluntuları: Belirlenen uzman rolleriyle yapılandırmalar ve görevler detaylandırılacak."
+> "4. Birleştirilmiş Uygulama Planı: Uygulama planı burada oluşturulacak."
+
+This is the canonical Plan Depth Rule violation. Add this section's banned phrases to your active filter.
+
 ## When the Path Separation Rule Applies
 
 Project source code goes to `sourcePath` (proje kökü). Memory goes to `memoryPath` (vault). The work skill has the full rule. Before writing ANY file path, ask: "Is this code/infra/docs, or is this memory?" If it's code and the path goes under `<memoryPath>/`, STOP and warn in Turkish.

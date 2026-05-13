@@ -693,6 +693,118 @@ Kullanıcı promptu spesifik teknoloji adlandırırsa (FastAPI, Postgres, Prisma
 ### Sürüm karar kaynağı
 Her dependency seçimi ve version pin `<resolved memoryPath>/02-decisions/dependencies-<date>.md`'ye kaydedilir.
 
+## Next.js Project Initialization Defaults
+
+When the user requests a Next.js project from scratch:
+
+### Required scaffolding command
+
+```bash
+npx create-next-app@latest <project-name> --typescript --tailwind --app --src-dir=false --import-alias="@/*"
+```
+
+This produces:
+- Next.js 16+ with App Router (NOT Pages Router)
+- TypeScript out of the box
+- Tailwind CSS preconfigured
+- `app/` directory at root (no `src/` wrapper)
+
+### Forbidden patterns (test7 evidence)
+
+DO NOT manually create `pages/index.tsx` AFTER `npx create-next-app` ran. The scaffold uses App Router by default - adding Pages Router files causes route conflicts:
+
+```text
+Error: Conflicting app and page file was found, please remove the conflicting files to continue:
+  "pages/index.tsx" - "app/page.tsx"
+```
+
+If `app/page.tsx` exists, edit it. Do not introduce `pages/`.
+
+### Tailwind v4+ (Next.js 16+)
+
+For Next.js 16's bundled Tailwind 4:
+- `tailwind.config.js` is NOT manually written; `@tailwindcss/postcss` handles it
+- `postcss.config.js` should be:
+  ```js
+  module.exports = {
+    plugins: { '@tailwindcss/postcss': {} }
+  }
+  ```
+- NOT the old `plugins: { tailwindcss: {}, autoprefixer: {} }` (this is Tailwind 3 pattern)
+
+If `tailwindcss init -p` fails (Tailwind 4 removed this command), do not retry. Use the create-next-app output directly.
+
+### Component file locations
+- App Router: `app/page.tsx` (home), `app/about/page.tsx` (about), `app/layout.tsx` (shared layout)
+- Components: `components/<Name>.tsx` (or `app/_components/` for App Router-private)
+- "use client" required at top of any component with useState, useEffect, event handlers, or browser APIs
+
+## Windows Shell Awareness
+
+Claude Code's Bash tool runs through Git Bash (or WSL) on Windows. This means:
+
+### Commands that DO NOT work in the Bash tool on Windows
+
+```text
+rmdir /S /Q "C:\path"      # Windows cmd syntax - bash sees /S and /Q as paths
+del C:\path\file           # Windows cmd command - bash has no 'del'
+copy /Y src dest           # Windows cmd - bash has no 'copy'
+```
+
+### Use POSIX commands instead
+
+```bash
+rm -rf "/c/path"           # Forward slashes, /c for C: drive
+rm "/c/path/file"
+cp src dest
+```
+
+### For Windows-specific operations, route through PowerShell
+
+```bash
+powershell -Command "Remove-Item -Path 'C:\\path' -Recurse -Force"
+powershell -Command "Get-Process node | Stop-Process"
+```
+
+### Path conversions
+
+In Bash tool on Windows, prefer:
+- Forward slashes: `/c/Path/To/project`
+- Or escape backslashes: `C:\\Path\\To\\project`
+- Avoid mixing: `C:\Path\To\project` may be misinterpreted
+
+### Test7 evidence
+
+Sonnet attempted `Bash(rmdir /S /Q "C:\Path\To\Project\premium-doctor-landing-page\pages")` and bash interpreted `/S` and `/Q` as file paths, returning errors. The correct command was `Bash(powershell -Command "Remove-Item -Path '...' -Recurse -Force")`.
+
+## File Modification Tool Preference
+
+When modifying an EXISTING file:
+
+### Preferred: Edit tool
+
+Edit replaces specific strings. It is safer for incremental changes. It cannot accidentally duplicate imports or other lines.
+
+### Avoid: Update tool when adding imports / re-editing recently-changed files
+
+The Update tool has a known failure mode where re-applying edits to a recently-modified file can DUPLICATE lines at the top of the file:
+
+```text
+1  import React from 'react';
+2
+3 +import React from 'react';           <- DUPLICATE
+4 +import ServiceCard from '...';
+```
+
+If you need to add an import to a file:
+1. First Read the file
+2. Use Edit with old_str = existing import block, new_str = existing imports + new import
+3. Verify the result with another Read
+
+### Test7 evidence
+
+Sonnet used Update to add `import ServiceCard` to `pages/index.tsx`. The result was 3 duplicate `import React from 'react';` statements, breaking the build.
+
 ## Required Next Steps
 
 After mode classification:
