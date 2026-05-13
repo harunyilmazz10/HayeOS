@@ -5,6 +5,46 @@ description: Use when user requests a feature, refactor, migration, deploy, or a
 
 # Haye Skill: work
 
+## The Iron Law
+
+```text
+NO IMPLEMENTATION CODE BEFORE PLAN APPROVAL
+NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+NO PROJECT SOURCE INSIDE THE MEMORY VAULT
+NO STUB PLAN ARTIFACTS - UNDER 20 LINES OR WITH PLACEHOLDERS
+```
+
+Violating the letter of any rule is violating the spirit. Don't rephrase your way out.
+
+## Red Flags - STOP, you're rationalizing
+
+| Thought | Reality |
+|---------|---------|
+| "This is too simple to need a plan" | Every project gets a plan. Short is fine. Stub is not. |
+| "I'll add detail to the plan later" | Stub plan in vault = lying about completion. |
+| "Tests/build look fine, no need to run" | If you didn't run it in this turn, you can't claim it. |
+| "User said 'devam', so 5 more files" | "Devam" = one meaningful step then stop. |
+| "Let me set up the vault later" | Auto Checkpoint Rule applies from file #1. |
+| "Team Mode is overkill here" | Trigger conditions are written in this skill. Read them, don't guess. |
+| "I'll skip the planning section, the prompt is clear" | The plan IS the prompt's contract. Skip = scope drift. |
+| "Just one quick fix without verification" | Quick = unverified = a lie. |
+| "Stack drift is fine, FastAPI vs Flask is similar" | Drift requires explicit user approval. |
+| "Placeholder is OK, user will fix it" | User explicitly said 'no placeholders'. You wrote them anyway. |
+
+## The Gate Function
+
+Before claiming "complete", "done", "works", "passes", "ready":
+
+1. IDENTIFY: What command/check proves this claim?
+2. RUN: Execute the FULL command (fresh, in this turn)
+3. READ: Full output, exit code, count failures
+4. VERIFY: Does output confirm the claim?
+   - If NO: State actual status with evidence, don't claim
+   - If YES: Claim WITH evidence
+5. ONLY THEN: Make the claim
+
+Skip any step = lying, not verifying.
+
 ## Purpose
 `/haye:work "görev"` tek giriş noktasıdır. HayeOS görevi analiz eder, büyüklük/risk/mod seçimini yapar, gerekirse Team Mode veya Full Architecture Mode önerir, onay sürtünmesini düşük tutar ve doğrulama disipliniyle ilerler.
 
