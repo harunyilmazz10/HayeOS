@@ -5,6 +5,61 @@ description: Use when user requests a feature, refactor, migration, deploy, or a
 
 # Haye Skill: work
 
+## ABSOLUTE FIRST STEP
+
+When this skill loads, your FIRST output MUST be a Task Classification block in this exact format. No prose preamble. No exploration. No "let me check files first."
+
+```markdown
+**HayeOS Görev Sınıflandırması**
+
+- task_size: <small / medium / large / massive>
+- task_type: <feature / refactor / migration / full-build / launch / fix>
+- risk_level: <low / medium / high>
+- affected_layers: <frontend / backend / db / infra / deploy / multiple>
+
+**Önerilen mode:** <Fast Single Agent / Standard Single Agent / Plan First / Team Mode / Full Architecture Mode>
+
+**Sebep:** <bir cümle gerekçe>
+
+Onaylıyor musunuz? Veya farklı bir mode tercih ediyor musunuz?
+```
+
+After producing this block, STOP. Wait for user reply.
+
+DO NOT call `Skill(haye:feature)` before classification + approval.
+DO NOT call `Skill(haye:team-mode)` before classification + approval.
+DO NOT start implementation.
+DO NOT explore files.
+DO NOT ask "how can I help".
+
+The classification is data, not a question - produce it from the prompt content alone.
+
+### Classification heuristics
+
+Use these rules to compute `task_size`:
+
+- **massive**: prompt contains 3+ of: "production-grade", "complete system", "multi-service", "from scratch", "AI pipeline", "microservices", "Kubernetes", "monitoring + analytics", Phase 0/1/2 roadmap, 10+ files implied
+- **large**: prompt mentions 4+ distinct sections/components (Hero + Services + About + Form + Contact = 5 sections -> large), or "production-grade" + multi-section, or full project scaffolding (Next.js init + components + styling + forms)
+- **medium**: 2-3 components or one new endpoint with UI
+- **small**: single component, single endpoint, single field
+
+Use these rules to compute `recommended_mode`:
+
+- massive -> Full Architecture Mode (with Team Mode internally)
+- large -> Team Mode
+- medium -> Plan First or Standard Single Agent
+- small -> Fast Single Agent
+
+### Banned shortcut
+
+A prompt like:
+
+> "Next.js ile premium bir doktor landing page projesi. Production-grade. Hero, hizmetler, hakkında, randevu formu ve iletişim bölümleri olsun."
+
+is **large** (5 sections + "production-grade" + project scaffolding). MUST recommend Team Mode. MUST NOT auto-route to `Skill(haye:feature)`.
+
+If you find yourself thinking "this is just a landing page, it's small" - STOP. Count the sections. Count "production-grade". Count "Next.js" (= scaffolding work). Apply the heuristic. Don't underclassify to avoid Team Mode overhead.
+
 ## The Iron Law
 
 ```text
@@ -109,8 +164,8 @@ When the user chooses one of the offered modes (Full Architecture Mode, Team Mod
 
 | User picks | REQUIRED next call / behavior | Why |
 |---|---|---|
-| Full Architecture Mode | `Skill(haye:team-mode)` | Coordinates specialist agents and produces the full architecture plan |
-| Team Mode | `Skill(haye:team-mode)` | Same orchestrator; produces a smaller specialist plan |
+| Full Architecture Mode | `Skill(haye:team-mode)` | Produces embedded specialist perspectives and the full architecture plan |
+| Team Mode | `Skill(haye:team-mode)` | Same orchestrator; produces a smaller multi-perspective plan |
 | Plan First | `Skill(haye:context-pack)` followed by read-only plan construction | Investigation before plan |
 | Standard Single Agent | inline plan in chat, then `Skill(haye:checkpoint)` after plan approval | One Sonnet, no subagents |
 | Fast Single Agent | direct implementation with checkpoint after 5 files | One Sonnet, no plan ceremony |
@@ -137,7 +192,7 @@ DO NOT continue answering with prose after the mode is chosen. Make the required
    - Wait for user approval before implementation.
 4. Team Mode
    - Large, multi-layer or risky work.
-   - Use short specialist perspectives: `project-manager`, `memory-architect`, `database-architect`, `api-integrator`, `security-reviewer`, `deployment-doctor`, `release-manager`, `token-economist`.
+   - Walk embedded specialist perspectives inside `haye:team-mode`: `project-manager`, `memory-architect`, `database-architect`, `api-integrator`, `security-reviewer`, `deployment-doctor`, `release-manager`, `token-economist`.
    - `token-economist` is always included.
    - `security-reviewer` is required for high-risk work.
    - `deployment-doctor` is required when infra/deploy is affected.
@@ -456,7 +511,7 @@ Phase sonunda rapor:
 - Detaylı içerikler için `docs/` veya HayeOS vault içinde uygun dosyaları kullan.
 - Chat'te sadece şunları ver: kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu.
 - If output would become long, prefer writing the detailed content to `docs/` or the HayeOS vault and provide a concise chat summary. Ask for continuation only if the user explicitly requested a long multi-part chat response.
-- Team Mode agent çıktıları kısa olmalı; her agent en fazla 3-7 madde yazmalı.
+- Team Mode perspective çıktıları kısa olmalı; her perspective en fazla 3-7 madde yazmalı.
 - Full Architecture Mode detayları `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazmalı; chat'e tamamını basmamalı.
 - `/haye:close` sırasında uzun session log basma; memory'ye yaz, chat'te kısa özet ver.
 
@@ -526,7 +581,7 @@ Büyük işlerde:
 - gereksiz repo tarama yapma
 - raw/log klasörlerini okuma
 - context-pack oluştur
-- agent raporlarını kısa tut
+- perspective raporlarını kısa tut
 - aynı bilgiyi tekrar etme
 - büyük işi phase/session parçalara böl
 - phase sonunda `/haye:close` öner
@@ -639,23 +694,24 @@ Bu ifadeler ancak yukarıdaki kanıtlarla birlikte kullanılır.
 ### Team Mode dispatch rule
 
 When specialist perspectives are required, `/haye:work` must route to `haye:team-mode`.
-`haye:team-mode` then dispatches specialist roles from `agents/` through the Claude Code agent/subagent mechanism.
+`haye:team-mode` then walks specialist perspectives inline inside the skill.
 
-Do NOT attempt to call agent names using `Skill(haye:<agent-name>)`.
+Do NOT attempt to call role names using `Skill(haye:<agent-name>)`.
+Do NOT attempt Task-tool subagent dispatch.
 
 ### token-economist HER ZAMAN zorunlu
-Her Full Architecture Mode oturumu, scope ne olursa olsun, token-economist'i en az bir kez çağırır. Çıktısı implementation başlamadan önce chat'e ya da memory note'a girer.
+Her Full Architecture Mode oturumu, scope ne olursa olsun, Token Economist perspective'ini en az bir kez yürütür. Çıktısı implementation başlamadan önce chat'e ya da memory note'a girer.
 
 ### Adı geçen specialist'ler GERÇEKTEN çağrılır
-Prompt project-manager, memory-architect, database-architect, api-integrator, security-reviewer, deployment-doctor, release-manager, token-economist gibi agent'lar listelediyse - adı geçen her agent çıktı üretir.
-Çıktıları `<resolved memoryPath>/10-reviews/team-mode/<agent>-<date>.md`'ye gider; chat'te <=7 bullet'lık özet kalır.
+Prompt project-manager, memory-architect, database-architect, api-integrator, security-reviewer, deployment-doctor, release-manager, token-economist gibi specialist perspektifleri listelediyse - adı geçen her perspective çıktı üretir.
+Çıktıları `<resolved memoryPath>/10-reviews/team-mode/<perspective>-<date>.md`'ye gider; chat'te <=7 bullet'lık özet kalır.
 
-### Agent atlamak explicit onay gerektirir
-Bir agent'ı çağırmamaya karar verirsen, yapmadan önce söyle:
-"{agent-name}'i atlıyorum çünkü: {sebep}. Onayınızı bekliyorum."
+### Perspective atlamak explicit onay gerektirir
+Bir perspective'i yürütmemeye karar verirsen, yapmadan önce söyle:
+"{perspective-name}'i atlıyorum çünkü: {sebep}. Onayınızı bekliyorum."
 
 ### Full Architecture Mode'da single-agent execution ihlaldir
-Kendini Full Architecture Mode'da ama tek agent olarak çalışıyorken bulursan, dur ve ya:
+Kendini Full Architecture Mode'da ama tek perspektifli çalışıyorken bulursan, dur ve ya:
 - Team Mode'a düzgün gir, ya da
 - Kullanıcıdan mode'u düşürmesini iste
 

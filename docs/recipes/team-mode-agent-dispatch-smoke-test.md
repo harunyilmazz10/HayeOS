@@ -1,10 +1,10 @@
-# Team Mode Agent Dispatch Smoke Test
+# Team Mode Inline Perspective Smoke Test
 
-Use this on a real Claude Code session with HayeOS enabled after installing v2.0.1 or later.
+Use this on a real Claude Code session with HayeOS enabled after installing v2.1.0 or later.
 
 ## Goal
 
-Confirm that Team Mode dispatches specialist roles as agents/subagents, not as HayeOS skills.
+Confirm that Team Mode walks specialist roles as inline perspectives, not as HayeOS skills, plugin agents, or subagents.
 
 ## Steps
 
@@ -24,12 +24,12 @@ Next.js ile premium bir doktor landing page projesi olu≈üturmak istiyorum. Tam √
 ```
 
 6. Confirm `Skill(haye:team-mode)` loads.
-7. Confirm specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` are dispatched as agents/subagents.
-8. Confirm no `Unknown skill` errors appear for specialist names.
+7. Confirm specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` appear as inline perspective sections.
+8. Confirm no `Unknown skill` or `Invalid tool parameters` errors appear for specialist names.
 
 ## Expected result
 
 - Skills orchestrate the workflow.
-- Agents provide specialist findings.
-- No agent role is called through `Skill(haye:<agent-name>)`.
-- Team Mode does not claim specialist perspectives were applied unless agent outputs actually exist.
+- Inline perspectives provide specialist findings.
+- No specialist role is called through `Skill(haye:<role-name>)`.
+- Team Mode does not claim specialist perspectives were applied unless the perspective sections contain task-specific findings.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0
+- **BREAKING (internal)**: Removed `agents/` directory entirely. Plugin agents (project-manager, security-reviewer, etc.) never worked reliably in Claude Code runtime - Skill() invocation produced "Unknown skill", Task subagent dispatch produced "Invalid tool parameters". User-facing slash commands and vault structure are unchanged.
+- Specialist perspectives (10 of them) are now embedded as inline process inside `skills/team-mode/SKILL.md`. Sonnet walks through them sequentially in the main conversation. No tool dispatch, no namespace issues.
+- Added **ABSOLUTE FIRST STEP** block to `skills/work/SKILL.md` - work skill MUST produce a Task Classification + mode recommendation + approval question before any sub-skill routing. Prevents the work -> feature drift seen in test6/test7/test8.
+- Added **Auto-Invoke Ban** to `skills/feature/SKILL.md` - feature skill cannot be auto-invoked from a user prompt. Only via work skill's Mandatory Routing AFTER mode approval.
+- Added **Gate Function** to `skills/using-hayeos/SKILL.md` - mechanical pre-claim check that catches "başarıyla / tamamlandı / oluşturuldu" claims following tool errors. Direct fix for test8 fake-completion-after-invalid-tool-parameters pattern.
+- ANTI-REGRESSION: Six new verify.sh checks for the v2.1.0 contracts.
+
 ## 2.0.4
 - Fixed agent dispatch failure mode: team-mode skill now shows explicit Task tool syntax (subagent_type, prompt) with concrete examples; banned Skill(haye:<agent-name>) shape that produces "Unknown skill"
 - Fixed `/haye:start` version placeholder bug (`HayeOS v<full semantic plugin version> aktif` was being literal-copied); replaced with `HayeOS aktif.` + pointer to `/haye:version`

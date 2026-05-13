@@ -22,12 +22,13 @@ Skills are not prose. They are behavior code. Each line shapes what Claude does 
 - Red Flags tables target specific rationalizations Claude makes. Don't generalize them.
 - "Use when X" descriptions activate the skill. Don't reformat to "Helps with X" or skill stops triggering.
 
-## Skill vs Agent Namespace
+## Team Mode Specialist Perspectives
 
 - `skills/` are invoked with the Skill tool.
-- `agents/` are specialist subagents and must be dispatched with the Claude Code agent/subagent mechanism.
-- Do not name agent roles as if they were skills.
-- A repo change that introduces `Skill(haye:<agent-name>)` or similar is a regression.
+- Team Mode specialist roles are no longer stored as plugin agents.
+- `skills/team-mode/SKILL.md` embeds the specialist perspectives inline: project-manager, memory-architect, security-reviewer, release-manager, token-economist, database-architect, api-integrator, deployment-doctor, ui-polisher and bug-investigator.
+- Do not reintroduce a plugin `agents/` directory unless a future runtime proves plugin agent dispatch works reliably.
+- A repo change that reintroduces `Skill(haye:<agent-name>)`, Task-tool role dispatch, or an `agents/` folder is a regression.
 
 ## User Response Language
 

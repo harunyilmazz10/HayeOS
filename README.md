@@ -42,7 +42,24 @@ Modes:
 - Team Mode: large veya high risk işlerde uzman rollere böler; ayrı user-facing team komutu yoktur.
 - Full Architecture Mode: massive veya sıfırdan production-grade sistemlerde kodlamadan önce mimari plan çıkarır ve onay ister.
 
-Team Mode combines skills for workflow/orchestration and agents for specialist perspectives. Specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` are not HayeOS skills. They are agents dispatched by Team Mode.
+## Specialist perspectives (Team Mode)
+
+HayeOS Team Mode walks through 9 specialist perspectives inline:
+
+**Mandatory** (every Team Mode run):
+- Project Manager - scope, phases, blockers
+- Memory Architect - vault hygiene
+- Security Reviewer - auth, secrets, surface area
+- Release Manager - verification, rollback, version
+- Token Economist - context discipline
+
+**Conditional** (when triggering signal present):
+- Database Architect - schema, migrations, indexes
+- API Integrator - auth, idempotency, retries
+- Deployment Doctor - Docker, Coolify, healthcheck
+- UI Polisher - states, a11y, motion
+
+Earlier versions used a separate `agents/` directory for these roles. v2.1.0 inlines them as process within the `team-mode` skill for runtime reliability.
 
 Work Strategy Selection Rule: large, massive, high-risk veya belirsiz işlerde HayeOS önce önerilen çalışma modunu açıklar ve Türkçe onay ister; small + low-risk işlerde sormadan Fast Single Agent ile ilerler.
 

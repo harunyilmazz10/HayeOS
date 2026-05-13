@@ -38,7 +38,7 @@ Find what is eating Claude's context budget in the current session and recommend
 - Big logs pasted whole instead of `head`/`tail`/`grep`
 - Full repo tree listed when a single directory would do
 - Architecture/roadmap content being written into chat instead of `docs/architecture.md`, `docs/roadmap.md` (Output Budget Rule)
-- Team Mode agent outputs longer than 7 bullets each (HayeOS cap)
+- Team Mode perspective outputs longer than 7 bullets each (HayeOS cap)
 - Repeated re-explanations of the same context
 
 ### Missing context pack

@@ -20,11 +20,13 @@ For a basic CLI sanity test, create a temporary project and run `python3 bin/hay
 - Use `<resolved memoryPath>/...` for memory targets.
 - Never write memory files to project root or plugin root.
 
-## Agent authoring rules
+## Team Mode perspective rules
 
-- Include `Inputs to read first`, `What this agent looks for`, `Output format`, and `Safety rules`.
-- Make the role specific; avoid generic filler that could apply to any agent.
-- State what the agent must not do and when it should escalate.
+- Do not add or restore a plugin `agents/` directory.
+- Put Team Mode specialist behavior inside `skills/team-mode/SKILL.md`.
+- Each perspective must include what it looks for and a concrete output shape.
+- Keep each perspective role-specific; avoid generic filler that could apply to any workflow.
+- Do not introduce Task-tool or subagent dispatch for Team Mode unless a future runtime proves it works reliably.
 
 ## Pre-PR verification checklist
 

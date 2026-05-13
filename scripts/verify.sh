@@ -510,17 +510,6 @@ from pathlib import Path
 import sys
 
 errors = []
-agent_requirements = {
-    "agents/security-reviewer.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Auth", "Secrets", "Dependencies"],
-    "agents/database-architect.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Migration safety", "Indexes"],
-    "agents/deployment-doctor.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Dockerfile", "Coolify"],
-    "agents/token-economist.md": ["## Inputs to read first", "## What this agent looks for", "## Output format", "Quality Preservation Rule"],
-}
-for filename, phrases in agent_requirements.items():
-    text = Path(filename).read_text(encoding="utf-8")
-    for phrase in phrases:
-        if phrase not in text:
-            errors.append(f"{filename}: missing enriched agent phrase {phrase}")
 
 skill_requirements = {
     "skills/nextjs-doctor/SKILL.md": ["Common symptoms", "App Router / RSC", "Verification commands"],
@@ -584,7 +573,7 @@ for name in ["coolify-build-log", "docker-log", "nextjs-dev-log"]:
         errors.append(f"monitors.example.json missing monitor {name}")
 
 doc_requirements = {
-    "CONTRIBUTING.md": ["Skill authoring rules", "Agent authoring rules", "Pre-PR verification checklist", "Hard requirements for every PR", "<resolved memoryPath>/..."],
+    "CONTRIBUTING.md": ["Skill authoring rules", "Team Mode perspective rules", "Pre-PR verification checklist", "Hard requirements for every PR", "<resolved memoryPath>/..."],
     "ROADMAP.md": ["v1.1 - JSONL parsing", "v1.2 - Obsidian link graph linting", "v1.3 - Project dashboards", "Maintenance backlog"],
     "SECURITY.md": ["Supported versions", "Coordinated disclosure", "Non-promises", "Defense in depth", "Cloudflare WAF"],
 }
@@ -594,7 +583,7 @@ for filename, phrases in doc_requirements.items():
         if phrase not in text:
             errors.append(f"{filename} missing release polish phrase {phrase}")
 
-scan_paths = [Path(p) for p in ["bin", "commands", "skills", "docs", "hooks", "scripts", "agents", "monitors"]]
+scan_paths = [Path(p) for p in ["bin", "commands", "skills", "docs", "hooks", "scripts", "monitors"]]
 scan_files = []
 for path in scan_paths:
     scan_files.extend(p for p in path.rglob("*") if p.is_file())
@@ -730,80 +719,6 @@ check_test_infrastructure_exists() {
   fi
 }
 
-check_team_mode_agent_invocation_contract() {
-  python3 - <<'PY'
-from pathlib import Path
-import re
-import sys
-
-errors = []
-
-agent_names = [
-    "project-manager",
-    "memory-architect",
-    "database-architect",
-    "api-integrator",
-    "security-reviewer",
-    "deployment-doctor",
-    "release-manager",
-    "token-economist",
-    "bug-investigator",
-    "ui-polisher",
-]
-
-scan_exts = {".md", ".sh", ".py", ".json"}
-bad_pattern = re.compile(
-    r'Skill\(haye:(?:' + "|".join(re.escape(name) for name in agent_names) + r')\)'
-)
-
-for path in Path(".").rglob("*"):
-    if ".git" in path.parts:
-        continue
-    if not path.is_file():
-        continue
-    if path.suffix not in scan_exts:
-        continue
-    text = path.read_text(encoding="utf-8", errors="ignore")
-    match = bad_pattern.search(text)
-    if match:
-        if path.as_posix() == "skills/team-mode/SKILL.md" and "Forbidden - common mistakes" in text:
-            pass
-        else:
-            errors.append(f"{path}: invalid agent-as-skill reference: {match.group(0)}")
-
-required_markers = {
-    "skills/team-mode/SKILL.md": [
-        "Agent Invocation Rule",
-        "Specialist roles under `agents/` are subagents, dispatched via the **Task tool**",
-        "Task(",
-        "subagent_type",
-    ],
-    "skills/work/SKILL.md": [
-        "Team Mode dispatch rule",
-        "Claude Code agent/subagent mechanism",
-    ],
-    "skills/using-hayeos/SKILL.md": [
-        "Agents are not skills",
-    ],
-    "CLAUDE.md": [
-        "Skill vs Agent Namespace",
-    ],
-}
-
-for target, markers in required_markers.items():
-    text = Path(target).read_text(encoding="utf-8")
-    for marker in markers:
-        if marker not in text:
-            errors.append(f"{target}: missing Team Mode agent contract marker: {marker}")
-
-if errors:
-    print("Team Mode agent invocation contract errors:")
-    for error in errors:
-        print("-", error)
-    sys.exit(1)
-PY
-}
-
 check_version_and_update_contract() {
   python3 - <<'PY'
 from pathlib import Path
@@ -820,11 +735,11 @@ changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
 changelog_version = m.group(1) if m else None
 
-if plugin_version != "2.0.4":
-    errors.append(f"plugin.json version expected 2.0.4, got {plugin_version!r}")
+if plugin_version != "2.1.0":
+    errors.append(f"plugin.json version expected 2.1.0, got {plugin_version!r}")
 
-if changelog_version != "2.0.4":
-    errors.append(f"CHANGELOG top version expected 2.0.4, got {changelog_version!r}")
+if changelog_version != "2.1.0":
+    errors.append(f"CHANGELOG top version expected 2.1.0, got {changelog_version!r}")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 for marker in ["def version_cmd", "HayeOS version:", "Working tree:"]:
@@ -905,13 +820,13 @@ for target, markers in required_markers.items():
             errors.append(f"{target}: missing canonical vault marker: {marker}")
 
 plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
-if plugin.get("version") != "2.0.4":
-    errors.append(f"plugin.json version expected 2.0.4, got {plugin.get('version')!r}")
+if plugin.get("version") != "2.1.0":
+    errors.append(f"plugin.json version expected 2.1.0, got {plugin.get('version')!r}")
 
 changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
-if not m or m.group(1) != "2.0.4":
-    errors.append("CHANGELOG top version expected 2.0.4")
+if not m or m.group(1) != "2.1.0":
+    errors.append("CHANGELOG top version expected 2.1.0")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 suspicious = re.findall(r'\.claude[^"\']*projects[^"\']*memory', bin_haye, flags=re.IGNORECASE)
@@ -1123,8 +1038,8 @@ if "You MUST use this before any creative work" in feature:
     errors.append("feature skill still has old over-broad creative-work description")
 
 for marker in [
-    "one small vertical feature slice",
-    "NOT for multi-section UI builds",
+    "Internal sub-skill invoked ONLY by work skill",
+    "NEVER for multi-section UI",
 ]:
     if marker not in feature:
         errors.append(f"feature skill missing description marker: {marker}")
@@ -1181,17 +1096,17 @@ for marker in [
         errors.append(f"using-hayeos missing trap section: {marker}")
 
 plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
-if plugin.get("version") != "2.0.4":
-    errors.append(f"plugin.json version expected 2.0.4, got {plugin.get('version')!r}")
+if plugin.get("version") != "2.1.0":
+    errors.append(f"plugin.json version expected 2.1.0, got {plugin.get('version')!r}")
 
 changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
 top_ver = m.group(1) if m else None
-if top_ver != "2.0.4":
-    errors.append(f"CHANGELOG top version expected 2.0.4, got {top_ver!r}")
+if top_ver != "2.1.0":
+    errors.append(f"CHANGELOG top version expected 2.1.0, got {top_ver!r}")
 
 if errors:
-    print("v2.0.3/v2.0.4 behavioral regression check errors:")
+    print("v2.0.3/v2.1.0 behavioral regression check errors:")
     for e in errors:
         print("-", e)
     sys.exit(1)
@@ -1243,9 +1158,11 @@ start = Path("commands/start.md").read_text(encoding="utf-8") + "\n" + Path("ski
 init_memory = Path("skills/init-memory/SKILL.md").read_text(encoding="utf-8")
 session_hook = Path("hooks/session-close-reminder.sh").read_text(encoding="utf-8")
 
-for marker in ["Task(", "subagent_type", "haye:project-manager", "Forbidden - common mistakes"]:
+for marker in ["Perspective 1 — Project Manager", "Perspective 5 — Token Economist", "Conditional 4 — UI Polisher", "No Task tool dispatch"]:
     if marker not in team:
-        errors.append(f"team-mode missing Task dispatch marker: {marker}")
+        errors.append(f"team-mode missing inline perspective marker: {marker}")
+if "Task(subagent_type" in team:
+    errors.append("team-mode must not contain Task(subagent_type...) dispatch guidance in v2.1.0")
 
 if "v<full semantic plugin version>" in start:
     errors.append("start docs still contain version placeholder")
@@ -1278,12 +1195,12 @@ for marker in ["NOT relative to `~`", "current working directory where `claude` 
         errors.append(f"init-memory missing path resolution marker: {marker}")
 
 plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
-if plugin.get("version") != "2.0.4":
-    errors.append(f"plugin.json version expected 2.0.4, got {plugin.get('version')!r}")
+if plugin.get("version") != "2.1.0":
+    errors.append(f"plugin.json version expected 2.1.0, got {plugin.get('version')!r}")
 changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
-if not m or m.group(1) != "2.0.4":
-    errors.append("CHANGELOG top version expected 2.0.4")
+if not m or m.group(1) != "2.1.0":
+    errors.append("CHANGELOG top version expected 2.1.0")
 
 if errors:
     print("v2.0.4 hotfix contract errors:")
@@ -1291,6 +1208,77 @@ if errors:
         print("-", e)
     sys.exit(1)
 PY
+}
+
+check_no_agents_directory() {
+  if [ -d "agents" ]; then
+    echo "FAIL: agents/ directory must not exist in v2.1.0+"
+    echo "  Specialist perspectives are now embedded in skills/team-mode/SKILL.md"
+    return 1
+  fi
+}
+
+check_team_mode_has_embedded_perspectives() {
+  python3 - <<'PY'
+from pathlib import Path
+import sys
+
+required_perspectives = [
+    "Perspective 1 — Project Manager",
+    "Perspective 2 — Memory Architect",
+    "Perspective 3 — Security Reviewer",
+    "Perspective 4 — Release Manager",
+    "Perspective 5 — Token Economist",
+    "Conditional 1 — Database Architect",
+    "Conditional 2 — API Integrator",
+    "Conditional 3 — Deployment Doctor",
+    "Conditional 4 — UI Polisher",
+]
+
+text = Path("skills/team-mode/SKILL.md").read_text(encoding="utf-8")
+missing = [p for p in required_perspectives if p not in text]
+if missing:
+    print("team-mode skill missing embedded perspectives:")
+    for m in missing:
+        print(f"  - {m}")
+    sys.exit(1)
+PY
+}
+
+check_team_mode_no_task_tool_dispatch() {
+  if grep -E "Task\(subagent_type" skills/team-mode/SKILL.md > /dev/null; then
+    echo "FAIL: team-mode must not instruct Task tool dispatch (v2.1.0 inlines perspectives)"
+    return 1
+  fi
+  if grep -E "Dispatch the .+ agent" skills/team-mode/SKILL.md > /dev/null; then
+    echo "FAIL: team-mode must not say 'Dispatch the X agent' (v2.1.0 inlines perspectives)"
+    return 1
+  fi
+}
+
+check_work_has_absolute_first_step() {
+  if ! grep -q "ABSOLUTE FIRST STEP" skills/work/SKILL.md; then
+    echo "FAIL: work skill missing 'ABSOLUTE FIRST STEP' block (v2.1.0 requirement)"
+    return 1
+  fi
+  if ! grep -q "HayeOS Görev Sınıflandırması" skills/work/SKILL.md; then
+    echo "FAIL: work skill missing task classification template"
+    return 1
+  fi
+}
+
+check_feature_has_auto_invoke_ban() {
+  if ! grep -q "Auto-Invoke Ban" skills/feature/SKILL.md; then
+    echo "FAIL: feature skill missing 'Auto-Invoke Ban' block"
+    return 1
+  fi
+}
+
+check_using_hayeos_has_gate_function() {
+  if ! grep -q "Gate Function" skills/using-hayeos/SKILL.md; then
+    echo "FAIL: using-hayeos missing 'Gate Function' section"
+    return 1
+  fi
 }
 
 check_plugin_root_clean() {
@@ -1314,13 +1302,18 @@ check_release_polish
 check_path_separation_and_workflow_rules
 check_skill_descriptions_use_when_pattern
 check_test_infrastructure_exists
-check_team_mode_agent_invocation_contract
 check_version_and_update_contract
 check_canonical_project_vault_contract
 check_canonical_real_project_root_init_contract
 check_v203_behavioral_regressions
 check_stub_plan_phrases_banned
 check_v204_hotfix_contract
+check_no_agents_directory
+check_team_mode_has_embedded_perspectives
+check_team_mode_no_task_tool_dispatch
+check_work_has_absolute_first_step
+check_feature_has_auto_invoke_ban
+check_using_hayeos_has_gate_function
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

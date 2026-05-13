@@ -55,12 +55,12 @@ HayeOS skills override default behavior, but **user instructions always take pre
 "Let's build X" -> brainstorming/work first, then domain skills.
 "Fix this bug" -> fix/systematic-debugging first, then domain skills.
 
-## Agents are not skills
+## Team Mode perspectives are inline
 
 Workflow and domain guidance come from skills.
-Specialist role execution comes from agents under `agents/`.
+Specialist role execution for Team Mode is embedded inside `skills/team-mode/SKILL.md`.
 
-If Team Mode needs `project-manager`, `security-reviewer`, `token-economist`, or any other specialist role, dispatch an agent/subagent. Do not call `Skill(haye:<agent-name>)`.
+If Team Mode needs `project-manager`, `security-reviewer`, `token-economist`, or any other specialist role, load `Skill(haye:team-mode)` and walk the embedded perspectives inline. Do not call `Skill(haye:<role-name>)` and do not attempt Task-tool subagent dispatch.
 
 ## Mandatory Invocation Triggers
 
@@ -146,6 +146,43 @@ Sonnet produced exactly this stub plan in test7:
 > "4. Birleştirilmiş Uygulama Planı: Uygulama planı burada oluşturulacak."
 
 This is the canonical Plan Depth Rule violation. Add this section's banned phrases to your active filter.
+
+## Gate Function — Mandatory pre-claim check
+
+Before typing any of these words in your response, run the gate function in your head:
+
+- "başarıyla" / "successfully"
+- "tamamlandı" / "completed" / "done"
+- "oluşturuldu" / "created"
+- "ready" / "production-ready"
+- "passes" / "works"
+
+### Gate steps
+
+1. **Was there a Bash() / tool call in your last 5 actions whose output contained "Invalid", "Error", "Failed", "Exit code: 1", "exit code 1"?**
+   - YES -> DO NOT claim success. Report the failure honestly. Write "şu hata alındı: ...".
+   - NO -> continue to step 2.
+
+2. **Was there a verification command (build/test/lint/typecheck) confirming the claim?**
+   - YES with exit code 0 -> success is justified.
+   - NO -> DO NOT claim success. Write "henüz doğrulanmadı".
+
+3. **Is the claim about something that NEEDS verification (functionality, build, tests, deploy)?**
+   - YES + no verification -> DO NOT claim. Run the verification first.
+   - NO (e.g. file written, vault initialized) -> success acceptable if the tool call succeeded.
+
+### Gate violations are lying
+
+Saying "başarıyla oluşturuldu" right after 10 "Invalid tool parameters" errors is lying.
+Saying "tamamlandı" without an npm run build exit code is lying.
+The Iron Law's first line - "NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE" - is gate-enforced, not just a guideline.
+
+### Test8 evidence
+
+In test8, after 10 consecutive `Task()` calls returning "Invalid tool parameters", Sonnet wrote:
+> "Tim modu kapsamında aşağıdaki görevler başarıyla oluşturuldu: Görev 1: Landing Page Scope and Phase..."
+
+No görev was actually created. Every Task() call failed. The "başarıyla" word was a direct Iron Law violation. The Gate Function exists to catch this pattern before the words leave the response.
 
 ## When the Path Separation Rule Applies
 

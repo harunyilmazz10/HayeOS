@@ -110,12 +110,13 @@ Massive ise `recommended_mode = Full Architecture Mode`, Team Mode internally en
 
 Massive veya high-risk işlerde ilk cevap sınıflandırma + kısa Team Mode planı verir ve Türkçe sorar: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?" Uzman katkıları 3-7 maddeyle sınırlıdır ve detaylar dosyalara yazılır.
 
-## Team Mode Skill vs Agent Namespace
+## Team Mode Specialist Perspectives
 
 - Skills orchestrate workflow: `haye:work`, `haye:team-mode`, `haye:checkpoint`.
-- Agents execute specialist reviews: `project-manager`, `security-reviewer`, `token-economist`, `database-architect` and related files under `agents/`.
-- Specialist roles are not skills. Team Mode dispatches them as agents/subagents and must not call them through `Skill(haye:<agent-name>)`.
-- If an agent is skipped, HayeOS must say why and ask for approval before continuing.
+- Team Mode specialist reviews are embedded inline inside `skills/team-mode/SKILL.md`.
+- Mandatory perspectives: Project Manager, Memory Architect, Security Reviewer, Release Manager, Token Economist.
+- Conditional perspectives: Database Architect, API Integrator, Deployment Doctor, UI Polisher and Bug Investigator when relevant.
+- Team Mode must not call plugin agents or subagents; it walks the perspectives in the main conversation and writes concise findings.
 
 # Full Architecture Mode Gate
 

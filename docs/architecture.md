@@ -1,3 +1,3 @@
 # Architecture
 
-Plugin + skills + agents + CLI + Obsidian vault + optional hooks/monitors.
+Plugin + skills + inline Team Mode perspectives + CLI + Obsidian vault + optional hooks/monitors.

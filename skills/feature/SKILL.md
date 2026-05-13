@@ -1,9 +1,28 @@
 ---
 name: feature
-description: Use when implementing one small vertical feature slice end-to-end - one endpoint, one component, one migration, with explicit in/out scope, contract, and verification. NOT for multi-section UI builds, marketing pages, landing pages, portfolio pages, showcase pages, multi-service systems, or full project scaffolding - those use work skill and team-mode.
+description: Internal sub-skill invoked ONLY by work skill AFTER mode classification has been shown to user AND user explicitly selected "Standard Single Agent" or "Fast Single Agent" mode. NEVER auto-invoke from a user prompt. Triggers for invocation: single endpoint, single component, single migration, single field change. NEVER for multi-section UI, marketing/landing/portfolio pages, project scaffolding, or anything matching task_size: large/massive.
 ---
 
 # Haye Skill: feature
+
+## Auto-Invoke Ban
+
+DO NOT auto-invoke this skill from a user prompt. This skill is invoked ONLY by `work` skill's Mandatory routing tablosu AFTER:
+1. Task Classification block was produced
+2. User selected Standard Single Agent or Fast Single Agent mode
+3. The selection is confirmed
+
+If you are loading this skill without having seen a Task Classification + user approval in the immediately preceding turns, STOP. Return to `work` skill, produce the classification, ask for mode approval.
+
+### Banned auto-invoke patterns
+
+Multi-section prompts (Hero + Services + About + Form + Contact) are ALWAYS large/massive. The work skill routing routes those to `team-mode`, not here.
+
+If the user prompt says "production-grade", "premium", "Next.js scaffolding" (npx create-next-app), or names 4+ sections/components - this is NOT a single-slice feature. Return control to work skill.
+
+### Test8 evidence
+
+In test8, this skill was auto-invoked for "Next.js ile premium bir doktor landing page projesi ... Hero, hizmetler, hakkında, randevu formu ve iletişim bölümleri". This violated the routing contract - large/multi-section work bypassed Team Mode and dropped into single-slice planning. v2.1.0 makes that an explicit ban.
 
 ## The Iron Law
 

@@ -198,23 +198,23 @@ Bu ifadeler ancak yukarıdaki kanıtlarla birlikte kullanılır.
 
 `/haye:work` Full Architecture Mode'a girdiğinde VEYA kullanıcı explicit specialist agent listesi verdiğinde:
 
-### Team Mode dispatch rule
+### Team Mode inline perspective rule
 
-Specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` are agents/subagents, not skills. Team Mode dispatches them as agents; it must not call them through `Skill(haye:<agent-name>)`.
+Specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` are embedded perspectives inside `Skill(haye:team-mode)`. Team Mode walks these perspectives inline; it must not call plugin agents, subagents, or `Skill(haye:<role-name>)`.
 
 ### token-economist HER ZAMAN zorunlu
 Her Full Architecture Mode oturumu, scope ne olursa olsun, token-economist'i en az bir kez çağırır. Çıktısı implementation başlamadan önce chat'e ya da memory note'a girer.
 
-### Adı geçen specialist'ler GERÇEKTEN çağrılır
-Prompt project-manager, memory-architect, database-architect, api-integrator, security-reviewer, deployment-doctor, release-manager, token-economist gibi agent'lar listelediyse - adı geçen her agent çıktı üretir.
-Çıktıları `<resolved memoryPath>/10-reviews/team-mode/<agent>-<date>.md`'ye gider; chat'te <=7 bullet'lık özet kalır.
+### Adı geçen specialist'ler GERÇEKTEN yürütülür
+Prompt project-manager, memory-architect, database-architect, api-integrator, security-reviewer, deployment-doctor, release-manager, token-economist gibi perspektifleri listelediyse - adı geçen her perspective çıktı üretir.
+Çıktıları `<resolved memoryPath>/10-reviews/team-mode/<perspective>-<date>.md`'ye gider; chat'te <=7 bullet'lık özet kalır.
 
-### Agent atlamak explicit onay gerektirir
-Bir agent'ı çağırmamaya karar verirsen, yapmadan önce söyle:
-"{agent-name}'i atlıyorum çünkü: {sebep}. Onayınızı bekliyorum."
+### Perspective atlamak explicit onay gerektirir
+Bir perspective'i yürütmemeye karar verirsen, yapmadan önce söyle:
+"{perspective-name}'i atlıyorum çünkü: {sebep}. Onayınızı bekliyorum."
 
-### Full Architecture Mode'da single-agent execution ihlaldir
-Kendini Full Architecture Mode'da ama tek agent olarak çalışıyorken bulursan, dur ve ya:
+### Full Architecture Mode'da single-perspective execution ihlaldir
+Kendini Full Architecture Mode'da ama tek perspective ile çalışıyorken bulursan, dur ve ya:
 - Team Mode'a düzgün gir, ya da
 - Kullanıcıdan mode'u düşürmesini iste
 
