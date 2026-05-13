@@ -68,8 +68,11 @@ HayeOS v<full semantic plugin version> aktif.
 1. Locate project config and memory path.
    - If `.hayeos.json` is missing, ask before creating `.hayeos.json`. Ask only in Turkish: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
    - Do not create files until the user explicitly says yes.
-   - If the user says yes, run `/haye:init-memory`. Do not ask the user to find `bin/haye`, bash or Python paths.
-   - If the CLI path fails, use the manual fallback from `skills/init-memory/SKILL.md`.
+   - If the user says yes, IMMEDIATELY call `Skill(haye:init-memory)`. Do not use the Write tool to create `.hayeos.json` or any vault file directly.
+   - Do not enumerate vault folders inline; the init-memory skill handles that.
+   - Do not say "Memory başarıyla oluşturuldu" before init-memory has actually run and reported success.
+   - If init-memory fails or returns an error, report the exact failure and ask the user how to proceed.
+   - Legacy `/haye:init-memory` wording is only a user-facing command name; the required continuation is the Skill tool call above.
    - After successful creation, memory is already considered started. Do not ask "Şimdi hafızayı başlatmamı ister misiniz?". Run only the lightweight `memory-start` read and ask: "Hangi görevle devam edelim?"
    - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
@@ -119,6 +122,25 @@ The canonical default is:
 Any other default path is a regression unless explicitly approved by a future migration feature.
 
 `/haye:start` and `init-memory` orchestrate approval and call the CLI. They do not manually synthesize alternate config layouts, do not choose `~/.claude/projects/.../memory`, and do not write raw Windows backslash paths into JSON.
+
+## Init Confirmation Rule
+
+If `.hayeos.json` is missing, do not create files automatically. Ask only in Turkish: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+
+When the user says yes (any of: "evet", "yes", "ok", "tamam", "olur"):
+
+1. IMMEDIATELY call `Skill(haye:init-memory)`. Do not use the Write tool to create `.hayeos.json` or any vault file directly.
+2. Do not enumerate vault folders inline; the init-memory skill handles that.
+3. Do not say "Memory başarıyla oluşturuldu" before init-memory has actually run and reported success.
+4. If init-memory fails or returns an error, report the exact failure and ask the user how to proceed.
+
+**Direct file writes for vault setup are forbidden in this skill.** The init-memory skill is the only authorized path. This includes:
+- DO NOT `Write(.hayeos.json)` with hand-written JSON
+- DO NOT `Write(<vault>/HAYE.md)` with manual content
+- DO NOT `Write(<resolved memoryPath>/current.md)`, `<resolved memoryPath>/next.md`, etc.
+- ALL of these go through `Skill(haye:init-memory)`.
+
+After init-memory reports success, memory is already considered started. Do not ask a second memory-start question. Run only the lightweight memory-start read and ask: "Hangi görevle devam edelim?"
 
 ## Canonical Project Root and Vault
 

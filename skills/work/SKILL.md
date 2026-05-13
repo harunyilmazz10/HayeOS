@@ -103,6 +103,24 @@ For massive or high-risk work, the first response must:
 4. If the prompt already explicitly says "Full Architecture Mode kullan" or similar, skip the strategy question and move to planning.
 5. Keep each specialist contribution to 3-7 bullets and write details to files.
 
+## Mandatory routing after mode selection
+
+When the user chooses one of the offered modes (Full Architecture Mode, Team Mode, Plan First, Standard Single Agent, Fast Single Agent), HayeOS routes IMMEDIATELY to the corresponding next action. No prose preamble. No "Şimdi planı yazıyorum" placeholder.
+
+| User picks | REQUIRED next call / behavior | Why |
+|---|---|---|
+| Full Architecture Mode | `Skill(haye:team-mode)` | Coordinates specialist agents and produces the full architecture plan |
+| Team Mode | `Skill(haye:team-mode)` | Same orchestrator; produces a smaller specialist plan |
+| Plan First | `Skill(haye:context-pack)` followed by read-only plan construction | Investigation before plan |
+| Standard Single Agent | inline plan in chat, then `Skill(haye:checkpoint)` after plan approval | One Sonnet, no subagents |
+| Fast Single Agent | direct implementation with checkpoint after 5 files | One Sonnet, no plan ceremony |
+
+DO NOT call `Skill(haye:feature)` for any of these mode-selection continuations. `feature` is for single-slice work, NOT for routing out of work-skill mode selection.
+
+DO NOT improvise a plan inline when Full Architecture Mode was selected. The team-mode skill is responsible for producing the plan.
+
+DO NOT continue answering with prose after the mode is chosen. Make the required skill call or perform the explicitly required continuation behavior.
+
 ### Modes
 1. Fast Single Agent
    - Small + low-risk work.
@@ -176,6 +194,23 @@ Large, massive, architecture and full-system `/haye:work` requests must preserve
 - If the user prompt contains sensitive content, preserve only what the user provided; do not invent or enrich secrets.
 - Small one-line bugfix tasks do not require prompt preservation.
 - Never write prompt records to `CLAUDE_PLUGIN_ROOT`, the plugin repo, or project root.
+
+## Prompt Fidelity Guard
+
+Before presenting any plan, restate the user's core objective in one sentence and verify that the proposed plan directly serves that objective.
+
+Do not silently transform the project into a different problem domain.
+
+Examples:
+- "premium doctor landing page" must not become "doctor CRUD backend"
+- "marketing site" must not become "multi-tenant SaaS"
+- "UI revamp" must not become "database redesign"
+
+If the plan introduces major new scope not explicitly requested by the user, stop and do one of:
+1. remove the unrelated scope, or
+2. ask for explicit approval before adding it.
+
+A plan that materially changes the user's objective is invalid, even if it sounds technically sophisticated.
 
 ## Mode selection
 - Fast Mode: `small` + `low risk`. Kısa planla direkt uygula. Kullanıcıya gereksiz onay sorma.
@@ -660,18 +695,20 @@ Her dependency seçimi ve version pin `<resolved memoryPath>/02-decisions/depend
 
 ## Required Next Steps
 
-After plan approval and before writing code:
+After mode classification:
 
-**REQUIRED SUB-SKILL:** Use haye:checkpoint to write the active task to vault.
+**REQUIRED SUB-SKILL (massive/large/full-architecture):** `Skill(haye:team-mode)` — never invent a plan inline.
 
-After each meaningful chunk (>=5 files, or phase boundary, or before risky op):
+**REQUIRED SUB-SKILL (small/medium with multiple files):** `Skill(haye:checkpoint)` after the active task is written to vault.
 
-**REQUIRED SUB-SKILL:** Use haye:checkpoint.
+After each work chunk (>=5 files or phase boundary):
 
-Before claiming work complete:
+**REQUIRED SUB-SKILL:** `Skill(haye:checkpoint)`.
 
-**REQUIRED SUB-SKILL: Verification Gate** (see Gate Function above).
+Before any "complete"/"done"/"works"/"passes"/"ready" claim:
 
-At the end of meaningful work, before user asks:
+**REQUIRED GATE FUNCTION** (see The Gate Function above). Skipping this is Iron Law violation.
 
-**REQUIRED SUB-SKILL:** Use haye:close.
+At the end of meaningful work, before user runs /haye:close:
+
+**REQUIRED SUB-SKILL:** `Skill(haye:close)`.

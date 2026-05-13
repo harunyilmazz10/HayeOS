@@ -1,6 +1,6 @@
 ---
 name: team-mode
-description: Internal sub-skill invoked only by work skill - never standalone. Coordinates specialist agent invocations for large or cross-layer tasks
+description: Use when work skill classifies a task as massive, large, or full-architecture - coordinates specialist agent dispatch and produces the architecture plan; never invoked directly by user, only via work skill routing
 ---
 
 # Haye Skill: team-mode

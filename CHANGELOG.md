@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.3
+- Fixed feature skill description that incorrectly used brainstorming-skill phrasing, causing wrong-skill routing after work mode selection
+- Fixed feature skill Verification template that emitted "build: pass / tests: pass" placeholder language; replaced with checklist requiring actual command output and exit codes
+- Added Landing Page / Static UI Scope Guard to prevent marketing-site requests from being silently expanded into CRUD/API/database work
+- Added Prompt Fidelity Guard so plans must preserve the user's actual objective and may not silently shift domains
+- Fixed work skill routing after mode selection: explicit mapping Full Architecture / Team Mode -> `Skill(haye:team-mode)`, no inline plan improvisation
+- Fixed `/haye:start` init approval flow: explicit "IMMEDIATELY call `Skill(haye:init-memory)`" + "DO NOT Write directly" instead of soft `/haye:init-memory` wording
+- Added Windows SessionStart execution robustness: `hooks/session-start.cmd` + `hooks/session-start.py` + thin `.sh` wrapper
+- Strengthened triggering descriptions for team-mode, checkpoint, close, init-memory skills
+- Added Verification Template Trap, Init Memory Trap, Mode Selection Trap sections to `using-hayeos`
+
 ## 2.0.2
 - Fixed `/haye:start` regression that wrote `.hayeos.json` and `<project-name>_obs` into Claude internal `~/.claude/projects/...` storage instead of the real project root
 - Restored canonical project-local vault initialization: `./<project-name>_obs`

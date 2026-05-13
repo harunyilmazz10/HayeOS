@@ -1,6 +1,6 @@
 ---
 name: feature
-description: You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores intent, requirements and design before implementation
+description: Use when implementing one small vertical feature slice end-to-end - one endpoint, one component, one migration, with explicit in/out scope, contract, and verification. NOT for multi-section UI builds, marketing pages, landing pages, portfolio pages, showcase pages, multi-service systems, or full project scaffolding - those use work skill and team-mode.
 ---
 
 # Haye Skill: feature
@@ -61,6 +61,36 @@ Ship a single, vertical feature slice: smallest piece of new behavior that a use
 ## Token discipline
 - Read only the files in the vertical slice (UI component + route handler + service + maybe a model).
 - Do not read the whole repo to "get a feel" — pick the closest analog and read that.
+
+## Landing Page / Static UI Scope Guard
+
+Do not infer API, database, migration, service, queue, authentication, or backend layers if the user's request is a:
+- marketing page
+- landing page
+- portfolio page
+- showcase page
+- brochure website
+- static/public-facing UI project
+
+unless the user explicitly asks for:
+- backend persistence
+- API routes
+- database storage
+- authentication
+- admin panel
+- content management
+- form submission handling beyond a clearly specified lightweight integration
+
+A request like:
+"Next.js ile premium doktor landing page oluştur"
+does NOT imply:
+- Doctors table
+- CRUD API
+- Express router
+- database migration
+- service layer
+
+If backend scope is genuinely needed but not explicitly requested, stop and ask for approval before adding it.
 
 ## Workflow
 
@@ -127,11 +157,25 @@ Ship a single, vertical feature slice: smallest piece of new behavior that a use
 3.
 
 ## Verification
-- build: pass
-- tests: pass
-- typecheck: pass
-- lint: pass
-- manual smoke: pass
+
+Bu bölüm bir checklist'tir. Her satırı `pass`/`fail` olarak otomatik doldurmak yasaktır.
+
+Aşağıdaki komutları FIILEN çalıştır, her birinin exit code'unu ve son 3-5 satırını yapıştır, sonra "pass" veya "fail" işaretle.
+
+- [ ] `npm run build` çıktısı: ...
+  - Sonuç: ...
+- [ ] `npm test` çıktısı: ...
+  - Sonuç: ...
+- [ ] `npm run typecheck` veya `tsc --noEmit` çıktısı: ...
+  - Sonuç: ...
+- [ ] `npm run lint` çıktısı: ...
+  - Sonuç: ...
+- [ ] Manual smoke: ekran/curl çıktısı: ...
+  - Sonuç: ...
+
+Komutu çalıştırmadıysan, "henüz doğrulanmadı" yaz. Asla "pass" yazma. Bu Iron Law'ın direkt parçası: `NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE`.
+
+Eğer test/build komutları proje stack'ine uygun değilse (örneğin Python projesinde `npm`), önce stack'i `<resolved memoryPath>/02-decisions/stack-<date>.md`'ya yaz, sonra uygun komutları belirle, sonra çalıştır.
 
 ## Memory updates
 - <resolved memoryPath>/current.md: ...

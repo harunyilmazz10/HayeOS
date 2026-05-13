@@ -1,6 +1,6 @@
 ---
 name: close
-description: Use at the end of a meaningful work block before user runs /haye:close - or auto-invoke before context approaches 50% of budget
+description: Use at the end of a meaningful work block when user is about to stop, or when context approaches 50% of model budget, or before /clear - updates changelog, current, next, decisions
 ---
 
 # Haye Skill: close

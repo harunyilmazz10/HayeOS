@@ -1,6 +1,6 @@
 ---
 name: checkpoint
-description: Use after 5 file modifications, before risky operations, before build/test runs, or every phase boundary - preserves work state in vault
+description: Use after writing or modifying 5+ files in one work block, or before any risky operation (deploy, migration, mass edit), or at any phase boundary - writes the current state to vault so the session can resume cleanly
 ---
 
 # Haye Skill: checkpoint

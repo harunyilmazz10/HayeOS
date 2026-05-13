@@ -73,8 +73,41 @@ Without any user prompting, you MUST invoke:
 - **close skill** - at the end of a meaningful work block, before user runs `/haye:close`
 - **checkpoint skill** - after 5 file modifications or before any risky operation
 - **verification-before-completion mindset** - before any "done", "complete", "works", "passes" claim
+- **team-mode skill** - when work skill recommends Full Architecture Mode or Team Mode AND user accepts. NEVER skip this in favor of writing a plan inline.
+- **init-memory skill** - when /haye:start has been answered "yes" for memory creation. NEVER use Write tool to create .hayeos.json or vault files directly; the init-memory skill is the only authorized path.
 
 If you find yourself typing one of these claim words and you haven't verified, STOP. Run the verification. Read the output. Then claim.
+
+## Verification Template Trap
+
+If you find yourself ABOUT to write a verification block that looks like:
+
+- build: pass
+- tests: pass
+- typecheck: pass
+- lint: pass
+- manual smoke: pass
+
+STOP. This is the placeholder template, not a real verification report. You have not run those commands. Writing "pass" without running the command is the most common lie Claude tells. If the command has not been run in this turn, write "not yet verified" - never "pass".
+
+Real verification format:
+
+- [ ] `npm run build`
+  - Exit code: 0
+  - Output (last 5 lines): ...
+  - Result: pass
+
+If you don't have an exit code and an output snippet, you don't have verification.
+
+## Init Memory Trap
+
+If `/haye:start` asked "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?" and the user said yes, your NEXT tool call MUST be `Skill(haye:init-memory)`. Not Write. Not Bash. Not anything else.
+
+If you find yourself reaching for the Write tool to create `.hayeos.json` or `<project>_obs/<file>.md` - STOP. That is forbidden. Call the skill.
+
+## Mode Selection Trap
+
+If `/haye:work` offered the user a choice between Full Architecture Mode, Team Mode, Plan First, Standard Single Agent, or Fast Single Agent, and the user picked one - your NEXT tool call depends on the choice. See `skills/work/SKILL.md` "Mandatory routing after mode selection" table. The most common error is dropping into `Skill(haye:feature)` because it has imperative description language. `feature` is for ONE small slice - NOT for routing out of mode selection.
 
 ## When the Path Separation Rule Applies
 

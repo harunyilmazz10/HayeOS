@@ -1,6 +1,6 @@
 ---
 name: init-memory
-description: Use when a project has no .hayeos.json or vault, or when core memory files are missing - creates the Obsidian vault structure
+description: Use ONLY when /haye:start has confirmed init approval and .hayeos.json or the vault is missing - creates the canonical project-local vault. Must not be invoked by user or by other skills without explicit init approval
 ---
 
 # Haye Skill: init-memory

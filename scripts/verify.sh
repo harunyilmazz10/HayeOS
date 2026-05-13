@@ -456,12 +456,19 @@ for script in [
     "dangerous-command-guard.sh",
     "large-file-warning.sh",
     "session-close-reminder.sh",
-    "session-start.sh",
 ]:
     if script not in serialized:
         errors.append(f"hooks/hooks.json does not wire retained hook {script}")
     if not Path("hooks", script).exists():
         errors.append(f"missing retained hook script hooks/{script}")
+if "session-start.cmd" not in serialized:
+    errors.append("hooks/hooks.json does not wire Windows-friendly SessionStart wrapper session-start.cmd")
+for script in ["session-start.sh", "session-start.py", "session-start.cmd"]:
+    if not Path("hooks", script).exists():
+        errors.append(f"missing retained hook script hooks/{script}")
+session_start_sh = Path("hooks/session-start.sh").read_text(encoding="utf-8")
+if "session-start.py" not in session_start_sh:
+    errors.append("hooks/session-start.sh must delegate to session-start.py")
 for matcher in ["Bash", "Read"]:
     if matcher not in serialized:
         errors.append(f"hooks/hooks.json missing matcher {matcher}")
@@ -695,9 +702,10 @@ for skill_md in Path("skills").rglob("SKILL.md"):
         desc.startswith("Use at") or
         desc.startswith("Use after") or
         desc.startswith("Use before") or
+        desc.startswith("Use ONLY") or
         desc.startswith("Internal")
     ):
-        errors.append(f"{skill_md}: description must start with 'Use when' / 'You MUST use this' / 'Use at/after/before' / 'Internal'")
+        errors.append(f"{skill_md}: description must start with 'Use when' / 'You MUST use this' / 'Use at/after/before' / 'Use ONLY' / 'Internal'")
 
 if errors:
     print("Skill description format errors:")
@@ -808,11 +816,11 @@ changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
 changelog_version = m.group(1) if m else None
 
-if plugin_version != "2.0.2":
-    errors.append(f"plugin.json version expected 2.0.2, got {plugin_version!r}")
+if plugin_version != "2.0.3":
+    errors.append(f"plugin.json version expected 2.0.3, got {plugin_version!r}")
 
-if changelog_version != "2.0.2":
-    errors.append(f"CHANGELOG top version expected 2.0.2, got {changelog_version!r}")
+if changelog_version != "2.0.3":
+    errors.append(f"CHANGELOG top version expected 2.0.3, got {changelog_version!r}")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 for marker in ["def version_cmd", "HayeOS version:", "Working tree:"]:
@@ -891,13 +899,13 @@ for target, markers in required_markers.items():
             errors.append(f"{target}: missing canonical vault marker: {marker}")
 
 plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
-if plugin.get("version") != "2.0.2":
-    errors.append(f"plugin.json version expected 2.0.2, got {plugin.get('version')!r}")
+if plugin.get("version") != "2.0.3":
+    errors.append(f"plugin.json version expected 2.0.3, got {plugin.get('version')!r}")
 
 changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
-if not m or m.group(1) != "2.0.2":
-    errors.append("CHANGELOG top version expected 2.0.2")
+if not m or m.group(1) != "2.0.3":
+    errors.append("CHANGELOG top version expected 2.0.3")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 suspicious = re.findall(r'\.claude[^"\']*projects[^"\']*memory', bin_haye, flags=re.IGNORECASE)
@@ -1089,6 +1097,101 @@ if errors:
 PY
 }
 
+check_v203_behavioral_regressions() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import re
+import sys
+
+errors = []
+
+feature = Path("skills/feature/SKILL.md").read_text(encoding="utf-8")
+work = Path("skills/work/SKILL.md").read_text(encoding="utf-8")
+start_cmd = Path("commands/start.md").read_text(encoding="utf-8")
+start_skill = Path("skills/start/SKILL.md").read_text(encoding="utf-8")
+using = Path("skills/using-hayeos/SKILL.md").read_text(encoding="utf-8")
+hook_sh = Path("hooks/session-start.sh").read_text(encoding="utf-8")
+
+if "You MUST use this before any creative work" in feature:
+    errors.append("feature skill still has old over-broad creative-work description")
+
+for marker in [
+    "one small vertical feature slice",
+    "NOT for multi-section UI builds",
+]:
+    if marker not in feature:
+        errors.append(f"feature skill missing description marker: {marker}")
+
+for forbidden in [
+    "- build: pass",
+    "- tests: pass",
+    "- typecheck: pass",
+    "- lint: pass",
+    "- manual smoke: pass",
+]:
+    if forbidden in feature:
+        errors.append(f"feature skill still contains forbidden verification placeholder: {forbidden}")
+
+for marker in [
+    "Mandatory routing after mode selection",
+    "Skill(haye:team-mode)",
+    "DO NOT call `Skill(haye:feature)`",
+    "Prompt Fidelity Guard",
+]:
+    if marker not in work:
+        errors.append(f"work skill missing marker: {marker}")
+
+if "Landing Page / Static UI Scope Guard" not in feature:
+    errors.append("feature skill missing Landing Page / Static UI Scope Guard")
+
+for target_name, text in [
+    ("commands/start.md", start_cmd),
+    ("skills/start/SKILL.md", start_skill),
+]:
+    for marker in [
+        "IMMEDIATELY call `Skill(haye:init-memory)`",
+        "Do not use the Write tool",
+    ]:
+        if marker not in text:
+            errors.append(f"{target_name} missing marker: {marker}")
+
+for path in [
+    Path("hooks/session-start.cmd"),
+    Path("hooks/session-start.py"),
+]:
+    if not path.exists():
+        errors.append(f"missing hook file: {path}")
+
+if "session-start.py" not in hook_sh:
+    errors.append("hooks/session-start.sh does not reference session-start.py")
+
+for marker in [
+    "Verification Template Trap",
+    "Init Memory Trap",
+    "Mode Selection Trap",
+]:
+    if marker not in using:
+        errors.append(f"using-hayeos missing trap section: {marker}")
+
+plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+if plugin.get("version") != "2.0.3":
+    errors.append(f"plugin.json version expected 2.0.3, got {plugin.get('version')!r}")
+
+changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
+top_ver = m.group(1) if m else None
+if top_ver != "2.0.3":
+    errors.append(f"CHANGELOG top version expected 2.0.3, got {top_ver!r}")
+
+if errors:
+    print("v2.0.3 behavioral regression check errors:")
+    for e in errors:
+        print("-", e)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -1114,6 +1217,7 @@ check_team_mode_agent_invocation_contract
 check_version_and_update_contract
 check_canonical_project_vault_contract
 check_canonical_real_project_root_init_contract
+check_v203_behavioral_regressions
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

@@ -1,6 +1,6 @@
 {
   "name": "haye",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Obsidian-powered memory, daily command routers, advanced workflow skills, dependency security, React/Next/Cloudflare advisory awareness, CLI helpers, agents, hooks, monitors and examples for Claude Code.",
   "author": {
     "name": "Haye Labs"
