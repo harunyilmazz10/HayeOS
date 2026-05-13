@@ -808,11 +808,11 @@ changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
 m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
 changelog_version = m.group(1) if m else None
 
-if plugin_version != "2.0.1":
-    errors.append(f"plugin.json version expected 2.0.1, got {plugin_version!r}")
+if plugin_version != "2.0.2":
+    errors.append(f"plugin.json version expected 2.0.2, got {plugin_version!r}")
 
-if changelog_version != "2.0.1":
-    errors.append(f"CHANGELOG top version expected 2.0.1, got {changelog_version!r}")
+if changelog_version != "2.0.2":
+    errors.append(f"CHANGELOG top version expected 2.0.2, got {changelog_version!r}")
 
 bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
 for marker in ["def version_cmd", "HayeOS version:", "Working tree:"]:
@@ -842,11 +842,115 @@ for concept in ["reload-plugins", "cache", "version", "previous", "new version"]
         errors.append(f"update command/skill missing concept: {concept}")
 
 combined_start = start_cmd + "\n" + start_skill
-if "hayeos v<plugin version> aktif" not in combined_start.lower():
+if "hayeos v<full semantic plugin version> aktif" not in combined_start.lower():
     errors.append("start command/skill missing visible version guidance")
 
 if errors:
     print("Version/update contract errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
+check_canonical_project_vault_contract() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import re
+import sys
+import tempfile
+import subprocess
+import os
+
+errors = []
+
+required_markers = {
+    "commands/start.md": [
+        "Do NOT manually write `.hayeos.json`",
+        "_obs",
+    ],
+    "skills/start/SKILL.md": [
+        "Canonical Init Authority",
+        "./<project-name>_obs",
+    ],
+    "skills/init-memory/SKILL.md": [
+        "Canonical Project Vault Rule",
+        "./<project-name>_obs",
+    ],
+    "README.md": [
+        "./sample-project_obs",
+        "~/.claude/projects/.../memory",
+    ],
+}
+
+for target, markers in required_markers.items():
+    text = Path(target).read_text(encoding="utf-8")
+    for marker in markers:
+        if marker not in text:
+            errors.append(f"{target}: missing canonical vault marker: {marker}")
+
+plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+if plugin.get("version") != "2.0.2":
+    errors.append(f"plugin.json version expected 2.0.2, got {plugin.get('version')!r}")
+
+changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
+if not m or m.group(1) != "2.0.2":
+    errors.append("CHANGELOG top version expected 2.0.2")
+
+bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
+suspicious = re.findall(r'\.claude[^"\']*projects[^"\']*memory', bin_haye, flags=re.IGNORECASE)
+if suspicious:
+    errors.append(f"bin/haye: suspicious global-memory path reference(s): {suspicious[:3]}")
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp) / "sample-project"
+    root.mkdir()
+    env = dict(os.environ)
+    try:
+        result = subprocess.run(
+            [sys.executable, str(Path("bin/haye").resolve()), "init"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=60,
+        )
+    except Exception as exc:
+        errors.append(f"bin/haye init temp test could not run: {exc}")
+    else:
+        if result.returncode != 0:
+            errors.append(f"bin/haye init temp test failed: rc={result.returncode}, stderr={result.stderr.strip()}")
+        config_path = root / ".hayeos.json"
+        vault_path = root / "sample-project_obs"
+        if not config_path.exists():
+            errors.append("temp init: .hayeos.json missing")
+        else:
+            try:
+                cfg = json.loads(config_path.read_text(encoding="utf-8"))
+            except Exception as exc:
+                errors.append(f"temp init: .hayeos.json invalid JSON: {exc}")
+            else:
+                expected = {
+                    "project": "sample-project",
+                    "memoryPath": "./sample-project_obs",
+                    "sourcePath": ".",
+                    "defaultWorkflow": "memory-first",
+                    "sessionCloseRequired": True,
+                }
+                for key, value in expected.items():
+                    if cfg.get(key) != value:
+                        errors.append(f"temp init: {key} expected {value!r}, got {cfg.get(key)!r}")
+                if "\\" in cfg.get("memoryPath", "") or "\\" in cfg.get("sourcePath", ""):
+                    errors.append("temp init: config contains Windows backslash path")
+        if not vault_path.exists():
+            errors.append("temp init: sample-project_obs vault missing")
+        if (root / "memory").exists():
+            errors.append("temp init: unexpected root memory/ directory created")
+
+if errors:
+    print("Canonical project vault contract errors:")
     for error in errors:
         print("-", error)
     sys.exit(1)
@@ -876,6 +980,7 @@ check_skill_descriptions_use_when_pattern
 check_test_infrastructure_exists
 check_team_mode_agent_invocation_contract
 check_version_and_update_contract
+check_canonical_project_vault_contract
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

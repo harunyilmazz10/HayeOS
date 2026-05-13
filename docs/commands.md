@@ -326,7 +326,21 @@ If `.hayeos.json` or the Obsidian vault is missing, `/haye:start` asks in Turkis
 Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
 ```
 
-If approved, Haye runs the `/haye:init-memory` flow. That flow writes a relative `memoryPath` using `./<project-name>_obs`, writes `sourcePath` as `"."`, never writes Windows absolute paths into JSON and never creates a generic `memory` folder.
+If approved, Haye runs the `/haye:init-memory` flow backed by `bin/haye init`. That flow writes a relative `memoryPath` using `./<project-name>_obs`, writes `sourcePath` as `"."`, never writes Windows absolute paths into JSON and never creates a generic `memory` folder.
+
+Canonical init config:
+
+```json
+{
+  "project": "<project-name>",
+  "memoryPath": "./<project-name>_obs",
+  "sourcePath": ".",
+  "defaultWorkflow": "memory-first",
+  "sessionCloseRequired": true
+}
+```
+
+`/haye:start` and `init-memory` must not manually synthesize alternate `.hayeos.json` layouts, must not choose `~/.claude/projects/.../memory`, and must show a full semantic version label such as `HayeOS v2.0.2 aktif.` after successful start.
 
 On Windows, manual fallback commands are:
 

@@ -11,7 +11,7 @@ Start simple session
 At the beginning or end of a successful start response, show one concise version line:
 
 ```text
-HayeOS v<plugin version> aktif.
+HayeOS v<full semantic plugin version> aktif.
 ```
 
 ## User Response Language Rule
@@ -106,6 +106,19 @@ Kaldığımız yerden devam edeyim mi?
 ```
 
 Never start coding automatically from `/haye:start` when a checkpoint exists.
+
+## Canonical Init Authority
+
+After user approval, do not create `.hayeos.json` manually.
+Delegate project initialization to the canonical HayeOS CLI init flow.
+
+The canonical default is:
+- `sourcePath`: `.`
+- `memoryPath`: `./<project-name>_obs`
+
+Any other default path is a regression unless explicitly approved by a future migration feature.
+
+`/haye:start` and `init-memory` orchestrate approval and call the CLI. They do not manually synthesize alternate config layouts, do not choose `~/.claude/projects/.../memory`, and do not write raw Windows backslash paths into JSON.
 
 ## Plugin root vs project vault
 - `CLAUDE_PLUGIN_ROOT` or HayeOS install path is the Plugin root.

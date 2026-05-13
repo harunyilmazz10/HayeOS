@@ -155,6 +155,8 @@ Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
 /haye:init-memory
 ```
 
+By default, HayeOS creates a project-local Obsidian vault named `<project-name>_obs`. It does not store a project's main memory under `~/.claude/projects/.../memory`.
+
 Manual CLI use is only a fallback. On Windows, use one of these instead of trying to run the Python script through bash:
 
 ```text
@@ -168,8 +170,8 @@ At the root of your project, create or let Haye create `.hayeos.json`:
 
 ```json
 {
-  "project": "<project-name>",
-  "memoryPath": "./<project-name>_obs",
+  "project": "sample-project",
+  "memoryPath": "./sample-project_obs",
   "sourcePath": ".",
   "defaultWorkflow": "memory-first",
   "sessionCloseRequired": true

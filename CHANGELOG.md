@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.2
+- Restored canonical project-local vault initialization: `./<project-name>_obs`
+- Fixed `/haye:start` / init-memory regression that manually synthesized invalid Windows `.hayeos.json`
+- Re-established `bin/haye init` as the single source of truth for default config generation
+- Prevented accidental fallback to `~/.claude/projects/.../memory` as the default project memory path
+- Updated `/haye:start` to show the full active semantic version, e.g. `HayeOS v2.0.2 aktif`
+- Added dynamic anti-regression verification for canonical init behavior and valid JSON config generation
+
 ## 2.0.1
 - Fixed Team Mode specialist dispatch: HayeOS agents are subagents, not skills
 - Prevented invalid `Skill(haye:<agent-name>)` calls that caused `Unknown skill` runtime errors
