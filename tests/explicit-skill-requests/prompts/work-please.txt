@@ -1,0 +1,1 @@
+Please use the haye:work skill to plan and implement a small feature for me. I need a contact form on my Next.js site with rate limiting and a Telegram notification.

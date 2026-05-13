@@ -1,0 +1,1 @@
+I want to build a small SaaS billing dashboard with subscription tiers, Stripe webhooks, and an admin panel. Can you help me design and implement this?

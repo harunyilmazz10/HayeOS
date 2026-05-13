@@ -1,0 +1,1 @@
+Our Next.js app on Coolify suddenly returns 500 on every server action. The build succeeds, container is running. What could it be?

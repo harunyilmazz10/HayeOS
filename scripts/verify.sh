@@ -707,6 +707,21 @@ if errors:
 PY
 }
 
+check_test_infrastructure_exists() {
+  local errors=""
+  [ -f "tests/skill-triggering/run-test.sh" ] || errors+="missing run-test.sh\n"
+  [ -f "tests/skill-triggering/run-all.sh" ] || errors+="missing run-all.sh\n"
+  [ -x "tests/skill-triggering/run-test.sh" ] || errors+="run-test.sh not executable\n"
+  for skill in work fix secure ship; do
+    [ -f "tests/skill-triggering/prompts/${skill}.txt" ] || errors+="missing prompt: ${skill}.txt\n"
+  done
+  if [ -n "$errors" ]; then
+    echo "Test infrastructure errors:"
+    printf "%b" "$errors"
+    return 1
+  fi
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -727,6 +742,7 @@ check_enriched_content
 check_release_polish
 check_path_separation_and_workflow_rules
 check_skill_descriptions_use_when_pattern
+check_test_infrastructure_exists
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"
