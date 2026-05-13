@@ -11,6 +11,7 @@ The simple command layer stays user-facing and routes to advanced skills instead
 /haye:secure
 /haye:ship
 /haye:close
+/haye:version
 /haye:update
 ```
 
@@ -23,21 +24,47 @@ Internal routing:
 - `/haye:secure` -> `secure`, `security`, `dependency-security`, `dependency-audit`, `version-policy`, `react-nextjs-security`, `secrets-audit`, `auth-audit`, `exposed-port-audit`
 - `/haye:ship` -> `ship`, `deploy`, `review`, `security`, `dependency-security`, `cloudflare-doctor`, `coolify-doctor`, `docker-doctor`
 - `/haye:close` -> `close`, `session-close`, `memory-lint`, `token-audit`
+- `/haye:version` -> local CLI/version inspection
 - `/haye:update` -> `update`
+
+# /haye:version
+
+HayeOS local/plugin sürümünü hızlı gösterir.
+
+Beklenen bilgiler:
+- HayeOS version from `.claude-plugin/plugin.json`
+- local repo commit
+- branch
+- working tree clean/dirty
+- plugin cache durumu doğrulanabiliyorsa kısa not
+
+Örnek:
+
+```text
+HayeOS v2.0.1
+Local repo commit: <short-sha>
+Branch: main
+Working tree: clean
+Plugin cache: not checked
+```
 
 # /haye:update
 
 HayeOS plugin'ini GitHub'dan günceller. Plugin root'u `CLAUDE_PLUGIN_ROOT`, marketplace install path veya mevcut plugin path bilgisinden bulur.
 
 Davranış:
+- Güncellemeden önce previous version ve old commit raporlanır.
 - `.git` yoksa durur ve yeniden clone gerektiğini Türkçe açıklar.
 - `origin` URL beklenen repo değilse kullanıcıya gösterir ve onay almadan değiştirmez.
 - Local değişiklik varsa durur; otomatik pull yapmaz ve değişiklikleri göstermeyi teklif eder.
 - Plugin root bulunamazsa durur; `git init`, placeholder remote veya kullanıcı/proje klasöründe yeni git repo oluşturma davranışı yoktur.
 - Temiz repo'da `git fetch origin` ve `git pull --ff-only origin main` çalıştırır.
-- Güncelleme sonrası `claude plugin validate .`, varsa `./scripts/verify.sh`, mümkünse `bin/haye --help` çalıştırır.
+- Güncelleme sonrası new version, new commit ve "already current / changed" durumu raporlanır.
+- Güncelleme sonrası `claude plugin validate .`, varsa `./scripts/verify.sh`, mümkünse `bin/haye --help` ve `bin/haye version` çalıştırır.
+- HayeOS-specific plugin cache path varsa yalnızca `haye-marketplace/haye` cache subtree'si temizlenir; tüm Claude cache'i silinmez.
+- Cache bulunamazsa bunu açıkça raporlar.
+- Sonunda Claude Code'un yeni plugin içeriğini yüklemesi için `/reload-plugins` çalıştırmasını söyler.
 - Commit/push yapmaz, project vault dosyalarına dokunmaz, context pack veya checkpoint üretmez.
-- Güncelleme tamamlandıysa Claude Code'u kapatıp yeniden açmayı önerir.
 
 # /haye:work Smart Modes
 
@@ -82,6 +109,13 @@ Massive ise `recommended_mode = Full Architecture Mode`, Team Mode internally en
 # Team Mode Offer Rule
 
 Massive veya high-risk işlerde ilk cevap sınıflandırma + kısa Team Mode planı verir ve Türkçe sorar: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?" Uzman katkıları 3-7 maddeyle sınırlıdır ve detaylar dosyalara yazılır.
+
+## Team Mode Skill vs Agent Namespace
+
+- Skills orchestrate workflow: `haye:work`, `haye:team-mode`, `haye:checkpoint`.
+- Agents execute specialist reviews: `project-manager`, `security-reviewer`, `token-economist`, `database-architect` and related files under `agents/`.
+- Specialist roles are not skills. Team Mode dispatches them as agents/subagents and must not call them through `Skill(haye:<agent-name>)`.
+- If an agent is skipped, HayeOS must say why and ask for approval before continuing.
 
 # Full Architecture Mode Gate
 

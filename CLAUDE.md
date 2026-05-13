@@ -22,6 +22,13 @@ Skills are not prose. They are behavior code. Each line shapes what Claude does 
 - Red Flags tables target specific rationalizations Claude makes. Don't generalize them.
 - "Use when X" descriptions activate the skill. Don't reformat to "Helps with X" or skill stops triggering.
 
+## Skill vs Agent Namespace
+
+- `skills/` are invoked with the Skill tool.
+- `agents/` are specialist subagents and must be dispatched with the Claude Code agent/subagent mechanism.
+- Do not name agent roles as if they were skills.
+- A repo change that introduces `Skill(haye:<agent-name>)` or similar is a regression.
+
 ## User Response Language
 
 - HayeOS user-facing language is Turkish unless user explicitly switches to English.

@@ -34,6 +34,39 @@ def memory_path():
 def plugin_root():
     return Path(__file__).resolve().parent.parent
 
+def plugin_version():
+    manifest = plugin_root()/'.claude-plugin'/'plugin.json'
+    try:
+        return json.loads(manifest.read_text(encoding='utf-8')).get('version') or 'unknown'
+    except Exception:
+        return 'unknown'
+
+def git_output(args):
+    try:
+        return subprocess.check_output(args, cwd=plugin_root(), stderr=subprocess.DEVNULL, text=True).strip()
+    except Exception:
+        return None
+
+def version_cmd():
+    print(f'HayeOS version: {plugin_version()}')
+    commit = git_output(['git','rev-parse','--short','HEAD'])
+    branch = git_output(['git','branch','--show-current'])
+    status = git_output(['git','status','--porcelain'])
+    if commit:
+        print(f'Git commit: {commit}')
+    else:
+        print('Git commit: unavailable')
+    if branch:
+        print(f'Branch: {branch}')
+    else:
+        print('Branch: unavailable')
+    if status is None:
+        print('Working tree: unavailable')
+    else:
+        print('Working tree: clean' if status == '' else 'Working tree: dirty')
+    print(f'Repository path: {plugin_root()}')
+    return 0
+
 def ensure_project_memory_target(p):
     target=Path(p).resolve()
     root=plugin_root().resolve()
@@ -203,6 +236,7 @@ def usage():
     print("""haye CLI
 commands:
   init                  create .hayeos.json and vault
+  version               show HayeOS version, git commit, branch and working tree state
   init-config           create .hayeos.json
   find-vault            print memoryPath
   print-config          print config
@@ -222,6 +256,7 @@ def main():
     try:
         cmd=sys.argv[1] if len(sys.argv)>1 else '--help'
         if cmd in ['--help','-h','help']: usage(); return 0
+        if cmd=='version': return version_cmd()
         if cmd=='init': return init_vault() or 0
         if cmd=='init-config': return init_config() or 0
         if cmd=='find-vault':

@@ -8,6 +8,10 @@ description: Use when user wants to update the installed HayeOS plugin to a newe
 ## Purpose
 Update the installed HayeOS plugin repository from GitHub so users do not need to manually run git commands on every machine.
 
+## Version source of truth
+`.claude-plugin/plugin.json` `version` field is the canonical HayeOS plugin version.
+Use `python3 bin/haye version || python bin/haye version` when available to show version, commit, branch and working tree state.
+
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
@@ -44,14 +48,16 @@ Run from plugin root.
    - If missing, stop and say: "Bu HayeOS kurulumu git repo değil. Güncelleme için GitHub'dan tekrar clone etmek gerekir."
 2. Capture old commit:
    - `git rev-parse --short HEAD`
-3. Check remotes:
+3. Capture previous version:
+   - read `.claude-plugin/plugin.json` `version`
+4. Check remotes:
    - `git remote -v`
    - Expected origin URL: `https://github.com/harunyilmazz10/HayeOS.git`
    - If origin is missing or different, show the current value and ask before changing anything. Do not auto-set a placeholder remote.
-4. Check branch:
+5. Check branch:
    - `git branch --show-current`
    - If branch is not `main`, report it and behave conservatively. Do not change branches automatically.
-5. Check local changes:
+6. Check local changes:
    - `git status --porcelain`
    - If output is not empty, do not pull. Ask in Turkish: "HayeOS klasöründe local değişiklikler var. Güncellemeden önce bunları çözmelisin. Değişiklikleri göstereyim mi?"
 
@@ -69,7 +75,26 @@ Then capture new commit:
 git rev-parse --short HEAD
 ```
 
+Then capture new version from `.claude-plugin/plugin.json`.
+
 If old commit equals new commit, report that HayeOS was already up to date.
+
+If git changed but plugin.json version did not change, say honestly: "Kod güncellendi, sürüm numarası değişmedi."
+
+## HayeOS-specific plugin cache refresh
+After a successful update, refresh only the HayeOS plugin cache when the cache path exists.
+
+Known HayeOS cache locations:
+- Windows: `%USERPROFILE%\.claude\plugins\cache\haye-marketplace\haye\`
+- Unix-like: `~/.claude/plugins/cache/haye-marketplace/haye/`
+
+Rules:
+- Delete only that HayeOS-specific cache subtree.
+- Do not delete the whole Claude cache.
+- Do not delete other plugin caches.
+- If the HayeOS cache path does not exist, report: "HayeOS plugin cache bulunamadı; temizlenecek bir şey yok."
+- After cache refresh or update, tell the user to run `/reload-plugins`.
+- Do not claim the current live Claude session is refreshed until `/reload-plugins` has actually been run.
 
 ## Validation flow
 After update, run what is available from plugin root:
@@ -103,16 +128,19 @@ claude plugin validate .
 Respond in Turkish and keep it concise:
 
 - Plugin root
+- Önceki sürüm
+- Yeni sürüm
 - Eski commit
 - Yeni commit
 - Güncelleme var mıydı?
+- HayeOS plugin cache temizlendi mi / bulunamadı mı?
 - `claude plugin validate .` sonucu
 - `./scripts/verify.sh` sonucu
 - `bin/haye --help` sonucu
-- Yeniden başlatma gerekli mi?
+- `/reload-plugins` gerekli mi?
 
 End with:
 
 ```text
-Güncelleme tamamlandıysa Claude Code'u kapatıp yeniden açmanız önerilir.
+Claude Code'un yeni sürümü yüklemesi için şimdi /reload-plugins çalıştır.
 ```

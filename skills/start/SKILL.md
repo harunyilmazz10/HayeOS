@@ -8,6 +8,12 @@ description: Use when starting a new HayeOS session - detects vault, loads conte
 ## Purpose
 Start simple session
 
+At the beginning or end of a successful start response, show one concise version line:
+
+```text
+HayeOS v<plugin version> aktif.
+```
+
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.

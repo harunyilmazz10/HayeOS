@@ -27,6 +27,7 @@ Use these first. They are smart routers over the advanced HayeOS workflows.
 /haye:ship    # deploy/release readiness
 /haye:close   # update Obsidian memory and close the session
 /haye:init-memory # create or repair project memory after user approval
+/haye:version # show installed/local HayeOS version and git state
 /haye:update  # update the installed HayeOS plugin safely
 ```
 
@@ -40,6 +41,8 @@ Modes:
 - Plan First: önce sadece plan çıkarır, kod yazmadan onay bekler.
 - Team Mode: large veya high risk işlerde uzman rollere böler; ayrı user-facing team komutu yoktur.
 - Full Architecture Mode: massive veya sıfırdan production-grade sistemlerde kodlamadan önce mimari plan çıkarır ve onay ister.
+
+Team Mode combines skills for workflow/orchestration and agents for specialist perspectives. Specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` are not HayeOS skills. They are agents dispatched by Team Mode.
 
 Work Strategy Selection Rule: large, massive, high-risk veya belirsiz işlerde HayeOS önce önerilen çalışma modunu açıklar ve Türkçe onay ister; small + low-risk işlerde sormadan Fast Single Agent ile ilerler.
 
@@ -61,7 +64,9 @@ Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the 
 
 Project source files (code, Dockerfile, docker-compose, docs/, infra/) live under `sourcePath`. Memory files (`<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/02-decisions/`, etc.) live under `memoryPath`. HayeOS must never write project source code into the memory vault. If a target path under `memoryPath` has a code/infra extension (.py, .ts, Dockerfile, docker-compose.yml, package.json, requirements.txt etc.) or a non-memory directory name (services/, apps/, infra/, scripts/), HayeOS halts and warns in Turkish. See `skills/work/SKILL.md` "Path Separation Rule" for the full list.
 
-`/haye:update` updates the installed HayeOS plugin repo from GitHub. It stops when local changes exist, does not commit or push, validates the plugin after updating, and recommends restarting Claude Code.
+`/haye:version` shows the HayeOS plugin version from `.claude-plugin/plugin.json`, local repo commit, branch and clean/dirty state.
+
+`/haye:update` updates the installed HayeOS plugin repo from GitHub. It stops when local changes exist, does not commit or push, reports previous/new version and commit, validates the plugin after updating, refreshes only the HayeOS-specific plugin cache when found, and tells the user to run `/reload-plugins`.
 
 Recommended daily flow:
 
@@ -120,6 +125,7 @@ After install, new Claude Code sessions should expose:
 /haye:ship
 /haye:close
 /haye:init-memory
+/haye:version
 /haye:update
 ```
 

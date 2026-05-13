@@ -601,6 +601,13 @@ Bu ifadeler ancak yukarıdaki kanıtlarla birlikte kullanılır.
 
 `/haye:work` Full Architecture Mode'a girdiğinde VEYA kullanıcı explicit specialist agent listesi verdiğinde:
 
+### Team Mode dispatch rule
+
+When specialist perspectives are required, `/haye:work` must route to `haye:team-mode`.
+`haye:team-mode` then dispatches specialist roles from `agents/` through the Claude Code agent/subagent mechanism.
+
+Do NOT attempt to call agent names using `Skill(haye:<agent-name>)`.
+
 ### token-economist HER ZAMAN zorunlu
 Her Full Architecture Mode oturumu, scope ne olursa olsun, token-economist'i en az bir kez çağırır. Çıktısı implementation başlamadan önce chat'e ya da memory note'a girer.
 

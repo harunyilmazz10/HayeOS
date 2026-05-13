@@ -55,6 +55,13 @@ HayeOS skills override default behavior, but **user instructions always take pre
 "Let's build X" -> brainstorming/work first, then domain skills.
 "Fix this bug" -> fix/systematic-debugging first, then domain skills.
 
+## Agents are not skills
+
+Workflow and domain guidance come from skills.
+Specialist role execution comes from agents under `agents/`.
+
+If Team Mode needs `project-manager`, `security-reviewer`, `token-economist`, or any other specialist role, dispatch an agent/subagent. Do not call `Skill(haye:<agent-name>)`.
+
 ## Mandatory Invocation Triggers
 
 Without any user prompting, you MUST invoke:

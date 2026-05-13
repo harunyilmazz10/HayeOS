@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.1
+- Fixed Team Mode specialist dispatch: HayeOS agents are subagents, not skills
+- Prevented invalid `Skill(haye:<agent-name>)` calls that caused `Unknown skill` runtime errors
+- Added explicit Skill vs Agent namespace guidance to Team Mode, work routing, using-hayeos, README, docs, and CLAUDE.md
+- Added anti-regression verification to reject agent-as-skill references
+- Added HayeOS version visibility via start/version/update flows
+- Added `/haye:version` command for quick local version inspection
+- Upgraded `/haye:update` to report before/after version, safe pull status, and HayeOS-specific plugin cache refresh guidance
+- Added anti-regression verification for version/update contract
+
 ## 2.0.0
 - BREAKING: skill description format zorunlu trigger-style oldu
 - BREAKING: SessionStart hook ile using-hayeos master skill her oturumda otomatik enjekte ediliyor

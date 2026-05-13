@@ -8,6 +8,20 @@ description: Internal sub-skill invoked only by work skill - never standalone. C
 ## Purpose
 Internal planning mode for `/haye:work`. Do not expose a separate `/haye:team` user command.
 
+## Agent Invocation Rule
+
+Specialist roles under `agents/` are not skills. They are subagents/agents.
+
+NEVER attempt to call specialist roles through the Skill tool. Agent-as-skill calls such as using `project-manager`, `token-economist`, or `security-reviewer` with a `Skill(haye:<agent-name>)` shape are invalid and produce `Unknown skill`.
+
+Team Mode must use the Claude Code agent/subagent execution mechanism for these roles.
+Skills orchestrate. Agents investigate, design, review, and advise.
+
+### Namespace separation
+- Skills live under `skills/` and are invoked with the Skill tool, for example `haye:team-mode`, `haye:work`, `haye:feature`, `haye:checkpoint`.
+- Agents live under `agents/` and must be dispatched as agents/subagents, for example `project-manager`, `memory-architect`, `database-architect`, `api-integrator`, `security-reviewer`, `deployment-doctor`, `release-manager`, `token-economist`, `bug-investigator`, `ui-polisher`.
+- Team Mode coordinates skills plus agents; it must not confuse the two namespaces.
+
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
@@ -27,21 +41,30 @@ Internal planning mode for `/haye:work`. Do not expose a separate `/haye:team` u
 - belirsiz veya çok geniş prompt
 
 ## Required roles
-- `project-manager`
-- `memory-architect`
-- `security-reviewer`
-- `release-manager`
-- `token-economist`
+- Dispatch the `project-manager` agent.
+- Dispatch the `memory-architect` agent.
+- Dispatch the `security-reviewer` agent.
+- Dispatch the `release-manager` agent.
+- Dispatch the `token-economist` agent.
 
 ## Conditional roles
-- `database-architect` when data model, migration, indexing or retention matters.
-- `api-integrator` when APIs, service contracts, webhooks or queue/events matter.
-- `deployment-doctor` when Docker, Coolify, Cloudflare, env, healthcheck, rollback or observability matters.
-- `ui-polisher` when frontend/dashboard/UX matters.
-- `bug-investigator` when debugging/root-cause work is present.
+- Dispatch the `database-architect` agent when data model, migration, indexing or retention matters.
+- Dispatch the `api-integrator` agent when APIs, service contracts, webhooks or queue/events matter.
+- Dispatch the `deployment-doctor` agent when Docker, Coolify, Cloudflare, env, healthcheck, rollback or observability matters.
+- Dispatch the `ui-polisher` agent when frontend/dashboard/UX matters.
+- Dispatch the `bug-investigator` agent when debugging/root-cause work is present.
 
 ## Token-economist rule
 `token-economist` is always included. It limits repo scanning, prevents repeated findings, recommends context packs, splits large work into phases/sessions, avoids raw/log reads, and reminds `/haye:close` at phase boundaries.
+
+## Team Mode execution contract
+1. `haye:team-mode` skill loads as the orchestration skill.
+2. It selects specialist agents.
+3. It dispatches selected specialists as agents/subagents, not skills.
+4. It collects agent outputs sequentially or in parallel according to runtime support.
+5. It synthesizes outputs into one plan.
+6. It writes specialist summaries to `<resolved memoryPath>/10-reviews/team-mode/<agent>-<date>.md` when memory is active.
+7. It never claims specialist perspectives were applied unless the relevant agents were actually dispatched or the user explicitly approved skipping them.
 
 ## Output format
 ```markdown

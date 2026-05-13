@@ -6,6 +6,12 @@ description: Start from Haye Obsidian memory with minimal context.
 
 Use `skills/start/SKILL.md`.
 
+At the beginning or end of a successful start response, show one concise version line:
+
+```text
+HayeOS v<plugin version> aktif.
+```
+
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.

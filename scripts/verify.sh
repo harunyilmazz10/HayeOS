@@ -722,6 +722,137 @@ check_test_infrastructure_exists() {
   fi
 }
 
+check_team_mode_agent_invocation_contract() {
+  python3 - <<'PY'
+from pathlib import Path
+import re
+import sys
+
+errors = []
+
+agent_names = [
+    "project-manager",
+    "memory-architect",
+    "database-architect",
+    "api-integrator",
+    "security-reviewer",
+    "deployment-doctor",
+    "release-manager",
+    "token-economist",
+    "bug-investigator",
+    "ui-polisher",
+]
+
+scan_exts = {".md", ".sh", ".py", ".json"}
+bad_pattern = re.compile(
+    r'Skill\(haye:(?:' + "|".join(re.escape(name) for name in agent_names) + r')\)'
+)
+
+for path in Path(".").rglob("*"):
+    if ".git" in path.parts:
+        continue
+    if not path.is_file():
+        continue
+    if path.suffix not in scan_exts:
+        continue
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    match = bad_pattern.search(text)
+    if match:
+        errors.append(f"{path}: invalid agent-as-skill reference: {match.group(0)}")
+
+required_markers = {
+    "skills/team-mode/SKILL.md": [
+        "Agent Invocation Rule",
+        "Specialist roles under `agents/` are not skills",
+        "Skills orchestrate. Agents investigate, design, review, and advise.",
+    ],
+    "skills/work/SKILL.md": [
+        "Team Mode dispatch rule",
+        "Claude Code agent/subagent mechanism",
+    ],
+    "skills/using-hayeos/SKILL.md": [
+        "Agents are not skills",
+    ],
+    "CLAUDE.md": [
+        "Skill vs Agent Namespace",
+    ],
+}
+
+for target, markers in required_markers.items():
+    text = Path(target).read_text(encoding="utf-8")
+    for marker in markers:
+        if marker not in text:
+            errors.append(f"{target}: missing Team Mode agent contract marker: {marker}")
+
+if errors:
+    print("Team Mode agent invocation contract errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
+check_version_and_update_contract() {
+  python3 - <<'PY'
+from pathlib import Path
+import json
+import re
+import sys
+
+errors = []
+
+plugin = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+plugin_version = plugin.get("version")
+
+changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+m = re.search(r'^##\s+(\d+\.\d+\.\d+)', changelog, re.MULTILINE)
+changelog_version = m.group(1) if m else None
+
+if plugin_version != "2.0.1":
+    errors.append(f"plugin.json version expected 2.0.1, got {plugin_version!r}")
+
+if changelog_version != "2.0.1":
+    errors.append(f"CHANGELOG top version expected 2.0.1, got {changelog_version!r}")
+
+bin_haye = Path("bin/haye").read_text(encoding="utf-8", errors="ignore")
+for marker in ["def version_cmd", "HayeOS version:", "Working tree:"]:
+    if marker not in bin_haye:
+        errors.append(f"bin/haye: missing version command marker {marker}")
+
+if not Path("commands/version.md").exists():
+    errors.append("commands/version.md missing")
+
+readme = Path("README.md").read_text(encoding="utf-8")
+docs_commands = Path("docs/commands.md").read_text(encoding="utf-8")
+update_cmd = Path("commands/update.md").read_text(encoding="utf-8")
+start_cmd = Path("commands/start.md").read_text(encoding="utf-8")
+update_skill = Path("skills/update/SKILL.md").read_text(encoding="utf-8")
+start_skill = Path("skills/start/SKILL.md").read_text(encoding="utf-8")
+
+if "/haye:version" not in readme:
+    errors.append("README.md: missing /haye:version documentation")
+
+if "/haye:version" not in docs_commands:
+    errors.append("docs/commands.md: missing /haye:version documentation")
+
+combined_update = update_cmd + "\n" + update_skill
+normalized_update = combined_update.lower()
+for concept in ["reload-plugins", "cache", "version", "previous", "new version"]:
+    if concept not in normalized_update:
+        errors.append(f"update command/skill missing concept: {concept}")
+
+combined_start = start_cmd + "\n" + start_skill
+if "hayeos v<plugin version> aktif" not in combined_start.lower():
+    errors.append("start command/skill missing visible version guidance")
+
+if errors:
+    print("Version/update contract errors:")
+    for error in errors:
+        print("-", error)
+    sys.exit(1)
+PY
+}
+
 check_plugin_root_clean() {
   for path in .hayeos.json 09-context-packs 05-sessions 04-tasks current.md next.md memory; do
     test ! -e "$ROOT_DIR/$path" || { echo "plugin root polluted with project memory: $path"; exit 1; }
@@ -743,6 +874,8 @@ check_release_polish
 check_path_separation_and_workflow_rules
 check_skill_descriptions_use_when_pattern
 check_test_infrastructure_exists
+check_team_mode_agent_invocation_contract
+check_version_and_update_contract
 check_plugin_root_clean
 bad_project="yt""shorts"
 bad_vault="${bad_project}_obs"

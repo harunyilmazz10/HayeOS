@@ -198,6 +198,10 @@ Bu ifadeler ancak yukarıdaki kanıtlarla birlikte kullanılır.
 
 `/haye:work` Full Architecture Mode'a girdiğinde VEYA kullanıcı explicit specialist agent listesi verdiğinde:
 
+### Team Mode dispatch rule
+
+Specialist roles such as `project-manager`, `security-reviewer`, and `token-economist` are agents/subagents, not skills. Team Mode dispatches them as agents; it must not call them through `Skill(haye:<agent-name>)`.
+
 ### token-economist HER ZAMAN zorunlu
 Her Full Architecture Mode oturumu, scope ne olursa olsun, token-economist'i en az bir kez çağırır. Çıktısı implementation başlamadan önce chat'e ya da memory note'a girer.
 
