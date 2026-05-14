@@ -79,23 +79,32 @@ Close session and update memory
 - Do not auto-upgrade dependencies without approval.
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
-## Required Sub-Skills
+## Closure tasks (perform inline, no sub-skill dispatch)
 
-This skill orchestrates:
+The close skill handles everything inline. v2.x's separate session-close, handoff, and memory-lint skills are removed; their behavior is included here:
 
-1. **REQUIRED SUB-SKILL:** Use haye:session-close to update changelog, current, next.
-2. **OPTIONAL but recommended:** Use haye:handoff if another assistant or future-you will pick up.
-3. **OPTIONAL:** Use haye:memory-lint if vault has accumulated cruft.
+1. **Update changelog/current/next** — required, always run.
+   - Append a session entry to `<resolved memoryPath>/changelog.md`.
+   - Refresh `<resolved memoryPath>/current.md` with the new focus or "Empty - waiting for next prompt".
+   - Update `<resolved memoryPath>/next.md` with the next 3-5 concrete actions.
 
-After session-close, the session can end. Tell user "memory updated, session can close."
+2. **Write latest-checkpoint** — required for non-trivial sessions.
+   - Save full session state snapshot to `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
+   - Include: completed tasks, files touched, verification results, open risks, next actions.
+
+3. **Vault lint** — optional, only if vault clearly needs it.
+   - Flag `current.md` over 150 lines.
+   - Flag stale `04-tasks/active-task.md` that doesn't match current focus.
+   - Flag orphan files in `08-raw/` not summarized into structured memory.
+   - Do not auto-rewrite; report findings and let user decide.
+
+After all three, tell the user (in Turkish): "Hafıza güncellendi, session kapanabilir."
 
 ## No Fake Completion Rule
 - Session close must distinguish files written, verification run, verification not run, runtime verified, runtime not verified, known gaps and next actions.
 - Do not mark work as "hazır", "başarıyla çalışıyor" or "production-ready" unless verification output supports it.
 - If verification did not run, say that clearly in the close summary.
 
-## Smart routing
-This simplified command may route internally to:
-- `session-close`
-- `memory-lint`
-- `token-audit`
+## No external sub-skills
+
+In v3.0.0 there is no `session-close`, `memory-lint`, `handoff`, or `token-audit` skill to route to. Everything is handled inline within this close skill. Token discipline awareness lives in `using-hayeos` and the brainstorming/writing-plans skills.

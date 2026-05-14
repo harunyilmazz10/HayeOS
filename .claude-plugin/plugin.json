@@ -1,21 +1,24 @@
 {
   "name": "haye",
-  "version": "2.1.0",
-  "description": "Obsidian-powered memory, daily command routers, advanced workflow skills, inline Team Mode perspectives, dependency security, React/Next/Cloudflare advisory awareness, CLI helpers, hooks, monitors and examples for Claude Code.",
+  "version": "3.0.0",
+  "description": "Memory-first, discipline-first workflow plugin: Superpowers-based brainstorming -> writing-plans -> subagent-driven-development chain, with TDD Iron Law, verification-before-completion gate, project-local memory vault, and Turkish UX",
   "author": {
     "name": "Haye Labs"
   },
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "memory-vault",
+    "brainstorming",
+    "writing-plans",
+    "subagent-driven-development",
+    "tdd",
+    "verification",
+    "turkish-ux",
     "obsidian",
-    "memory",
-    "security",
-    "nextjs",
-    "cloudflare",
     "workflow"
   ],
-  "homepage": "https://github.com/harunyilmazz10/hayeos",
+  "homepage": "https://github.com/harunyilmazz10/HayeOS",
   "repository": "https://github.com/harunyilmazz10/HayeOS",
   "commands": "./commands",
   "skills": "./skills"

@@ -1,30 +1,31 @@
 # Roadmap
 
-## v1.1 - JSONL parsing + optional MCP integration
+## v3.1 - haye-extras plugin extraction
+
+Move the 25 domain skills from v2.x (nextjs-doctor, prisma-doctor, coolify-doctor, cloudflare-doctor, etc.) into a separate `haye-extras` plugin. Users who need them install both; users who only want the core process model install just HayeOS core.
+
+## v3.2 - JSONL parsing for session ingestion
 
 - Add structured session event ingestion for Claude Code transcripts and runtime logs.
-- Improve `ingest-session` so it can extract decisions, blockers, commands, verification status, and risks from JSONL-style event streams.
+- Add an `ingest-session` companion skill so it can extract decisions, blockers, commands, verification status, and risks from JSONL event streams.
 - Expand monitor tooling so captured log windows can be summarized into the vault without loading raw logs into chat.
-- Explore optional MCP bridge or connector patterns for local vault reads, metrics, and external tool metadata.
-- Affected areas: `ingest-session` skill, `monitors/`, `<resolved memoryPath>/11-metrics/`, telemetry/reporting flow.
 
-## v1.2 - Obsidian link graph linting
+## v3.3 - Obsidian link graph linting
 
-- Extend `memory-lint` with Obsidian link graph checks.
+- Extend a `memory-lint` companion skill with Obsidian link graph checks.
 - Detect dead backlinks, orphan decisions, orphan risks, and session summaries with no current/next linkage.
-- Add vault consistency checks for stale context packs, oversized current/next files, and missing decision references.
 - Produce compact repair suggestions rather than auto-rewriting memory files.
 
-## v1.3 - Project dashboards + metrics export
+## v3.4 - Project dashboards + metrics export
 
 - Use `<resolved memoryPath>/11-metrics/` as the stable home for project progress/status metrics.
-- Generate lightweight dashboards for active task, risk count, verification freshness, and dependency/security status.
-- Add optional exports for manager AI/operator visibility, such as JSON summaries or Markdown dashboards.
+- Generate lightweight dashboards for active task, risk count, verification freshness.
+- Add optional exports for manager AI/operator visibility (JSON summaries or Markdown dashboards).
 - Keep dashboard generation read-mostly and path-safe; no external upload by default.
 
 ## Maintenance backlog
 
-- Refresh embedded dependency/security baselines at least every 90 days.
+- Track upstream Superpowers changes; sync skill improvements quarterly.
 - Add more monitor recipes only when they reduce raw-log token waste.
-- Consider richer visual dashboards later, after metrics schemas stabilize.
 - Keep plugin metadata, README command truth, and verify coverage aligned with each release.
+- Document migration paths from v2.x and v1.x for any new user landing on the repo.

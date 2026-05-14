@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""HayeOS SessionStart hook - Python implementation for cross-platform use."""
+"""HayeOS SessionStart hook - Python implementation.
+
+Called by hooks/session-start (bash) when python is available, or directly
+by run-hook.cmd on Windows via hooks/session-start.py.
+
+Emits the using-hayeos skill content as Claude Code's SessionStart hook
+expects: hookSpecificOutput.additionalContext (nested) for Claude Code,
+additional_context (snake_case, top-level) for Cursor, additionalContext
+(camelCase, top-level) for Copilot CLI and others.
+"""
 
 import json
 import os
@@ -27,6 +36,7 @@ def main() -> int:
         "</EXTREMELY_IMPORTANT>"
     )
 
+    # Emit correct JSON shape for each platform
     if os.environ.get("CURSOR_PLUGIN_ROOT"):
         payload = {"additional_context": session_context}
     elif os.environ.get("CLAUDE_PLUGIN_ROOT") and not os.environ.get("COPILOT_CLI"):

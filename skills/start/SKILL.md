@@ -91,7 +91,7 @@ Then quote the version line from that output. Do NOT fabricate a version number.
    - Do not say "Memory başarıyla oluşturuldu" before init-memory has actually run and reported success.
    - If init-memory fails or returns an error, report the exact failure and ask the user how to proceed.
    - Legacy `/haye:init-memory` wording is only a user-facing command name; the required continuation is the Skill tool call above.
-   - After successful creation, memory is already considered started. Do not ask "Şimdi hafızayı başlatmamı ister misiniz?". Run only the lightweight `memory-start` read and ask: "Hangi görevle devam edelim?"
+   - After successful creation, memory is already considered started. Do not ask "Şimdi hafızayı başlatmamı ister misiniz?". Read minimal memory (current.md, next.md, active-task.md) inline and ask: "Hangi görevle devam edelim?"
    - If `.hayeos.json` exists but `memoryPath` is missing or invalid, report the exact missing path in Turkish and offer to repair it through `/haye:init-memory`.
 2. Read minimal memory.
 3. Apply Safe Resume Rule:
@@ -121,7 +121,6 @@ Recovery summary format:
 ## Changed Files
 ## Current Blocker
 ## Next 3 Actions
-## Recommended Next Mode
 
 Kaldığımız yerden devam edeyim mi?
 ```
@@ -158,7 +157,7 @@ When the user says yes (any of: "evet", "yes", "ok", "tamam", "olur"):
 - DO NOT `Write(<resolved memoryPath>/current.md)`, `<resolved memoryPath>/next.md`, etc.
 - ALL of these go through `Skill(haye:init-memory)`.
 
-After init-memory reports success, memory is already considered started. Do not ask a second memory-start question. Run only the lightweight memory-start read and ask: "Hangi görevle devam edelim?"
+After init-memory reports success, memory is already considered started. Do not ask a second initialization question. Read minimal memory inline (current.md, next.md, active-task.md) and ask: "Hangi görevle devam edelim?"
 
 ## Canonical Project Root and Vault
 
@@ -201,11 +200,11 @@ Default config:
 - Do not claim safe/fixed/done without verification output or a clear limitation note.
 
 ## Team/Subagent Rule
-Subagent and Team Mode behavior is only allowed inside `/haye:work` for large or risky tasks. `/haye:start` must not use subagents, must not enter plan mode and must not trigger Team Mode.
+Subagent dispatch (via subagent-driven-development) is only allowed inside `/haye:work` after brainstorming and writing-plans have produced an approved plan. `/haye:start` must not use subagents and must not enter plan mode.
 
 ## No Work Loading Rule
 `/haye:start` must not load `/haye:work`, must not start task classification, and must not ask broad work questions like task size, risk level or affected layers. Work classification belongs only to `/haye:work`.
 
-## Smart routing
-This simplified command may route internally only to:
-- `memory-start`
+## Internal routing
+
+`/haye:start` is terminal — after presenting the recovery summary (or the "Hangi görevle devam edelim?" question) it stops and waits for the user. It does not auto-route to `/haye:work`, `/haye:close`, or any process skill. The only internal handoff allowed is to `Skill(haye:init-memory)` when the user has approved memory creation.

@@ -25,8 +25,9 @@ mv /tmp/docker-window.log "<resolved memoryPath>/08-raw/docker/${DATE}-${SHORT}.
 ```
 
 ## Ingest
-- `ingest-session` extracts: stack trace, repeated error pattern, restart loop indicators
-- Output: `03-bugs/` entry with repro and root cause hypothesis
+- Invoke `Skill(haye:systematic-debugging)` against the saved file path; Phase 1 extracts the stack trace, repeated error pattern, and restart loop indicators.
+- Output: a `03-bugs/open/<topic>.md` entry with repro steps and root cause hypothesis.
+- During `/haye:close`, reference the bug entry in the session changelog.
 
 ## Tips
 - Use `--timestamps` to correlate with frontend errors / user reports

@@ -1,0 +1,1 @@
+I just finished writing some code. Before I tell my team "it's done", I want you to walk through the verification-before-completion skill so I know what evidence I need.

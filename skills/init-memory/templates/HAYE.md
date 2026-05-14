@@ -28,12 +28,13 @@ This project uses Haye memory-first workflow.
 - The default vault lives at `<project-root>/<project-name>_obs/`, not under machine-specific absolute paths or `~/.claude/projects/.../memory`.
 - The project root is the real current folder, not Claude internal project state under `~/.claude/projects/...`.
 
-## Smart Work Router
-- `/haye:work` classifies `task_size`, `task_type`, `risk_level`, `affected_layers` and `recommended_mode`.
-- Small low-risk work uses Fast Mode.
-- Medium work uses Standard Mode.
-- Large or high-risk work may use Team Mode.
-- Massive or production-grade architecture work uses Full Architecture Mode and requires approval before coding.
+## HayeOS v3 Process Chain
+- `/haye:work` routes the request through the Superpowers process chain.
+- New feature or system -> `Skill(haye:brainstorming)` (HARD-GATE before any code).
+- Approved spec -> `Skill(haye:writing-plans)` (bite-sized plan, exact paths).
+- Ready plan -> `Skill(haye:subagent-driven-development)` (implementer + spec reviewer + code quality reviewer per task).
+- Bug report or error -> `Skill(haye:systematic-debugging)`.
+- Implementation complete -> `Skill(haye:finishing-a-development-branch)`.
 
 ## Approval Friction Rule
 - If a plan or phase is approved, continue small safe steps without asking after every edit.
@@ -78,7 +79,7 @@ This project uses Haye memory-first workflow.
 - Use HayeOS memory first.
 - Avoid unnecessary repo scans and raw/log reads.
 - Use context packs for big work.
-- Keep Team Mode role findings short.
+- Keep subagent reviewer findings short.
 - Split large work into phases/sessions and close with `/haye:close`.
 
 ## Framework Security Rule

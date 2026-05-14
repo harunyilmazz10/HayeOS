@@ -1,1 +1,0 @@
-We're about to launch a new admin route at /admin/users. Before we go live I want to make sure auth and authorization are tight. Can you check?

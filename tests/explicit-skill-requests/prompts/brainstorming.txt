@@ -1,0 +1,1 @@
+I want to build a doctor landing page in Next.js. Premium, production-grade, with Hero, Services, About, Appointment form, and Contact sections. Please brainstorm the design with me before writing any code.

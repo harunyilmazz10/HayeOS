@@ -1,0 +1,1 @@
+Please use the haye:work skill to handle this request. I want to add a contact form to my Next.js site with rate limiting and a Telegram notification webhook. Walk me through the HayeOS flow.

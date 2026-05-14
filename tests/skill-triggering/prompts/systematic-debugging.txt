@@ -1,0 +1,1 @@
+My Next.js build is failing with "Conflicting app and page file was found". How do I fix this?

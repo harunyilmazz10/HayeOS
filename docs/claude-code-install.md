@@ -1,16 +1,22 @@
 # Claude Code Install
 
-## A. Development/test
+## A. Development / test (recommended for testing)
 
-Use this when editing or validating the local checkout:
+Use this when editing the local checkout:
 
 ```bash
 claude --plugin-dir <hayeos-plugin-root>
 ```
 
+For Windows users (PowerShell):
+
+```powershell
+claude --plugin-dir "C:\Users\<user>\Desktop\HayeOS-v3"
+```
+
 ## B. Permanent local marketplace install
 
-Use this when you want Haye commands available in normal `claude` sessions without passing `--plugin-dir`.
+Use this when you want HayeOS commands available in normal `claude` sessions without `--plugin-dir`:
 
 ```text
 claude
@@ -18,62 +24,72 @@ claude
 /plugin install haye@haye-marketplace
 ```
 
-Expected commands after install:
+## Available commands after install
 
 ```text
 /haye:start
 /haye:init-memory
 /haye:work
-/haye:fix
-/haye:secure
-/haye:ship
 /haye:close
+/haye:update
+/haye:version
 ```
 
-In normal use, you do not need to run `bin/haye` manually. Open Claude Code in a project and use `/haye:start`. If Haye memory is missing, `/haye:start` offers to create it automatically; `/haye:init-memory` can also be run directly.
+These six commands are the user-facing entry points. Process discipline (brainstorming, writing-plans, subagent-driven-development, systematic-debugging, etc.) lives in skills and is invoked automatically through the `/haye:work` chain.
 
-Plugin root and project memory vault are different. The installed HayeOS directory is plugin code only; all project memory, context packs and checkpoints are written under the current project's `.hayeos.json` `memoryPath`.
+## Removed in v3.0.0
 
-If Claude Code crashes before `/haye:close`, open a new session and run `/haye:start`. HayeOS reads `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, shows a short recovery summary, and waits for your approval before continuing.
+These commands existed in v2.x and are intentionally removed:
 
-To update an installed HayeOS plugin from inside Claude Code, run:
+- `/haye:fix` -> use `/haye:work` for bugs, it routes to `Skill(haye:systematic-debugging)`
+- `/haye:secure` -> security concerns belong in CLAUDE.md or `haye-extras` plugin
+- `/haye:ship` -> `/haye:work` chain ends in `Skill(haye:finishing-a-development-branch)`
+- `/haye:bugfix`, `/haye:deploy` -> same as `/haye:fix` and `/haye:ship` removals
+
+## Typical first session
+
+```bash
+mkdir my-project
+cd my-project
+claude --plugin-dir /path/to/HayeOS-v3
+```
+
+In Claude Code:
+
+```text
+/haye:start
+```
+
+If HayeOS memory is missing, `/haye:start` asks:
+
+> Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
+
+Say "evet". HayeOS creates `.hayeos.json` plus the project memory vault automatically.
+
+Then describe what you want to build:
+
+```text
+Next.js ile premium bir doktor landing page projesi oluşturmak istiyorum.
+Hero, hizmetler, hakkında, randevu formu ve iletişim bölümleri olsun.
+```
+
+The work skill routes to brainstorming. Brainstorming HARD-GATE blocks any code or scaffolding until you approve the design. Then writing-plans produces a bite-sized plan, then subagent-driven-development executes task-by-task.
+
+## Recovery after crash
+
+If Claude Code crashes mid-session, open a new session and run `/haye:start`. HayeOS reads `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, shows a short recovery summary in Turkish, and waits for your approval before continuing.
+
+## Updating the plugin
 
 ```text
 /haye:update
 ```
 
-It updates the plugin repo with a safe fast-forward pull, stops if local changes exist, validates the plugin, and then recommends restarting Claude Code.
+This safely runs `git pull --ff-only origin main` against the plugin repo. After update, run `/reload-plugins` or restart Claude Code so the new skill content takes effect.
 
-The marketplace manifest lives at `.claude-plugin/marketplace.json`, and the `haye` plugin source points to the repository root with `./`.
+Manual fallback:
 
-## C. GitHub marketplace install
-
-Claude Code marketplace add accepts a URL, path, or GitHub repo. After the GitHub repository contains `.claude-plugin/marketplace.json`, use:
-
-```text
-claude
-/plugin marketplace add https://github.com/harunyilmazz10/HayeOS.git
-/plugin install haye@haye-marketplace
-```
-
-## Windows manual fallback
-
-Manual CLI use should be rare. If you need it on Windows, do not run `bin/haye` through bash. Use:
-
-```text
-C:\Path\To\HayeOS\bin\haye.cmd init
-```
-
-or:
-
-```text
-powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
-```
-
-If your Claude Code build requires GitHub shorthand instead of a full URL, use:
-
-```text
-claude
-/plugin marketplace add harunyilmazz10/HayeOS
-/plugin install haye@haye-marketplace
+```bash
+cd <hayeos-plugin-root>
+git pull origin main
 ```

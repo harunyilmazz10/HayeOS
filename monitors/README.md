@@ -1,9 +1,9 @@
 # HayeOS Monitors
 
-Optional log/process monitor *recipes*. These are NOT activated by default — they describe how a user can pipe logs from common Haye-stack processes into the HayeOS vault for later ingestion via the `ingest-session` skill.
+Optional log/process monitor *recipes*. These are NOT activated by default — they describe how a user can pipe logs from common Haye-stack processes into the HayeOS vault for later inspection during /haye:close or systematic-debugging.
 
 ## Why off by default
-Live log monitoring is a token-cost trap. Most sessions don't need it. When something is actually misbehaving, follow the recipe for that source, capture only the failing window, and let `ingest-session` summarize what was useful.
+Live log monitoring is a token-cost trap. Most sessions don't need it. When something is actually misbehaving, follow the recipe for that source, capture only the failing window, and let `/haye:close` skill summarize what was useful.
 
 ## What's here
 - `coolify-build-log.md` — capture a single Coolify build's log into `08-raw/`
@@ -13,7 +13,7 @@ Live log monitoring is a token-cost trap. Most sessions don't need it. When some
 ## Pattern (all recipes)
 1. Reproduce the issue with logging enabled
 2. Save the captured window to `<resolved memoryPath>/08-raw/<source>/<YYYY-MM-DD>-<short-name>.log`
-3. Run the `ingest-session` skill against that file to extract decisions / bugs / risks
+3. Summarize relevant lines into `<resolved memoryPath>/02-decisions/` or `<resolved memoryPath>/03-bugs/` as needed (do not load the raw file fully into chat)
 4. Archive the raw file to `08-raw/processed/`
 
 ## Adding a new monitor

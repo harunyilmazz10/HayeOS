@@ -30,7 +30,7 @@ If plugin cache freshness cannot be verified from the current session, say: "Plu
 ## Output shape
 
 ```text
-HayeOS v2.0.1
+HayeOS v3.0.0
 Local repo commit: <short-sha>
 Branch: main
 Working tree: clean/dirty

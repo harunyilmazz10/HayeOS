@@ -3,7 +3,7 @@ import json, os, sys, re, subprocess
 from pathlib import Path
 
 CORE_FILES=['HAYE.md','index.md','current.md','next.md','changelog.md','health.md']
-DIRS=['00-system','01-project','01-prompts','02-decisions','03-bugs/open','03-bugs/solved','03-bugs/recurring','04-tasks','05-sessions','06-prompts','07-checklists','08-raw/claude-sessions','08-raw/terminal-logs','08-raw/screenshots','08-raw/old-prompts','08-raw/docs','09-context-packs','10-reviews','11-metrics','12-risks','99-archive']
+DIRS=['00-system','01-project','01-prompts','02-decisions','03-bugs/open','03-bugs/solved','03-bugs/recurring','04-plans','04-tasks','05-sessions','06-prompts','07-checklists','08-raw/claude-sessions','08-raw/terminal-logs','08-raw/screenshots','08-raw/old-prompts','08-raw/docs','09-context-packs','10-reviews','11-metrics','12-risks','99-archive']
 DEFAULT_CONFIG={'sourcePath':'.','riskLevel':'medium','defaultWorkflow':'memory-first','sessionCloseRequired':True,'rawReadPolicy':'explicit-only'}
 class ConfigError(Exception): pass
 
@@ -184,51 +184,6 @@ def version_tuple(v):
 def in_range(v, lo, hi):
     t=version_tuple(v); return version_tuple(lo)<=t<=version_tuple(hi)
 
-def react_next_audit():
-    deps=parse_pkg(); print('# React / Next.js Security Report\n')
-    print(f'Source path: {source_path()}\n')
-    if not deps: print('No package.json dependencies found.'); return 1
-    for n in ['next','react','react-dom','react-server-dom-webpack','react-server-dom-parcel','react-server-dom-turbopack']:
-        if n in deps: print(f'- {n}: {deps[n]}')
-    print('\n## Findings')
-    bad=False
-    for pkg, spec in deps.items():
-        if clean(spec).lower()=='latest':
-            print(f'- UNSAFE VERSION POLICY: {pkg} uses `latest`. Choose a specific patched compatible version after checking advisories.'); bad=True
-    for pkg in ['react-server-dom-webpack','react-server-dom-parcel','react-server-dom-turbopack']:
-        if pkg in deps:
-            v=clean(deps[pkg])
-            if in_range(v,'19.0.0','19.0.5') or in_range(v,'19.1.0','19.1.6') or in_range(v,'19.2.0','19.2.5'):
-                print(f'- UNSAFE: {pkg} {deps[pkg]} is in embedded vulnerable RSC range. Recommend patched compatible version 19.0.6 / 19.1.7 / 19.2.6 or later.'); bad=True
-    if 'next' in deps:
-        v=clean(deps['next']); t=version_tuple(v)
-        if t[0]==15 and t < version_tuple('15.5.16'):
-            print(f'- UNSAFE BASELINE: next {deps["next"]} below 15.5.16. Recommend 15.5.16+ compatible patch.'); bad=True
-        if t[0]==16 and t < version_tuple('16.2.5'):
-            print(f'- UNSAFE BASELINE: next {deps["next"]} below 16.2.5. Recommend 16.2.5+ compatible patch.'); bad=True
-    if not bad: print('- No embedded React/Next vulnerable baseline detected. Run live advisory/audit check if internet is available.')
-    print('\n## Cloudflare WAF status\n- WAF is defense-in-depth only. It does not replace dependency patching.\n')
-    print('## Live advisory note\n- If internet is available, verify with npm registry, npm audit, GitHub advisories, React/Next/Cloudflare changelogs.\n')
-    return 1 if bad else 0
-
-def deps_audit():
-    sp=source_path()
-    pm='npm'
-    if (sp/'pnpm-lock.yaml').exists(): pm='pnpm'
-    elif (sp/'yarn.lock').exists(): pm='yarn'
-    print(f'package manager guess: {pm}')
-    print(f'source path: {sp}')
-    if not (sp/'package.json').exists(): print('package.json missing'); return 1
-    deps=parse_pkg()
-    latest=[name for name, spec in deps.items() if clean(spec).lower()=='latest']
-    if latest:
-        print('unsafe version policy: dependencies must not use latest:', ', '.join(sorted(latest)))
-    if not any((sp/x).exists() for x in ['package-lock.json','pnpm-lock.yaml','yarn.lock','bun.lockb']): print('warning: lockfile missing')
-    cmd={'npm':['npm','audit'],'pnpm':['pnpm','audit'],'yarn':['yarn','npm','audit']}.get(pm,['npm','audit'])
-    print('recommended audit command:', ' '.join(cmd))
-    print('live advisory rule: check official sources when internet is available; if unavailable, document that only local files and embedded Haye rules were used.')
-    return 1 if latest else 0
-
 def context_pack(task='manual-task'):
     mp=memory_path();
     if not mp: print('No vault'); return 1
@@ -254,12 +209,6 @@ commands:
   health                health + lint
   raw-status            list raw files
   context-pack [task]   create context pack
-  deps-audit            local dependency audit helper
-  react-nextjs-audit    check embedded React/Next vulnerable baselines
-  dependency-report     alias deps-audit
-  safe-version-check    alias react-nextjs-audit
-  cloudflare-framework-report alias react-nextjs-audit
-  doctor                health + deps + React/Next audit
 """)
 
 def main():
@@ -281,9 +230,7 @@ def main():
         if cmd=='health': return health()
         if cmd=='raw-status': raw_status(); return 0
         if cmd=='context-pack': return context_pack(' '.join(sys.argv[2:]) or 'manual-task') or 0
-        if cmd in ['deps-audit','dependency-report']: return deps_audit()
-        if cmd in ['react-nextjs-audit','safe-version-check','cloudflare-framework-report']: return react_next_audit()
-        if cmd=='doctor': health(); deps_audit(); return react_next_audit()
+
         usage(); return 1
     except ConfigError as e:
         print(e, file=sys.stderr)

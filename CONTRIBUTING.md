@@ -2,7 +2,7 @@
 
 ## Local setup
 
-Clone the repo, install it as a local Claude Code plugin when needed, then test from the repository root:
+Clone the repo and verify it locally:
 
 ```bash
 git clone https://github.com/harunyilmazz10/HayeOS.git
@@ -10,38 +10,55 @@ cd HayeOS
 bash scripts/verify.sh
 ```
 
-For a basic CLI sanity test, create a temporary project and run `python3 bin/haye init` or `python bin/haye init`. The generated config must use `./<project-name>_obs` and must not create root-level memory folders.
+Expected: `verification OK` and exit code 0.
+
+For a basic CLI sanity test, create a temporary project and run `python3 bin/haye init`. The generated config must use `./<project-name>_obs` and must not create root-level memory folders.
 
 ## Skill authoring rules
 
 - Use proper YAML frontmatter with `name` and `description`.
-- Include the User Response Language Rule for user-facing skills.
+- Skill content stays English; user-facing replies are Turkish (per HayeOS Layer).
+- Include the User Response Language Rule for any skill that produces user-facing output.
 - Keep chat concise; put deeper technical artifacts in docs or vault files.
-- Use `<resolved memoryPath>/...` for memory targets.
+- Use `<resolved memoryPath>/...` for memory targets; resolve at runtime from `.hayeos.json`.
 - Never write memory files to project root or plugin root.
 
-## Team Mode perspective rules
+## Adding a new skill
 
-- Do not add or restore a plugin `agents/` directory.
-- Put Team Mode specialist behavior inside `skills/team-mode/SKILL.md`.
-- Each perspective must include what it looks for and a concrete output shape.
-- Keep each perspective role-specific; avoid generic filler that could apply to any workflow.
-- Do not introduce Task-tool or subagent dispatch for Team Mode unless a future runtime proves it works reliably.
+1. Use `Skill(haye:writing-skills)` to author it - that skill applies TDD to skill documentation.
+2. Write a pressure test in `tests/skill-triggering/prompts/<skill-name>.txt`.
+3. Run the test against a baseline (no skill loaded) and confirm it fails the way the skill is meant to fix.
+4. Write the SKILL.md.
+5. Re-run the test with the skill loaded; confirm it passes.
+6. Add the skill to `scripts/verify.sh` `check_required_skills_present` list.
+7. Add the skill to `using-hayeos` Mandatory Invocation Triggers if relevant.
+
+## Removed v2.x concepts
+
+- Do not restore the `agents/` directory; plugin agents never worked reliably in Claude Code runtime.
+- Do not restore `feature` or `team-mode` skills; brainstorming -> writing-plans -> subagent-driven-development replaces them.
+- Do not restore domain-specific skills (nextjs-doctor, prisma-doctor, coolify-doctor, etc.); those belong in `haye-extras`.
 
 ## Pre-PR verification checklist
 
-Run:
-
 ```bash
 bash scripts/verify.sh
+python3 bin/haye --help
+python3 bin/haye init  # in a temp directory
 ```
 
-Also smoke-test CLI changes with `python3 bin/haye --help || python bin/haye --help`.
+All must succeed.
 
 ## Hard requirements for every PR
 
-- Skill bodies stay duplicate-free and operational.
 - `verification OK` must appear in a successful verify run.
-- No personal hardcode such as `Harun`.
-- No broken wrapper regressions.
-- No path-safety, init fail-fast, or plugin-root leakage regressions.
+- No personal hardcoded values (names, paths, emails).
+- No wrapper regressions for Windows (`bin/haye.cmd`, `hooks/run-hook.cmd`).
+- No path-safety regressions (init fail-fast when inside plugin root).
+- New skills include a triggering test prompt in `tests/skill-triggering/prompts/`.
+
+## Style
+
+- Markdown only, no smart quotes (use ASCII `'` and `"`).
+- Use ASCII arrows (`->`) not Unicode (`→`) in code blocks and tables.
+- Code blocks fenced with triple backticks and a language hint when possible.

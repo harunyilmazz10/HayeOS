@@ -1,11 +1,99 @@
 # Changelog
 
+## 3.0.0 — Major Architectural Reset
+
+This release is a foundational rebuild. HayeOS v2.x and earlier tried to instill discipline by adding more written rules. Real-world testing (test6, test7, test8 sessions) proved this hits a ceiling: Sonnet 4.6 reads the rules, even quotes the Iron Law verbatim, but routinely violates them at execution time.
+
+v3.0.0 takes a different path: **mechanical discipline through the Superpowers process model**. Instead of one Sonnet self-policing against written rules, work flows through brainstorming -> writing-plans -> subagent-driven-development, where each task is implemented by a fresh subagent and then verified by two separate review subagents (spec compliance + code quality). The orchestrator cannot unilaterally declare success; three dispatches must agree.
+
+### What's NEW
+
+Thirteen new core skills, adapted from Obra's Superpowers plugin (https://github.com/obra/superpowers), with permission and credit:
+
+- **brainstorming** — HARD-GATE: no implementation skill, no code, no scaffolding until a design is presented and the user approves. Applies to every project regardless of perceived simplicity.
+- **writing-plans** — turns approved spec into a bite-sized implementation plan with exact file paths, complete code in every step, expected command output, and frequent commits. No "TBD", no "implement later", no stub sections.
+- **subagent-driven-development** — executes plan task-by-task: dispatch implementer subagent, then spec-reviewer subagent, then code-quality-reviewer subagent. Re-dispatch on findings. Move to next task only when both reviews approve.
+- **executing-plans** — fallback for environments where subagent dispatch isn't ideal.
+- **dispatching-parallel-agents** — 2+ independent failures investigated in parallel via concurrent subagent dispatch.
+- **test-driven-development** — Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST. Watch the test fail, write minimal code, refactor.
+- **verification-before-completion** — Iron Law: NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. Gate function before every "done"/"works"/"passes"/"başarıyla" claim.
+- **systematic-debugging** — strict procedure for bugs, errors, unexpected behavior.
+- **requesting-code-review** — dispatch a code reviewer subagent after each task, before merge, on major features.
+- **receiving-code-review** — when feedback arrives, verify technically against codebase reality before implementing; reasoned pushback over performative agreement.
+- **using-git-worktrees** — isolated workspace via native tooling or git worktree fallback before feature work or plan execution.
+- **finishing-a-development-branch** — merge/PR/cleanup decision flow when implementation is complete.
+- **writing-skills** — TDD applied to skill documentation: write pressure test, watch baseline fail, write skill, watch test pass, refactor.
+
+Each Superpowers-derived skill includes a HayeOS Layer section adding Turkish UX rules, memory vault integration (plans -> `04-plans/`, specs -> `02-decisions/`, reviews -> `10-reviews/`), and Path Separation enforcement.
+
+### What's REMOVED (BREAKING)
+
+The following v2.x skills are removed because v3 process skills cover their roles more rigorously:
+
+**Process skills removed (replaced by Superpowers chain):**
+- `feature` — replaced by brainstorming -> writing-plans
+- `team-mode` — replaced by subagent-driven-development (real subagent dispatch, not inline perspective simulation)
+- `bugfix` — replaced by systematic-debugging
+- `fix` — replaced by systematic-debugging
+- `refactor` — handled by brainstorming -> writing-plans
+- `migration` — handled by brainstorming -> writing-plans
+- `review` — replaced by subagent-driven-development's reviewer subagents
+- `test-plan` — replaced by test-driven-development
+- `handoff` — handled by writing-plans + close
+- `session-close` — collapsed into close
+- `ingest-session` — collapsed into start
+- `memory-lint` — collapsed into close
+- `memory-start` — collapsed into start
+- `context-pack` — moved to writing-plans as "Context Section" of plan format
+- `secure` — generic security guidance, project-specific concerns belong in user's CLAUDE.md
+- `ship` — generic deployment, belongs in finishing-a-development-branch
+
+**Domain skills removed (will move to `haye-extras` plugin in a future release):**
+nextjs-doctor, prisma-doctor, docker-doctor, coolify-doctor, cloudflare-doctor, database-doctor, auth-audit, secrets-audit, exposed-port-audit, react-nextjs-security, dependency-audit, dependency-security, version-policy, api-integration, ai-agent-system, saas-billing, trading-terminal, video-factory, mobile-app, content-automation, n8n-pipeline, security, project-map, token-audit, deploy
+
+Rationale: Superpowers core contains general-purpose skills only. Domain skills belong in dedicated plugins.
+
+### What's KEPT
+
+These HayeOS-specific skills are retained because they encode value not present in Superpowers:
+
+- **using-hayeos** — master orchestrator (rewritten to route through Superpowers chain)
+- **start** — session start, memory vault detection, Turkish welcome
+- **init-memory** — canonical project-local vault creation
+- **work** — entry router (simplified: routes to brainstorming-as-first-step)
+- **checkpoint** — write current state to vault (5+ files modified, risky operation, phase boundary)
+- **close** — meaningful work block end, vault update
+- **update** — pull plugin updates from GitHub
+
+### What CHANGED
+
+- `bin/haye init` now creates `04-plans/` directory alongside `04-tasks/`.
+- All Superpowers-derived skills end with a "HayeOS Layer" section adding Turkish UX rules and memory vault paths.
+- `<resolved memoryPath>` placeholder used in skill text is intended for AI runtime substitution from `.hayeos.json` — same as v2.x.
+- Plugin description updated to reflect process-first identity.
+
+### Migration from v2.x
+
+For existing projects with `<project>_obs/` vaults from v2.x:
+- Vault structure is compatible. `04-plans/` directory will be created on first `bin/haye init` re-run, or you may create it manually.
+- Slash commands `/haye:start`, `/haye:work`, `/haye:close`, `/haye:update`, `/haye:version` work unchanged.
+- `/haye:fix`, `/haye:secure`, `/haye:ship`, `/haye:bugfix`, `/haye:deploy` are removed. Use `/haye:work` and let routing pick systematic-debugging or finishing-a-development-branch as appropriate.
+
+### Credits
+
+The Superpowers process model is by Jesse Vincent (Obra) and contributors:
+https://github.com/obra/superpowers
+
+HayeOS v3 wraps that model with Turkish UX, project-local memory vaults, and HayeOS-specific session management. Substantial portions of `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `test-driven-development`, `verification-before-completion`, `systematic-debugging`, and `finishing-a-development-branch` skill content originates from that project, used with attribution and adapted under MIT.
+
+---
+
 ## 2.1.0
 - **BREAKING (internal)**: Removed `agents/` directory entirely. Plugin agents (project-manager, security-reviewer, etc.) never worked reliably in Claude Code runtime - Skill() invocation produced "Unknown skill", Task subagent dispatch produced "Invalid tool parameters". User-facing slash commands and vault structure are unchanged.
 - Specialist perspectives (10 of them) are now embedded as inline process inside `skills/team-mode/SKILL.md`. Sonnet walks through them sequentially in the main conversation. No tool dispatch, no namespace issues.
 - Added **ABSOLUTE FIRST STEP** block to `skills/work/SKILL.md` - work skill MUST produce a Task Classification + mode recommendation + approval question before any sub-skill routing. Prevents the work -> feature drift seen in test6/test7/test8.
 - Added **Auto-Invoke Ban** to `skills/feature/SKILL.md` - feature skill cannot be auto-invoked from a user prompt. Only via work skill's Mandatory Routing AFTER mode approval.
-- Added **Gate Function** to `skills/using-hayeos/SKILL.md` - mechanical pre-claim check that catches "başarıyla / tamamlandı / oluşturuldu" claims following tool errors. Direct fix for test8 fake-completion-after-invalid-tool-parameters pattern.
+- Added **Gate Function** to `skills/using-hayeos/SKILL.md` - mechanical pre-claim check that catches "başarıyla / tamamlandı / oluşturuldu" claims following tool errors.
 - ANTI-REGRESSION: Six new verify.sh checks for the v2.1.0 contracts.
 
 ## 2.0.4

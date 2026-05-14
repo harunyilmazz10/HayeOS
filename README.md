@@ -1,248 +1,217 @@
-# HayeOS / Haye Claude Code Plugin
+# HayeOS
 
-**Haye** is an Obsidian-powered, memory-first operating system for Claude Code. It is built for long-running Haye Labs projects: AI agents, SaaS panels, Next.js/Coolify deployments, n8n automations, video factories, trading terminals, mobile apps and content automation.
+**Memory-first, discipline-first Claude Code workflow plugin.**
 
-## Why it exists
+HayeOS v3.0.0 is a Turkish-friendly Claude Code plugin built on the Superpowers process model. It enforces a structured workflow:
 
-Claude Code sessions can become expensive and unstable when old conversations, full repositories, raw logs and huge context are repeatedly loaded. Haye fixes this with:
-
-- Obsidian project memory
-- minimal context starts
-- task-specific context packs
-- session close handoffs
-- dependency security and safe version policy
-- React / Next.js / Cloudflare advisory rules
-- smart daily commands
-- advanced expert workflows when needed
-
-## Simple daily commands
-
-Use these first. They are smart routers over the advanced HayeOS workflows.
-
-```text
-/haye:start   # start from Obsidian memory with minimal context
-/haye:work    # feature/refactor/API/migration/test work
-/haye:fix     # debugging and root-cause-first fixes
-/haye:secure  # security, dependency and safe version checks
-/haye:ship    # deploy/release readiness
-/haye:close   # update Obsidian memory and close the session
-/haye:init-memory # create or repair project memory after user approval
-/haye:version # show installed/local HayeOS version and git state
-/haye:update  # update the installed HayeOS plugin safely
+```
+brainstorming  ->  writing-plans  ->  subagent-driven-development (or executing-plans)
+       |                                          |
+       |                                          +-- test-driven-development per task
+       |                                          +-- verification-before-completion gate
+       v                                          v
+  spec saved to                          plan saved to                    reviews saved to
+  <memoryPath>/02-decisions/             <memoryPath>/04-plans/           <memoryPath>/10-reviews/
 ```
 
-### /haye:work Smart Modes
+Every project gets a sibling memory vault (`<project>_obs/`) where specs, plans, decisions, sessions, and reviews are persisted across sessions.
 
-`/haye:work "görev"` Smart Work Router olarak çalışır. Görevi `task_size`, `task_type`, `risk_level`, `affected_layers` ve `recommended_mode` alanlarıyla sınıflandırır.
+---
 
-Modes:
-- Fast Single Agent: small + low risk işler için kısa planla direkt uygular.
-- Standard Single Agent: medium işler için plan + implementation + verification yapar.
-- Plan First: önce sadece plan çıkarır, kod yazmadan onay bekler.
-- Team Mode: large veya high risk işlerde uzman rollere böler; ayrı user-facing team komutu yoktur.
-- Full Architecture Mode: massive veya sıfırdan production-grade sistemlerde kodlamadan önce mimari plan çıkarır ve onay ister.
+## Why this exists
 
-## Specialist perspectives (Team Mode)
+Earlier HayeOS versions (v1.x, v2.x) tried to enforce discipline by writing more and more rules into skills. Real-world testing showed Sonnet 4.6 hits a ceiling: it can quote the Iron Law verbatim, then immediately violate it.
 
-HayeOS Team Mode walks through 9 specialist perspectives inline:
+v3.0.0 changes approach: **mechanical discipline through subagent dispatch**. Three separate subagents (implementer, spec reviewer, code quality reviewer) must agree before a task is marked complete. No single Sonnet can unilaterally claim "başarıyla tamamlandı".
 
-**Mandatory** (every Team Mode run):
-- Project Manager - scope, phases, blockers
-- Memory Architect - vault hygiene
-- Security Reviewer - auth, secrets, surface area
-- Release Manager - verification, rollback, version
-- Token Economist - context discipline
+The process model is from Jesse Vincent's Superpowers plugin. HayeOS wraps it with Turkish UX, project-local memory vaults, and session management.
 
-**Conditional** (when triggering signal present):
-- Database Architect - schema, migrations, indexes
-- API Integrator - auth, idempotency, retries
-- Deployment Doctor - Docker, Coolify, healthcheck
-- UI Polisher - states, a11y, motion
+---
 
-Earlier versions used a separate `agents/` directory for these roles. v2.1.0 inlines them as process within the `team-mode` skill for runtime reliability.
+## Skills
 
-Work Strategy Selection Rule: large, massive, high-risk veya belirsiz işlerde HayeOS önce önerilen çalışma modunu açıklar ve Türkçe onay ister; small + low-risk işlerde sormadan Fast Single Agent ile ilerler.
+### Core process (from Superpowers, with HayeOS adaptation)
 
-Original Prompt Preservation Rule: large, massive, architecture ve full-system `/haye:work` isteklerinde HayeOS orijinal kullanıcı promptunu özetlemeden `<resolved memoryPath>/01-prompts/` altına kaydeder. İlk master prompt `<resolved memoryPath>/01-prompts/initial-master-prompt.md`, sonraki work promptları `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md` olur.
+| Skill | When to use |
+|---|---|
+| `brainstorming` | ANY new feature, system, or non-trivial change. HARD-GATE blocks code until design is approved. |
+| `writing-plans` | After brainstorming reaches an approved spec. Produces bite-sized plan. |
+| `subagent-driven-development` | After plan exists. Dispatches implementer + 2 reviewer subagents per task. |
+| `executing-plans` | Fallback when subagent dispatch isn't ideal. |
+| `dispatching-parallel-agents` | 2+ independent failures or tasks that can be investigated concurrently. |
+| `test-driven-development` | Every feature/bugfix, before writing implementation code. |
+| `verification-before-completion` | Before ANY "done"/"completed"/"works"/"başarıyla" claim. |
+| `systematic-debugging` | Bug reports, errors, unexpected behavior. |
+| `requesting-code-review` | After each task in subagent flow, before merge, on feature completion. |
+| `receiving-code-review` | When the user (or another reviewer) gives you feedback — verify technically, don't agree blindly. |
+| `using-git-worktrees` | Starting feature work that needs workspace isolation. |
+| `finishing-a-development-branch` | Implementation complete, decide merge/PR/cleanup. |
+| `writing-skills` | Creating new HayeOS skills or editing existing ones (TDD for documentation). |
 
-HayeOS minimizes approval friction. It asks for approval at phase boundaries and risk gates, not after every small edit.
+### HayeOS-specific (memory + session management)
 
-No Fake Completion Rule: HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" demez. Build/test/lint/typecheck çalışmadıysa bunu açıkça yazar.
+| Skill | When to use |
+|---|---|
+| `using-hayeos` | Auto-injected at session start by SessionStart hook. |
+| `start` | `/haye:start` slash command — session start, vault detect. |
+| `init-memory` | First-time vault creation for a project. |
+| `work` | `/haye:work` slash command — routes to brainstorming. |
+| `checkpoint` | After 5+ file changes or before risky operations. |
+| `close` | End of meaningful work block. |
+| `update` | `/haye:update` slash command — pull plugin updates from GitHub. |
 
-Output Budget Rule: large outputs go to files. HayeOS büyük mimari, roadmap, servis planı, DB planı, event/queue schema ve deployment planı gibi uzun çıktıları chat'e basmak yerine `docs/` veya HayeOS vault dosyalarına yazar; chat'te kısa özet, dosyalar, kararlar, doğrulama durumu ve sıradaki 3 adım kalır. Bu kural 64000 output token hatasına yol açabilecek büyük chat çıktılarının önüne geçer.
+---
 
-Quality Preservation Rule: token discipline must never reduce implementation quality. HayeOS token tasarrufunu uzun chat, tekrar, gereksiz repo taraması ve dev logları azaltarak yapar; gerekli kod okuma, test, validation, security check, error handling ve mimari akıl yürütmeden ödün vermez. Doğruluk hızdan ve token tasarrufundan önce gelir.
+## Installation
 
-Auto Checkpoint Rule: HayeOS uzun veya riskli işlerde `/haye:close` beklemeden `<resolved memoryPath>/05-sessions/latest-checkpoint.md`, `<resolved memoryPath>/04-tasks/active-task.md`, `<resolved memoryPath>/current.md` ve `<resolved memoryPath>/next.md` dosyalarını günceller. Claude Code API 400, output limit veya bağlantı hatasıyla kapanırsa yeni oturumda `/haye:start` latest checkpoint'i okur, kısa recovery özeti verir ve kullanıcı onayı olmadan kodlamaya devam etmez.
-
-Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root. All project memory is stored under the current project's `.hayeos.json` `memoryPath`; HayeOS must not write context packs, checkpoints, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` or `<resolved memoryPath>/changelog.md` into the plugin repository.
-
-## Path Separation Rule
-
-Project source files (code, Dockerfile, docker-compose, docs/, infra/) live under `sourcePath`. Memory files (`<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/02-decisions/`, etc.) live under `memoryPath`. HayeOS must never write project source code into the memory vault. If a target path under `memoryPath` has a code/infra extension (.py, .ts, Dockerfile, docker-compose.yml, package.json, requirements.txt etc.) or a non-memory directory name (services/, apps/, infra/, scripts/), HayeOS halts and warns in Turkish. See `skills/work/SKILL.md` "Path Separation Rule" for the full list.
-
-`/haye:version` shows the HayeOS plugin version from `.claude-plugin/plugin.json`, local repo commit, branch and clean/dirty state.
-
-`/haye:update` updates the installed HayeOS plugin repo from GitHub. It stops when local changes exist, does not commit or push, reports previous/new version and commit, validates the plugin after updating, refreshes only the HayeOS-specific plugin cache when found, and tells the user to run `/reload-plugins`.
-
-Recommended daily flow:
-
-```text
-/haye:start
-/haye:work "Add the package billing screen"
-/haye:secure
-/haye:ship
-/haye:close
-/haye:update
-```
-
-## Internal Skills / Routed Workflows
-
-These are internal skills and routed workflows, not user-facing slash commands. HayeOS invokes them through the daily commands such as `/haye:work`, `/haye:secure`, `/haye:ship`, `/haye:start` and `/haye:close` when needed.
-
-```text
-memory-start
-context-pack
-session-close
-dependency-security
-react-nextjs-security
-cloudflare-doctor
-coolify-doctor
-bugfix
-deploy
-memory-lint
-token-audit
-```
-
-## Install locally
+### Quick start
 
 ```bash
-git clone https://github.com/harunyilmazz10/hayeos.git
-cd hayeos
-claude --plugin-dir .
+git clone https://github.com/harunyilmazz10/HayeOS.git
+cd HayeOS
 ```
 
-## Permanent Install
+In Claude Code:
 
-Use this when you want the Haye commands to appear in normal `claude` sessions without passing `--plugin-dir` every time.
+```bash
+claude --plugin-dir /path/to/HayeOS
+```
 
-```text
+Or via marketplace (Mac/Linux):
+
+```bash
 claude
-/plugin marketplace add <hayeos-plugin-root>
+# inside Claude Code:
+/plugin marketplace add /path/to/HayeOS
 /plugin install haye@haye-marketplace
 ```
 
-After install, new Claude Code sessions should expose:
+### Windows specifics
 
-```text
-/haye:start
-/haye:work
-/haye:fix
-/haye:secure
-/haye:ship
-/haye:close
-/haye:init-memory
-/haye:version
-/haye:update
+If `bash hooks/session-start` fails with "execvpe(/bin/bash) failed", add Git Bash to PowerShell:
+
+```powershell
+Add-Content -Path $PROFILE.CurrentUserAllHosts -Value "Set-Alias -Name bash -Value 'C:\Program Files\Git\bin\bash.exe' -Scope Global"
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 ```
 
-For one-off development testing, keep using:
+Then restart PowerShell.
+
+---
+
+## First session
 
 ```bash
-claude --plugin-dir <hayeos-plugin-root>
+mkdir my-new-project
+cd my-new-project
+claude --plugin-dir /path/to/HayeOS
 ```
 
-## Memory Setup
+In Claude Code:
 
-After Haye is installed permanently, users normally do not need to run `bin/haye` manually. In any project, start with:
-
-```text
+```
 /haye:start
 ```
 
-If the project does not have `.hayeos.json` or an Obsidian vault yet, `/haye:start` asks in Turkish:
+Claude asks "HayeOS hafızası bulunamadı. Şimdi oluşturayım mı?" -> answer "evet".
 
-```text
-Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
+This runs `Skill(haye:init-memory)`, which creates:
+- `.hayeos.json` — project config
+- `my-new-project_obs/` — memory vault with 16 top-level directories (some with subdirectories)
+
+Now describe what you want to build:
+
+```
+Next.js ile premium bir doktor landing page projesi oluşturmak istiyorum. Production-grade, Hero, Services, About, Appointment, Contact.
 ```
 
-`/haye:start` is intentionally light: it does not use subagents, does not enter plan mode, does not scan the whole repository and does not create `.hayeos.json` until you approve. When you approve, Haye creates `.hayeos.json` and the `<project-name>_obs` vault, then performs only the lightweight memory-start read. You can also run the setup directly:
+Claude:
+1. Invokes `Skill(haye:work)` — router skill.
+2. Routes to `Skill(haye:brainstorming)`.
+3. brainstorming asks clarifying questions ONE AT A TIME.
+4. After spec approval, writes spec to `my-new-project_obs/02-decisions/2026-05-14-doctor-landing-spec.md`.
+5. Routes to `Skill(haye:writing-plans)`.
+6. Writes plan to `my-new-project_obs/04-plans/2026-05-14-doctor-landing-plan.md` — bite-sized tasks, exact file paths.
+7. Routes to `Skill(haye:subagent-driven-development)`.
+8. For each task: dispatch implementer -> spec reviewer -> code quality reviewer.
+9. Only after all 3 approve does the task get marked complete.
 
-```text
-/haye:init-memory
+You stay in control: the brainstorming step gates everything. No code gets written before you approve the design.
+
+---
+
+## Memory vault structure
+
+```
+<project>_obs/
+HAYE.md              # vault index, last-touched files, vault health summary
+current.md           # current focus (under 150 lines)
+next.md              # next concrete actions
+changelog.md         # session-by-session log
+health.md            # vault health metadata
+01-prompts/          # original user prompts, preserved verbatim
+02-decisions/        # specs from brainstorming, architectural decisions
+03-bugs/             # open/, solved/, recurring/ subdirectories
+04-plans/            # implementation plans from writing-plans
+04-tasks/            # active-task.md
+05-sessions/         # session checkpoints
+06-prompts/          # crafted reusable prompts
+07-checklists/
+08-raw/              # logs, screenshots, terminal output
+09-context-packs/    # context bundles for handoff
+10-reviews/          # review notes from subagent reviewers
+11-metrics/
+12-risks/
+99-archive/
 ```
 
-By default, HayeOS creates a project-local Obsidian vault named `<project-name>_obs` inside the real project folder. It must not use Claude Code's internal `~/.claude/projects/...` storage as the project root or default vault location. It does not default memory to `~/.claude/projects/.../memory`.
+---
 
-Manual CLI use is only a fallback. On Windows, use one of these instead of trying to run the Python script through bash:
+## Slash commands
 
-```text
-C:\Path\To\HayeOS\bin\haye.cmd init
-powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
+| Command | What it does |
+|---|---|
+| `/haye:start` | Start session, detect or create vault, summarize prior state |
+| `/haye:work` | Route a new request through brainstorming -> writing-plans -> execution |
+| `/haye:close` | End meaningful work block, update changelog/current/next |
+| `/haye:update` | Pull plugin updates from GitHub (`git pull` wrapper) |
+| `/haye:version` | Show plugin version, commit hash, vault path |
+| `/haye:init-memory` | Manually create memory vault (usually `/haye:start` does this) |
+
+---
+
+## Iron Law (non-negotiable)
+
+```
+NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+NO IMPLEMENTATION CODE BEFORE BRAINSTORMING + APPROVED PLAN
+NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST (TDD)
+NO PROJECT SOURCE CODE INSIDE THE MEMORY VAULT
+NO "DEVAM EDELIM" LOOPS — EACH "DEVAM" = ONE MEANINGFUL STEP THEN STOP
 ```
 
-## Project setup
+---
 
-At the root of your project, create or let Haye create `.hayeos.json`:
+## Hooks
 
-```json
-{
-  "project": "sample-project",
-  "memoryPath": "./sample-project_obs",
-  "sourcePath": ".",
-  "defaultWorkflow": "memory-first",
-  "sessionCloseRequired": true
-}
-```
+Four hooks run during sessions:
 
-Then run:
+- **SessionStart** — injects `using-hayeos` skill content into Claude's context. Required for the discipline rules to be visible. On Windows, Git Bash must be accessible (see Installation > Windows specifics).
+- **PreToolUse Bash** — blocks destructive commands like `rm -rf /`, `drop database`, `git push --force` unless explicitly confirmed.
+- **PreToolUse Read** — warns on large file reads.
+- **Stop** — gentle reminder if a meaningful work block ended without `/haye:close`.
 
-```text
-/haye:init-memory
-/haye:start
-```
+---
 
-## Dependency security and safe versions
+## Credits
 
-Haye never blindly uses `latest`. When dependencies are added or changed it checks:
+- **Superpowers process model**: Jesse Vincent (Obra) and contributors. https://github.com/obra/superpowers
+- **HayeOS**: Haye Labs. https://github.com/harunyilmazz10/HayeOS
 
-- `package.json`
-- lockfiles
-- audit output
-- official advisories and changelogs when internet is available
-- embedded Haye security rules
-- Obsidian safe dependency decisions
+Substantial portions of `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `requesting-code-review`, `receiving-code-review`, `using-git-worktrees`, `finishing-a-development-branch`, and `writing-skills` skill content originates from Superpowers, used with attribution and adapted under MIT.
 
-If internet/advisory access is unavailable, Haye must clearly say that live advisory verification was not performed.
+---
 
-### React / Next.js / Cloudflare rule
+## License
 
-For React Server Components, Next.js App Router, middleware/proxy, server actions, image optimization and cache components, Haye uses the internal `react-nextjs-security` skill or routes through `/haye:secure`.
-
-Known embedded baseline from the May 2026 React/Next.js advisory set:
-
-- Avoid React RSC packages `19.0.0-19.0.5`, `19.1.0-19.1.6`, `19.2.0-19.2.5`
-- Prefer patched RSC packages `19.0.6`, `19.1.7`, `19.2.6` or later compatible patch
-- Next.js 15.x baseline: `15.5.16+`
-- Next.js 16.x baseline: `16.2.5+`
-- Cloudflare WAF is defense-in-depth, not a replacement for patching dependencies
-
-## CLI
-
-```bash
-./bin/haye --help
-./bin/haye init
-./bin/haye find-vault
-./bin/haye health
-./bin/haye lint
-./bin/haye react-nextjs-audit
-./bin/haye deps-audit
-```
-
-## Haye vs normal CLAUDE.md
-
-`CLAUDE.md` gives instructions. Haye adds a full operating model: Obsidian memory, context packs, session handoff, CLI checks, security workflows and project recipes.
-
-## Haye vs Superpowers
-
-Superpowers focuses on software engineering discipline. Haye focuses on project memory, token economy, dependency/security policy, Haye-specific ops and long-running project continuity. They can be used together: start with Haye memory, use engineering workflows when needed, close with Haye memory updates.
+MIT

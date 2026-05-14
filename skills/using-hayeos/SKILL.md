@@ -3,8 +3,6 @@ name: using-hayeos
 description: Use when starting any conversation - establishes how to find and use HayeOS skills, requiring Skill tool invocation before ANY response including clarifying questions
 ---
 
-# Using HayeOS
-
 <SUBAGENT-STOP>
 If you were dispatched as a subagent to execute a specific task, skip this skill.
 </SUBAGENT-STOP>
@@ -17,192 +15,172 @@ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 This is not negotiable. This is not optional. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
-HayeOS is a memory-first workflow plugin. Every meaningful unit of work flows through: brainstorming/planning -> bite-sized task list -> execution with verification -> checkpoint to vault -> close session.
+# Using HayeOS
+
+HayeOS is a memory-first, discipline-first workflow plugin built on the Superpowers process model.
+
+Every meaningful unit of work flows through:
+
+1. **brainstorming** — idea -> design spec (with user approval gate)
+2. **writing-plans** — spec -> bite-sized implementation plan
+3. **subagent-driven-development** OR **executing-plans** — task-by-task execution with review checkpoints
+4. **test-driven-development** — every task: failing test first, minimal code, refactor
+5. **verification-before-completion** — every claim of completion requires evidence
+6. **checkpoint** + **close** — HayeOS-specific memory vault updates
 
 ## Instruction Priority
 
 HayeOS skills override default behavior, but **user instructions always take precedence**:
 
-1. **User's explicit instructions** (CLAUDE.md, AGENTS.md, direct messages) - highest priority
-2. **HayeOS skills** - override default behavior where they conflict
-3. **Default behavior** - lowest priority
+1. **User's explicit instructions** (CLAUDE.md, AGENTS.md, direct messages) — highest priority
+2. **HayeOS skills** — override default behavior where they conflict
+3. **Default behavior** — lowest priority
+
+## How to Access Skills
+
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded — follow it directly. Never use the Read tool on skill files.
+
+**Plugin-namespaced form:** `haye:<skill-name>` (e.g., `haye:brainstorming`, `haye:writing-plans`).
 
 ## The Rule
 
 **Invoke relevant HayeOS skills BEFORE any response or action.** Even a 1% chance a skill might apply means invoke it. If invoked skill turns out wrong for the situation, you don't need to follow it.
 
-## Red Flags - These thoughts mean STOP, you're rationalizing
+## Red Flags — These thoughts mean STOP, you're rationalizing
 
 | Thought | Reality |
 |---------|---------|
 | "This is just a simple question" | Questions are tasks. Check for skills. |
 | "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | The work or feature skill tells you HOW to explore. Check first. |
-| "I'll just write the code, it's quick" | The work skill exists for a reason. Use it. |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
+| "I'll just write the code, it's quick" | brainstorming + writing-plans exist for a reason. Use them. |
 | "User said 'devam edelim', I should keep going" | "Devam" is not a license to skip the skill check. |
-| "This task is too small for Team Mode" | Team Mode triggers are written in the work skill. Read them, don't guess. |
-| "I'll just write a stub plan now and detail it later" | Stub plans are explicitly banned. |
-| "Verification is overhead, I can see it works" | If you didn't run the command in this turn, you cannot claim it passes. |
-| "Vault setup is for next time" | Auto Checkpoint Rule applies from the first file. |
-| "Output Budget said be concise, so I'll skip the plan" | Concise chat, but artifacts go to files. Plan is required. |
+| "This task is too small to need a plan" | brainstorming HARD-GATE applies to EVERY project. |
+| "I'll write a stub plan and detail it later" | Stub plans are explicitly banned in writing-plans. |
+| "Verification is overhead, I can see it works" | verification-before-completion is the Iron Law. |
 | "User just wants the code, not the process" | If they wanted a one-shot LLM they wouldn't have installed HayeOS. |
+| "I know what that skill says, no need to invoke" | Knowing the concept does not equal following the discipline. Invoke it. |
 
 ## Skill Priority (when multiple could apply)
 
-1. **Process skills first** - brainstorming, work routing, fix routing - these determine HOW
-2. **Domain skills second** - nextjs-doctor, prisma-doctor, etc. - these guide WHAT
+1. **Process skills first** — brainstorming, writing-plans, systematic-debugging — these determine HOW
+2. **HayeOS-specific skills second** — work, start, checkpoint, close — these handle memory and routing
+3. **TDD always applies** — test-driven-development is invoked alongside, not in sequence
 
-"Let's build X" -> brainstorming/work first, then domain skills.
-"Fix this bug" -> fix/systematic-debugging first, then domain skills.
-
-## Team Mode perspectives are inline
-
-Workflow and domain guidance come from skills.
-Specialist role execution for Team Mode is embedded inside `skills/team-mode/SKILL.md`.
-
-If Team Mode needs `project-manager`, `security-reviewer`, `token-economist`, or any other specialist role, load `Skill(haye:team-mode)` and walk the embedded perspectives inline. Do not call `Skill(haye:<role-name>)` and do not attempt Task-tool subagent dispatch.
+"Let's build X" -> brainstorming -> writing-plans -> subagent-driven-development.
+"Fix this bug" -> systematic-debugging -> test-driven-development.
+"Plan looks done, run it" -> subagent-driven-development OR executing-plans.
 
 ## Mandatory Invocation Triggers
 
 Without any user prompting, you MUST invoke:
 
-- **work skill** - when user describes a feature, system, or non-trivial change to implement
-- **fix skill** - when user describes a bug, error, or failure
-- **secure skill** - when user mentions security, auth, secrets, exposure, or hardening
-- **ship skill** - when user mentions deploy, release, production, or rollout
-- **close skill** - at the end of a meaningful work block, before user runs `/haye:close`
-- **checkpoint skill** - after 5 file modifications or before any risky operation
-- **verification-before-completion mindset** - before any "done", "complete", "works", "passes" claim
-- **team-mode skill** - when work skill recommends Full Architecture Mode or Team Mode AND user accepts. NEVER skip this in favor of writing a plan inline.
-- **init-memory skill** - when /haye:start has been answered "yes" for memory creation. NEVER use Write tool to create .hayeos.json or vault files directly; the init-memory skill is the only authorized path.
+- **brainstorming skill** — when user describes ANY new feature, system, or non-trivial change
+- **writing-plans skill** — when brainstorming reaches an approved spec
+- **subagent-driven-development skill** — when a plan is ready and tasks are mostly independent
+- **executing-plans skill** — when plan is ready but subagent dispatch isn't ideal
+- **dispatching-parallel-agents skill** — when facing 2+ independent failures/tasks that can be investigated concurrently
+- **test-driven-development skill** — when implementing any feature or bugfix, before writing implementation code
+- **verification-before-completion skill** — before ANY "done", "complete", "works", "passes", "başarıyla" claim
+- **systematic-debugging skill** — when user describes a bug, error, or failure
+- **requesting-code-review skill** — after each task in subagent-driven-development, before merge, on completion
+- **receiving-code-review skill** — when user gives you code review feedback (don't blindly agree, verify technically)
+- **using-git-worktrees skill** — when starting feature work that needs workspace isolation
+- **finishing-a-development-branch skill** — when implementation is complete, before merge/PR
+- **writing-skills skill** — when creating new HayeOS skills or editing existing ones
+- **checkpoint skill** — after 5 file modifications or before any risky operation (HayeOS-specific)
+- **close skill** — at the end of a meaningful work block (HayeOS-specific)
+- **init-memory skill** — when /haye:start has been answered "yes" for memory creation
 
-If you find yourself typing one of these claim words and you haven't verified, STOP. Run the verification. Read the output. Then claim.
+## Skill Types
 
-## Verification Template Trap
+**Rigid** (TDD, verification-before-completion, systematic-debugging): Follow exactly. Don't adapt away discipline.
 
-If you find yourself ABOUT to write a verification block that looks like:
+**Flexible** (brainstorming, writing-plans patterns): Adapt principles to context.
 
-- build: pass
-- tests: pass
-- typecheck: pass
-- lint: pass
-- manual smoke: pass
+The skill itself tells you which.
 
-STOP. This is the placeholder template, not a real verification report. You have not run those commands. Writing "pass" without running the command is the most common lie Claude tells. If the command has not been run in this turn, write "not yet verified" - never "pass".
+## HayeOS-Specific Rules
 
-Real verification format:
+### Path Separation Rule
 
-- [ ] `npm run build`
-  - Exit code: 0
-  - Output (last 5 lines): ...
-  - Result: pass
+Project source code goes to `sourcePath` (proje kökü).
+Memory and planning artifacts go to `memoryPath` (vault, `<project>_obs/`).
 
-If you don't have an exit code and an output snippet, you don't have verification.
-
-## Init Memory Trap
-
-If `/haye:start` asked "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?" and the user said yes, your NEXT tool call MUST be `Skill(haye:init-memory)`. Not Write. Not Bash. Not anything else.
-
-If you find yourself reaching for the Write tool to create `.hayeos.json` or `<project>_obs/<file>.md` - STOP. That is forbidden. Call the skill.
-
-## Mode Selection Trap
-
-If `/haye:work` offered the user a choice between Full Architecture Mode, Team Mode, Plan First, Standard Single Agent, or Fast Single Agent, and the user picked one - your NEXT tool call depends on the choice. See `skills/work/SKILL.md` "Mandatory routing after mode selection" table. The most common error is dropping into `Skill(haye:feature)` because it has imperative description language. `feature` is for ONE small slice - NOT for routing out of mode selection.
-
-## Stub Plan Trap
-
-If you find yourself about to write a plan section like:
-
-```markdown
-## 3. Role Findings
-Belirlenen uzman rolleriyle yapılandırmalar ve görevler detaylandırılacak.
-
-## 4. Birleştirilmiş Uygulama Planı
-Uygulama planı burada oluşturulacak.
-
-## 6. Doğrulama Planı
-Her bir aşama tamamlandıkça doğrulama testleri yapılacak.
-```
-
-STOP. These are stub-plan phrases. Specifically banned in this skill:
-
-- "Uygulama planı burada oluşturulacak"
-- "burada belirtilecek"
-- "ileride detaylandırılacak"
-- "aşağıda detaylı olarak verilecek"
-- "X yapılandırılacaktır"
-- "(Devamı ... detaylı olarak belirtilmeli)"
-- "Plan implementation will be defined"
-- "TBD" / "TBA" / "..." as a section body
-
-A plan section must contain ACTUAL content (file names, decisions, risks, commands, exit criteria) or it must not be claimed complete.
-
-If you cannot fill a section with real content right now, mark it `[ ] (pending - needs <X>)` and do not check it off.
-
-### Test7 evidence
-
-Sonnet produced exactly this stub plan in test7:
-> "3. Rol Buluntuları: Belirlenen uzman rolleriyle yapılandırmalar ve görevler detaylandırılacak."
-> "4. Birleştirilmiş Uygulama Planı: Uygulama planı burada oluşturulacak."
-
-This is the canonical Plan Depth Rule violation. Add this section's banned phrases to your active filter.
-
-## Gate Function — Mandatory pre-claim check
-
-Before typing any of these words in your response, run the gate function in your head:
-
-- "başarıyla" / "successfully"
-- "tamamlandı" / "completed" / "done"
-- "oluşturuldu" / "created"
-- "ready" / "production-ready"
-- "passes" / "works"
-
-### Gate steps
-
-1. **Was there a Bash() / tool call in your last 5 actions whose output contained "Invalid", "Error", "Failed", "Exit code: 1", "exit code 1"?**
-   - YES -> DO NOT claim success. Report the failure honestly. Write "şu hata alındı: ...".
-   - NO -> continue to step 2.
-
-2. **Was there a verification command (build/test/lint/typecheck) confirming the claim?**
-   - YES with exit code 0 -> success is justified.
-   - NO -> DO NOT claim success. Write "henüz doğrulanmadı".
-
-3. **Is the claim about something that NEEDS verification (functionality, build, tests, deploy)?**
-   - YES + no verification -> DO NOT claim. Run the verification first.
-   - NO (e.g. file written, vault initialized) -> success acceptable if the tool call succeeded.
-
-### Gate violations are lying
-
-Saying "başarıyla oluşturuldu" right after 10 "Invalid tool parameters" errors is lying.
-Saying "tamamlandı" without an npm run build exit code is lying.
-The Iron Law's first line - "NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE" - is gate-enforced, not just a guideline.
-
-### Test8 evidence
-
-In test8, after 10 consecutive `Task()` calls returning "Invalid tool parameters", Sonnet wrote:
-> "Tim modu kapsamında aşağıdaki görevler başarıyla oluşturuldu: Görev 1: Landing Page Scope and Phase..."
-
-No görev was actually created. Every Task() call failed. The "başarıyla" word was a direct Iron Law violation. The Gate Function exists to catch this pattern before the words leave the response.
-
-## When the Path Separation Rule Applies
-
-Project source code goes to `sourcePath` (proje kökü). Memory goes to `memoryPath` (vault). The work skill has the full rule. Before writing ANY file path, ask: "Is this code/infra/docs, or is this memory?" If it's code and the path goes under `<memoryPath>/`, STOP and warn in Turkish.
+Before writing ANY file path, ask: "Is this code/infra, or is this memory/planning?"
+- Source code under `<memoryPath>/` -> STOP and warn in Turkish.
+- Plans (`writing-plans` output) go to `<memoryPath>/04-plans/`.
+- Specs (`brainstorming` output) go to `<memoryPath>/02-decisions/`.
 
 This is non-negotiable. Vault pollution was the #1 failure mode in v1.0.0.
 
-## User Response Language Rule
+### User Response Language Rule (Turkish)
 
 - If user writes Turkish, respond in Turkish.
 - Code, file paths, package names, technical identifiers stay in English.
+- Skill content (which is English) is followed AS-IS — translate only your reply to the user.
 - Don't switch to English unless user explicitly asks for English.
+
+### Devam Loop Rule
+
+When user says "devam", "continue", "ilerle", you do ONE meaningful step, then STOP and present results. Never chain multiple steps just because the user said "continue."
+
+### Output Budget Rule
+
+- Chat output is conversational. Plans, specs, large artifacts go to files in `<memoryPath>/`.
+- Don't paste long logs in chat; use `head`/`grep`/save to `08-raw/`.
+- Don't re-read the same file multiple times per session.
 
 ## The Iron Law
 
 ```text
 NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
-NO PLAN ARTIFACT UNDER 20 LINES OR WITH PLACEHOLDER PROSE
+NO IMPLEMENTATION CODE BEFORE BRAINSTORMING + APPROVED PLAN
+NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST (TDD)
 NO PROJECT SOURCE CODE INSIDE THE MEMORY VAULT
-NO "DEVAM EDELIM" LOOPS - EACH "DEVAM" = ONE MEANINGFUL STEP THEN STOP
+NO "DEVAM EDELIM" LOOPS — EACH "DEVAM" = ONE MEANINGFUL STEP THEN STOP
 ```
 
 Violating the letter of any rule above is violating the spirit. Don't rephrase your way out.
+
+## Why Subagents Matter
+
+HayeOS v3 builds on `subagent-driven-development` because Sonnet's tendency to claim "başarıyla tamamlandı" without verification is structurally prevented by:
+
+- **Implementer** subagent does the task (fresh context, focused only on this task)
+- **Spec reviewer** subagent confirms code matches plan
+- **Code quality reviewer** subagent confirms quality
+- All three must approve before the task is marked complete
+
+This is mechanical discipline. The orchestrating Sonnet cannot single-handedly declare success — three separate dispatches must agree.
+
+For projects where subagents aren't ideal, `executing-plans` is the fallback with manual review checkpoints.
+
+## Memory Vault Layout
+
+Every HayeOS project has a memory vault at `<project>_obs/` (sibling of project root):
+
+```
+<project>_obs/
+HAYE.md              # vault index
+current.md           # current focus
+next.md              # next actions
+changelog.md         # session-by-session log
+health.md            # vault health metadata
+01-prompts/          # original user prompts preserved
+02-decisions/        # specs from brainstorming, architectural decisions
+03-bugs/             # open/, solved/, recurring/
+04-plans/            # plans from writing-plans
+04-tasks/            # active-task.md
+05-sessions/         # session checkpoints
+06-prompts/          # crafted prompts for reuse
+07-checklists/
+08-raw/              # logs, screenshots, terminal output
+09-context-packs/    # context bundles for handoff
+10-reviews/          # review notes from reviewer subagents
+11-metrics/
+12-risks/
+99-archive/
+```
+
+This vault is created by `Skill(haye:init-memory)`. Never create vault files manually via Write tool.

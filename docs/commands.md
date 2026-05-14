@@ -1,381 +1,103 @@
 # Commands
 
-# Simple Daily Commands
+HayeOS v3.0.0 has six slash commands. They are user-facing entry points; process discipline lives in skills.
 
-The simple command layer stays user-facing and routes to advanced skills instead of replacing them.
-
-```text
+```
 /haye:start
 /haye:work
-/haye:fix
-/haye:secure
-/haye:ship
 /haye:close
-/haye:version
 /haye:update
+/haye:version
+/haye:init-memory
 ```
 
-Internal routing:
+## Command to skill routing
 
-- `/haye:start` -> `start`, `memory-start`
-- `/haye:init-memory` -> `init-memory`
-- `/haye:work` -> `work`, `context-pack`, `feature`, `refactor`, `api-integration`, `migration`, `test-plan`, internal `team-mode`
-- `/haye:fix` -> `fix`, `bugfix`, `nextjs-doctor`, `prisma-doctor`, `docker-doctor`, `coolify-doctor`, `cloudflare-doctor`, `database-doctor`
-- `/haye:secure` -> `secure`, `security`, `dependency-security`, `dependency-audit`, `version-policy`, `react-nextjs-security`, `secrets-audit`, `auth-audit`, `exposed-port-audit`
-- `/haye:ship` -> `ship`, `deploy`, `review`, `security`, `dependency-security`, `cloudflare-doctor`, `coolify-doctor`, `docker-doctor`
-- `/haye:close` -> `close`, `session-close`, `memory-lint`, `token-audit`
-- `/haye:version` -> local CLI/version inspection
-- `/haye:update` -> `update`
+| Command | Primary skill | Chains to |
+|---|---|---|
+| `/haye:start` | `haye:start` | `haye:init-memory` if vault is missing and user approves |
+| `/haye:work` | `haye:work` (router) | `haye:brainstorming` for new work; `haye:systematic-debugging` for bugs; `haye:finishing-a-development-branch` on completion |
+| `/haye:close` | `haye:close` | none (terminal step) |
+| `/haye:update` | `haye:update` | runs `git pull` for plugin repo |
+| `/haye:version` | none (CLI direct) | runs `bin/haye version` |
+| `/haye:init-memory` | `haye:init-memory` | manual fallback when `/haye:start` chain doesn't fit |
 
-# /haye:version
+## Removed in v3.0.0
 
-HayeOS local/plugin sürümünü hızlı gösterir.
+These commands existed in v2.x and earlier and are intentionally removed:
 
-Beklenen bilgiler:
-- HayeOS version from `.claude-plugin/plugin.json`
-- local repo commit
-- branch
-- working tree clean/dirty
-- plugin cache durumu doğrulanabiliyorsa kısa not
+| Removed | Reason |
+|---|---|
+| `/haye:fix` | Now: `/haye:work` routes to `Skill(haye:systematic-debugging)` for bugs |
+| `/haye:secure` | Generic security guidance belongs in CLAUDE.md or `haye-extras` plugin |
+| `/haye:ship` | Now: `/haye:work` chain ends in `Skill(haye:finishing-a-development-branch)` |
+| `/haye:bugfix` | Same as `/haye:fix` removal |
+| `/haye:deploy` | Same as `/haye:ship` removal |
 
-Örnek:
+The Superpowers process model means there is one entry point (`/haye:work`) and the chain picks the right discipline skill automatically.
 
-```text
-HayeOS v2.0.1
-Local repo commit: <short-sha>
+## /haye:version
+
+`/haye:version` runs `bin/haye version` and shows:
+
+```
+HayeOS version: 3.0.0
+Git commit: <hash>
 Branch: main
-Working tree: clean
-Plugin cache: not checked
+Working tree: clean | modified
+Repository path: <plugin root>
 ```
 
-# /haye:update
+## /haye:update
 
-HayeOS plugin'ini GitHub'dan günceller. Plugin root'u `CLAUDE_PLUGIN_ROOT`, marketplace install path veya mevcut plugin path bilgisinden bulur.
+Safe `git pull` from GitHub for the plugin repository. It checks:
 
-Davranış:
-- Güncellemeden önce previous version ve old commit raporlanır.
-- `.git` yoksa durur ve yeniden clone gerektiğini Türkçe açıklar.
-- `origin` URL beklenen repo değilse kullanıcıya gösterir ve onay almadan değiştirmez.
-- Local değişiklik varsa durur; otomatik pull yapmaz ve değişiklikleri göstermeyi teklif eder.
-- Plugin root bulunamazsa durur; `git init`, placeholder remote veya kullanıcı/proje klasöründe yeni git repo oluşturma davranışı yoktur.
-- Temiz repo'da `git fetch origin` ve `git pull --ff-only origin main` çalıştırır.
-- Güncelleme sonrası new version, new commit ve "already current / changed" durumu raporlanır.
-- Güncelleme sonrası `claude plugin validate .`, varsa `./scripts/verify.sh`, mümkünse `bin/haye --help` ve `bin/haye version` çalıştırır.
-- HayeOS-specific plugin cache path varsa yalnızca `haye-marketplace/haye` cache subtree'si temizlenir; tüm Claude cache'i silinmez.
-- Cache bulunamazsa bunu açıkça raporlar.
-- Sonunda Claude Code'un yeni plugin içeriğini yüklemesi için `/reload-plugins` çalıştırmasını söyler.
-- Commit/push yapmaz, project vault dosyalarına dokunmaz, context pack veya checkpoint üretmez.
+1. Plugin root has `.git` directory
+2. Working tree is clean (no local changes)
+3. Origin URL matches expected GitHub URL
+4. Branch is `main`
 
-# /haye:work Smart Modes
+If all clear, runs `git fetch origin && git pull --ff-only origin main`. Otherwise reports the issue in Turkish and asks how to proceed.
 
-`/haye:work "görev"` Smart Work Router olarak çalışır. Kullanıcıdan sürekli başka komut kullanmasını istemez; bug ise fix workflow, security ise secure workflow, deploy/release ise ship workflow mantığını içeride uygular.
+After update, recommends `/reload-plugins` (or restart Claude Code) so the new skill content takes effect.
 
-Classification fields:
-- `task_size`: `small`, `medium`, `large`, `massive`
-- `task_type`: `quick fix`, `feature`, `refactor`, `architecture`, `full system`, `security`, `deployment`, `debugging`, `research/planning`
-- `risk_level`: `low`, `medium`, `high`
-- `affected_layers`: frontend, backend, database, infra, AI pipeline, security, deployment, docs, tests
-- `recommended_mode`: Fast Single Agent, Standard Single Agent, Plan First, Team Mode, Full Architecture Mode
+## /haye:start
 
-# Work Strategy Selection Rule
+Lightweight session start:
 
-`/haye:work` büyük, belirsiz veya riskli işlerde çalışma stratejisini kendisi sessizce seçmez. Önce sınıflandırma yapar, önerilen modu açıklar ve Türkçe sorar:
+1. Detect `.hayeos.json` in cwd
+2. If present: read `memoryPath` from it; read `HAYE.md`, `current.md`, `next.md`, `04-tasks/active-task.md`, latest session checkpoint
+3. If absent: ask "HayeOS hafızası bulunamadı. Şimdi oluşturayım mı?" and route to `Skill(haye:init-memory)` on "evet"
 
-```text
-Bu iş [task_size] ve [risk_level] görünüyor. Önerim: [recommended_mode].
-Nasıl ilerleyeyim?
+Reports a one-line summary in Turkish.
 
-1. Önerilen modla devam et
-2. Sadece plan çıkar
-3. Tek agent ile hızlı ilerle
-4. Daha küçük bir MVP'ye indir
-```
+## /haye:work
 
-Modes:
-1. Fast Single Agent / Fast Mode: small + low risk. Gereksiz subagent yok, kısa özetle uygular.
-2. Standard Single Agent / Standard Mode: medium. Kısa plan + implementation + verification.
-3. Plan First: önce plan çıkarır, kod yazmaz, implementation için onay bekler.
-4. Team Mode: large/high-risk. Uzman perspektifleri kısa tutar; `token-economist` her zaman dahil edilir.
-5. Full Architecture Mode: massive/production-grade/multi-service. Önce docs/plan üretir, kodlamadan önce onay ister.
+Router skill. Reads user's request shape and routes:
 
-Kullanıcı modu açıkça belirtmişse tekrar sormaz; seçilen modu kısa teyit eder.
+| User's request shape | Routes to |
+|---|---|
+| New feature/system/non-trivial change | `Skill(haye:brainstorming)` |
+| Approved spec, asking for plan | `Skill(haye:writing-plans)` |
+| Ready plan, asking for execution | `Skill(haye:subagent-driven-development)` (preferred) or `Skill(haye:executing-plans)` |
+| Bug report / error / "X doesn't work" | `Skill(haye:systematic-debugging)` |
+| Implementation done, asking about merge | `Skill(haye:finishing-a-development-branch)` |
 
-# Massive Task Classification Rule
+`work` does not produce a task classification block or pick a mode. v2.x's "Full Architecture Mode / Team Mode / Plan First / Standard / Fast" choice is removed because the Superpowers chain handles complexity automatically through brainstorming.
 
-Şu sinyaller varsa iş `massive` kabul edilir: `production-grade`, `complete system`, `autonomous`, `multi-service`, `microservices`, `24/7`, `scale horizontally`, `Kubernetes`, `monitoring`, `analytics`, `AI pipeline`, `full architecture`, `from scratch`, çok sayıda servis listesi, Phase 0/1/2 roadmap, veya backend + frontend + infra + AI + monitoring birlikte istenmesi.
+## /haye:close
 
-Massive ise `recommended_mode = Full Architecture Mode`, Team Mode internally enabled, `token-economist`, `security-reviewer`, `deployment-doctor` zorunlu; DB varsa `database-architect` zorunlu. Kodlamadan önce plan onayı gerekir.
+End of meaningful work block. Updates:
+- `<memoryPath>/changelog.md` — what changed this session
+- `<memoryPath>/current.md` — new focus or "Empty"
+- `<memoryPath>/next.md` — next concrete actions
+- `<memoryPath>/05-sessions/latest-checkpoint.md` — full state snapshot
 
-# Team Mode Offer Rule
+## /haye:init-memory
 
-Massive veya high-risk işlerde ilk cevap sınıflandırma + kısa Team Mode planı verir ve Türkçe sorar: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?" Uzman katkıları 3-7 maddeyle sınırlıdır ve detaylar dosyalara yazılır.
+Manual vault creation. Normally not invoked directly - `/haye:start` chains to it when the user confirms. Available for cases where the `start` flow doesn't fit (e.g., re-initializing a vault).
 
-## Team Mode Specialist Perspectives
-
-- Skills orchestrate workflow: `haye:work`, `haye:team-mode`, `haye:checkpoint`.
-- Team Mode specialist reviews are embedded inline inside `skills/team-mode/SKILL.md`.
-- Mandatory perspectives: Project Manager, Memory Architect, Security Reviewer, Release Manager, Token Economist.
-- Conditional perspectives: Database Architect, API Integrator, Deployment Doctor, UI Polisher and Bug Investigator when relevant.
-- Team Mode must not call plugin agents or subagents; it walks the perspectives in the main conversation and writes concise findings.
-
-# Full Architecture Mode Gate
-
-Massive projelerde implementation öncesi plan artifact'leri dosyalara yazılır: Project Understanding, Architecture Overview, Service Map, Data Flow, Event Flow, Database Plan, Queue Plan, Storage Plan, AI Pipeline Plan, Monitoring Plan, Security Plan, Deployment Plan, HayeOS Memory Usage Plan, Phased Implementation Roadmap ve First Implementation Plan. Tercih edilen dosyalar `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md`, `docs/database.md`, `docs/deployment.md`, `docs/security.md`, `docs/monitoring.md`, `docs/operations.md`, `docs/ai-pipeline.md`, `docs/queues.md`, `docs/storage.md`. Kodlamaya başlamadan önce onay gerekir.
-
-## Behavior Examples
-
-Örnek 1 - küçük iş:
-- User: `/haye:work "README'de typo düzelt"`
-- Expected: Fast Single Agent. Sormadan düzeltir, kısa özet verir.
-
-Örnek 2 - orta iş:
-- User: `/haye:work "Yeni API endpoint ekle"`
-- Expected: Standard Single Agent. Kısa plan + implementation. Risk yoksa sürekli sormaz.
-
-Örnek 3 - büyük iş:
-- User: `/haye:work "Production-grade microservices AI media system build"`
-- Expected: "Bu iş massive/high-risk görünüyor. Önerim Full Architecture Mode + Team Mode. Onaylıyor musunuz?"
-
-Örnek 4 - kullanıcı modu belirtmiş:
-- User: `/haye:work "Full Architecture Mode kullan..."`
-- Expected: Tekrar strateji sormadan Full Architecture Mode ile plan üretir, kodlamadan önce onay ister.
-
-# Approval Friction Rule
-
-HayeOS minimizes approval friction. It asks for approval at phase boundaries and risk gates, not after every small edit.
-
-Plan veya phase onaylandıysa küçük ve güvenli işleri tekrar tekrar sormadan tamamlar:
-- klasör oluşturma
-- stub dosya ekleme
-- docs/README güncelleme
-- basit config ekleme
-- service/route/test placeholder oluşturma
-- internal refactor
-- HayeOS memory'ye kısa not yazma
-
-Strategy approval = phase içindeki güvenli küçük işleri yapma iznidir. Risk gate ve phase sonunda tekrar sorulur.
-
-# No Placeholder Production Rule
-
-Production-grade veya Full Architecture Mode işlerde Hello world / Merhaba dünya, `myapp:latest`, `your-*-image`, `placeholder-image`, Docker Compose top-level `version`, `python:3.8`, executable commands içinde `./path/to/...` veya `/path/to/...`, yalnızca `assert True` testleri veya 2-line docs ile production foundation tamamlandı denmez. Skeleton yazıldıysa açıkça skeleton olduğu ve production-ready olmadığı belirtilir.
-
-# Foundation Quality Gate
-
-Production foundation iddiası için gerçek yapı, anlamlı test, dependency/security değerlendirmesi, verification status ve next/rollback steps gerekir. Bu gate geçmeden "Aşama tamamlandı", "production-ready", "temel işlevsellik sağlandı", "hazır" veya "başarıyla çalışıyor" denmez.
-
-# Dependency / Base Image Safety Rule
-
-Docker image'larında latest tag kullanma. `myapp:latest`, `image: latest`, Docker Compose top-level `version`, eski/EOL `python:3.8` ve kör dependency install yasaktır. Modern desteklenen explicit version tag kullan; Python için uyumluysa `python:3.12-slim` gibi güncel slim base tercih et ve kararı dependency/security notes içine yaz.
-
-Dependency install/update/remove risk gate'tir. `pip install`, `python -m pip install`, `py -m pip install`, `npm install`, `pnpm add`, `yarn add`, `docker pull` veya unknown image pull eden Docker komutlarından önce onay al. `docker compose up` öncesi fake image, build context, Dockerfile, obsolete top-level `version` ve `latest` tag kontrolü yap.
-
-# No Fake Completion Rule
-
-HayeOS doğrulama çıktısı olmadan "çalışıyor", "tamamlandı", "geçti", "production-ready" veya "başarılı" demez.
-
-Phase sonunda Verification Status verir:
-- commands run
-- passed
-- failed
-- not run
-- reason if not run
-
-# Output Budget Rule
-
-Chat cevabı kısa tutulur. Varsayılan cevap 1500-3000 token civarında olur; büyük işler için 5000-6000 tokenı geçmemeye çalışır.
-
-Amaç, 64000 output token limitine takılabilecek büyük cevapları önlemektir.
-
-Uzun içerikler chat'e değil dosyalara yazılır:
-- büyük mimari
-- roadmap
-- servis planı
-- DB planı
-- event schema
-- queue schema
-- deployment planı
-- uzun Team Mode role çıktıları
-- uzun session close logları
-
-Detaylar için `docs/` veya HayeOS vault dosyaları kullanılır. Full Architecture Mode detayları örneğin `docs/architecture.md`, `docs/roadmap.md`, `docs/services.md`, `docs/events.md` gibi dosyalara yazılır.
-
-Chat'te sadece kısa özet, değişen/oluşan dosyalar, önemli kararlar, doğrulama durumu, sıradaki 3 adım ve gerekiyorsa onay sorusu verilir. If output would become long, prefer writing the detailed content to `docs/` or the HayeOS vault and provide a concise chat summary. Ask for continuation only if the user explicitly requested a long multi-part chat response.
-
-# Quality Preservation Rule
-
-Token discipline must never reduce implementation quality.
-
-HayeOS token tasarrufu için şunları azaltır:
-- verbose chat output
-- repeated explanations
-- unnecessary repo scans
-- huge pasted logs
-- oversized reports
-
-HayeOS token tasarrufu için şunları atlamaz:
-- gerekli code reading
-- tests
-- validation
-- security checks
-- error handling
-- architecture reasoning
-
-Detailed technical artifacts gerektiğinde dosyalara yazılır. Chat concise kalır, ama code ve project files complete, maintainable, secure ve production-quality kalmalıdır. Token saving ile correctness çakışırsa correctness kazanır. Speed ile safety çakışırsa safety kazanır.
-
-# Auto Checkpoint Rule
-
-HayeOS `/haye:work`, `/haye:fix`, `/haye:ship` ve büyük işlemler sırasında `/haye:close` beklemeden checkpoint yazar.
-
-Checkpoint dosyaları:
-- `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
-- `<resolved memoryPath>/04-tasks/active-task.md`
-- `<resolved memoryPath>/current.md`
-- `<resolved memoryPath>/next.md`
-
-Checkpoint phase başında/sonunda, 5+ dosya değiştiğinde, dependency/security/deploy işleminden önce, docker/build/test/lint/typecheck öncesi/sonrası, hata alındığında, büyük kod üretimi bittiğinde, output çok uzayacaksa ve riskli işlemden önce yazılır.
-
-Chat'e uzun checkpoint basılmaz; sadece `Checkpoint güncellendi: <resolved memoryPath>/05-sessions/latest-checkpoint.md` denir.
-
-# Original Prompt Preservation Rule
-
-Large, massive, architecture and full-system `/haye:work` isteklerinde HayeOS kullanıcının orijinal promptunu aynen saklar.
-
-- Hedef klasör: `<resolved memoryPath>/01-prompts/`
-- İlk büyük master prompt: `<resolved memoryPath>/01-prompts/initial-master-prompt.md`
-- Sonraki work promptları: `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md`
-- Dosya içeriği: timestamp, task classification summary, original prompt verbatim ve optional short normalized brief.
-- Orijinal prompt özetlenmez, çevrilmez veya düzeltilmez; verbatim bölümünde aynen korunur.
-- Küçük tek satırlık bugfix görevlerinde zorunlu değildir.
-- Prompt kayıtları plugin root'a veya project root'a yazılmaz.
-
-# Safe Resume Rule
-
-`/haye:start` `.hayeos.json` dosyasını okur, vault path'ini bulur ve `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, varsa `<resolved memoryPath>/04-tasks/active-task.md` ve varsa `<resolved memoryPath>/05-sessions/latest-checkpoint.md` dosyalarını okur.
-
-Checkpoint varsa kısa recovery özeti verir ve otomatik kodlamaya başlamaz. Türkçe onay ister:
-
-```text
-Son checkpoint'e göre kaldığımız yeri buldum. Devam edeyim mi?
-```
-
-# What happens if Claude Code crashes?
-
-`/haye:close` çalıştırılamadan oturum giderse sorun değil. Yeni oturumda `/haye:start` checkpoint'i okur, kısa recovery özeti verir ve kullanıcı "evet", "devam et" veya "kaldığın yerden devam" demeden implementation'a devam etmez.
-
-# How /haye:start resumes safely
-
-Recovery summary kısa tutulur: current task, current phase, last successful step, changed files, current blocker, next 3 actions ve recommended next mode.
-
-# How /haye:close finalizes checkpoint
-
-`/haye:close` `latest-checkpoint.md` dosyasını okur, session summary'ye taşır, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/health.md` ve `<resolved memoryPath>/04-tasks/active-task.md` dosyalarını günceller. Checkpoint silinmez; `closed` olarak işaretlenir veya son kapanış durumu yazılır.
-
-# When HayeOS asks for approval
-
-- destructive işlem
-- database migration veya data loss riski
-- dependency install/update/remove
-- security/auth/payment/permission değişikliği
-- deploy veya production config değişikliği
-- secret/env işlemleri
-- büyük mimari yön değişikliği
-- scope dışına çıkma
-- paid API, GPU, cloud resource, canlı webhook, gerçek upload/publish
-- kullanıcı açıkça "önce sor" dediyse
-
-# When HayeOS continues automatically
-
-Onaylı phase içindeki küçük ve güvenli işler için "Devam ediyorum: sıradaki adım ..." diyerek ilerler. Phase sonunda "Phase X tamamlandı. Yapılanlar: ... Sıradaki phase'e geçeyim mi?" diye sorar.
-
-## Advanced
-
-Use detailed skills directly when the request is already specific. The simple commands are convenience routers for daily use.
-
-## Configuration
-
-Commands inspect `.hayeos.json` first:
-
-- `memoryPath` points to the Obsidian vault.
-- `sourcePath` points to the source tree for package/security checks.
-- `defaultWorkflow` and `sessionCloseRequired` guide workflow strictness.
-
-## /haye:start Start Light Rule
-
-`/haye:start` must stay lightweight. It may check `.hayeos.json`, read `memoryPath`, read minimal memory files, show a short recovery summary and ask the next Turkish question.
-
-`/haye:start` must not load `/haye:work`, must not start a task classification wizard, must not ask "Şimdi hafızayı başlatmamı ister misiniz?" after init, must not use subagents, must not enter plan mode, must not scan the whole repository, must not perform codebase exploration, must not search test patterns, must not produce an automatic project plan and must not create `.hayeos.json` before user approval.
-
-Plugin root and project memory vault are different:
-
-- `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only the plugin code root.
-- `.hayeos.json` `memoryPath` is the single source of truth for the current project's memory vault.
-- `.hayeos.json` `sourcePath` is the current project's source root.
-- Context packs are written only to `<resolved memoryPath>/09-context-packs/`.
-- Checkpoints are written only to `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
-- Active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `<resolved memoryPath>/changelog.md` are updated only inside the resolved project vault.
-- HayeOS must stop before writing any project memory file under `CLAUDE_PLUGIN_ROOT` and warn: `Bu dosya plugin klasörüne yazılmaya çalışılıyor. Proje vault'u kullanılmalı.`
-
-Do not read `08-raw/` unless the user asks or a context pack names specific raw files.
-
-## Memory initialization
-
-Users normally do not need to run `bin/haye` manually. After the global plugin is installed, `/haye:start` is enough in each project.
-
-If `.hayeos.json` or the Obsidian vault is missing, `/haye:start` asks in Turkish:
-
-```text
-Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?
-```
-
-If approved, Haye runs the `/haye:init-memory` flow backed by `bin/haye init`. That flow writes a relative `memoryPath` using `./<project-name>_obs`, writes `sourcePath` as `"."`, never writes Windows absolute paths into JSON and never creates a generic `memory` folder.
-
-Canonical init config:
-
-```json
-{
-  "project": "<project-name>",
-  "memoryPath": "./<project-name>_obs",
-  "sourcePath": ".",
-  "defaultWorkflow": "memory-first",
-  "sessionCloseRequired": true
-}
-```
-
-`/haye:start` and `init-memory` must not manually synthesize alternate `.hayeos.json` layouts, must not choose `~/.claude/projects/.../memory`, and must show a full semantic version label such as `HayeOS v2.0.2 aktif.` after successful start.
-
-The real current working directory is the HayeOS project root. Claude internal project storage under `~/.claude/projects/<encoded-project-path>/` is forbidden as an init target. HayeOS must not write `.hayeos.json` or `<project-name>_obs/` there.
-
-On Windows, manual fallback commands are:
-
-```text
-C:\Path\To\HayeOS\bin\haye.cmd init
-powershell -ExecutionPolicy Bypass -File C:\Path\To\HayeOS\bin\haye.ps1 init
-```
-
-## Path Separation Rule
-
-Proje dosyaları ve memory dosyaları FARKLI dizinlerde yaşar. Birbirine karıştırılmaz.
-
-### sourcePath (proje kökü) - buraya yazılır
-Kullanıcının projesinin gerçekten çalıştığı her şey:
-- Kod: `.py`, `.ts`, `.tsx`, `.js`, `.jsx`, `.go`, `.rs`, `.java`, `.html`, `.css`
-- Infra: `Dockerfile`, `docker-compose*.yml`, `Procfile`, `.dockerignore`, helm/kustomize
-- Config: `.env.example`, `next.config.*`, `tsconfig.json`, `package.json`, `requirements.txt`, `pyproject.toml`, `Makefile`
-- Docs: `README.md`, `CHANGELOG.md`, `docs/`, `ADR/`, API specs
-- Klasörler: `services/`, `apps/`, `packages/`, `infra/`, `scripts/`, `tests/`, `public/`, `assets/`
-
-### memoryPath (vault) - SADECE memory için
-Yapısal proje hafızası:
-- `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`
-- `<resolved memoryPath>/01-prompts/`, `<resolved memoryPath>/02-decisions/`, `<resolved memoryPath>/03-bugs/`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/06-prompts/`, `<resolved memoryPath>/07-checklists/`, `<resolved memoryPath>/08-raw/`, `<resolved memoryPath>/09-context-packs/`, `<resolved memoryPath>/10-reviews/`, `<resolved memoryPath>/11-metrics/`, `<resolved memoryPath>/12-risks/`, `<resolved memoryPath>/99-archive/`
-
-### Hard rule
-Bir hedef path `<resolved memoryPath>` altındaysa VE şu isimlerden/uzantılardan biriyse -> DUR ve Türkçe uyar:
-- `.py`, `.ts`, `.tsx`, `.js`, `.jsx`, `.go`, `.rs`, `.java`, `.html`, `.css`, `.sh`, `.yaml`, `.yml`, `.toml`, `Dockerfile`, `docker-compose*`, `package.json`, `requirements.txt`, `pyproject.toml`, `next.config.*`
-- Memory subfolder olmayan klasörler: `services/`, `apps/`, `packages/`, `infra/`, `scripts/`, `tests/`, `public/`, `assets/`
-
-Uyarı mesajı:
-"Bu dosya memory vault'una yazılmaya çalışılıyor ama bu proje kodu/dökümanı. Proje kök dizinine (sourcePath) yazılmalı."
-
-Proje için `docs/` gerekiyorsa `<sourcePath>/docs/`'a yazılır, `<memoryPath>/docs/`'a değil.
-Proje `README.md`'si `<sourcePath>/README.md`'ye yazılır, `<memoryPath>/README.md`'ye değil.
+Creates:
+- `.hayeos.json` (project config: project, sourcePath, memoryPath, riskLevel)
+- `<project>_obs/` (16 top-level directories including `04-plans/`, `04-tasks/`, `10-reviews/`)
+- `HAYE.md`, `current.md`, `next.md`, `changelog.md`, `health.md`, `index.md`

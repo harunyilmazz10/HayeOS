@@ -1,1 +1,0 @@
-We are ready to release the dashboard to production on Friday. I want a safe go-live plan and release-readiness check.

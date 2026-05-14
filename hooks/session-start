@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# HayeOS SessionStart hook
+# Cross-platform: invoked by run-hook.cmd on Windows, directly on Unix
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+SKILL_PATH="${PLUGIN_ROOT}/skills/using-hayeos/SKILL.md"
+
+# Prefer Python (it's already required for bin/haye) for cleaner JSON escaping
+if command -v python3 >/dev/null 2>&1; then
+    exec python3 "${SCRIPT_DIR}/session-start.py"
+elif command -v python >/dev/null 2>&1; then
+    exec python "${SCRIPT_DIR}/session-start.py"
+fi
+
+# Pure-bash fallback (no python available)
+if [ ! -f "$SKILL_PATH" ]; then
+    skill_content="Error: using-hayeos skill not found at ${SKILL_PATH}"
+else
+    skill_content="$(cat "$SKILL_PATH")"
+fi
+
+# Escape for JSON embedding via bash parameter substitution
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+skill_escaped=$(escape_for_json "$skill_content")
+session_context="<EXTREMELY_IMPORTANT>\nYou have HayeOS active in this session.\n\n**Below is the full content of your 'haye:using-hayeos' skill - your introduction to HayeOS workflow and discipline. For all other skills, use the 'Skill' tool:**\n\n${skill_escaped}\n</EXTREMELY_IMPORTANT>"
+
+# Emit correct JSON shape for each platform
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+    printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+    printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
+fi
+
+exit 0

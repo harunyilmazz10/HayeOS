@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# PreToolUse Bash hook. Blocks destructive commands.
+# Reads the proposed Bash command via stdin (Claude Code injects the tool_input).
+# Pattern-matches, exits non-zero to block, with a Turkish message on stderr.
+
+input=$(cat)
+
+# Lowercase a copy for case-insensitive matching of SQL-style keywords
+input_lower="$(printf '%s' "$input" | tr '[:upper:]' '[:lower:]')"
+
+# Filesystem destruction
+case "$input" in
+  *"rm -rf /"*|*"rm -rf /*"*|*"rm -rf ~"*|*"rm -rf ~/"*|*"rm -rf \$HOME"*)
+    echo "Haye guard: filesystem-wide rm -rf detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+  *"chmod -R 777 /"*|*"chmod 777 -R /"*)
+    echo "Haye guard: chmod 777 on / detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+esac
+
+# Generic rm -rf (covers project dirs) - block, but with a slightly softer message
+case "$input" in
+  *"rm -rf"*)
+    echo "Haye guard: destructive rm -rf detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+esac
+
+# Database destruction (case-insensitive)
+case "$input_lower" in
+  *"drop database"*|*"drop schema"*|*"truncate "*|*"prisma migrate reset"*)
+    echo "Haye guard: destructive database command detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+esac
+
+# Docker volume destruction
+case "$input" in
+  *"docker compose down -v"*|*"docker-compose down -v"*|*"docker volume rm"*|*"docker volume prune"*)
+    echo "Haye guard: docker volume destruction detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+esac
+
+# Force-push to main/master
+case "$input" in
+  *"git push --force"*main*|*"git push --force"*master*|*"git push -f"*main*|*"git push -f"*master*|*"git push --force-with-lease"*main*|*"git push --force-with-lease"*master*)
+    echo "Haye guard: force-push to main/master detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+esac
+
+# Git hard reset
+case "$input" in
+  *"git reset --hard"*)
+    echo "Haye guard: git reset --hard detected. Ask user for explicit approval." >&2
+    exit 2
+    ;;
+esac
+
+exit 0

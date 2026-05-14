@@ -6,7 +6,7 @@ description: Use after writing or modifying 5+ files in one work block, or befor
 # Haye Skill: checkpoint
 
 ## Purpose
-Internal workflow used by `/haye:work`, `/haye:fix`, `/haye:ship`, `/haye:start` and `/haye:close`. It preserves state before `/haye:close` so a crashed or interrupted Claude Code session can resume safely.
+Internal workflow used by `/haye:work`, `/haye:start` and `/haye:close`. It preserves state before `/haye:close` so a crashed or interrupted Claude Code session can resume safely.
 
 ## User Response Language Rule
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
@@ -100,7 +100,6 @@ Recovery summary format:
 ## Changed Files
 ## Current Blocker
 ## Next 3 Actions
-## Recommended Next Mode
 
 Kaldığımız yerden devam edeyim mi?
 ```

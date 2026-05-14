@@ -1,16 +1,46 @@
 # Obsidian Vault Standard
 
-Core files: `HAYE.md`, `index.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`.
+HayeOS v3.0.0 vault layout. Created by `Skill(haye:init-memory)` or `bin/haye init`.
+
+## Top-level core files
+
+- `HAYE.md` — vault index, layout guide
+- `index.md` — quick navigation
+- `current.md` — current work focus (keep under 150 lines)
+- `next.md` — next concrete actions
+- `changelog.md` — session-by-session log
+- `health.md` — vault health metadata
+
+## Directories
+
+```
+00-system/           # system-level metadata
+01-project/          # project meta (rare use)
+01-prompts/          # original user prompts, preserved verbatim
+02-decisions/        # specs from brainstorming, architectural decisions
+03-bugs/             # open/, solved/, recurring/
+04-plans/            # implementation plans from writing-plans skill
+04-tasks/            # active-task.md
+05-sessions/         # session checkpoints (latest-checkpoint.md)
+06-prompts/          # crafted reusable prompts
+07-checklists/       # security and dependency checklists
+08-raw/              # claude-sessions, terminal-logs, screenshots, old-prompts, docs
+09-context-packs/    # context bundles for handoff
+10-reviews/          # outputs from subagent code reviewers
+11-metrics/
+12-risks/
+99-archive/
+```
 
 ## Plugin root vs project vault
 
-Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only where plugin commands, skills and CLI files live. Project memory must always be stored under the current project's `.hayeos.json` `memoryPath`, resolved relative to that project root.
+Plugin root and project memory vault are different. `CLAUDE_PLUGIN_ROOT` or the HayeOS install path is only where plugin commands, skills and CLI files live. Project memory always lives under the current project's `.hayeos.json` `memoryPath`, resolved relative to that project root.
 
-Never write project memory into the plugin repository. Context packs belong in `<resolved memoryPath>/09-context-packs/`; checkpoints belong in `<resolved memoryPath>/05-sessions/latest-checkpoint.md`; active task, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md` and `<resolved memoryPath>/changelog.md` belong inside the resolved project vault.
+Never write project memory into the plugin repository. Plans belong in `<resolved memoryPath>/04-plans/`; specs belong in `<resolved memoryPath>/02-decisions/`; reviews belong in `<resolved memoryPath>/10-reviews/`; active task belongs in `<resolved memoryPath>/04-tasks/active-task.md`; checkpoints belong in `<resolved memoryPath>/05-sessions/latest-checkpoint.md`.
 
-Generated vaults must contain useful starter content, not empty placeholders:
+## .hayeos.json shape
 
-New project init must create `.hayeos.json` with a relative vault path:
+Init must create `.hayeos.json` with relative paths:
 
 ```json
 {
@@ -18,53 +48,30 @@ New project init must create `.hayeos.json` with a relative vault path:
   "memoryPath": "./<project-name>_obs",
   "sourcePath": ".",
   "defaultWorkflow": "memory-first",
-  "sessionCloseRequired": true
+  "sessionCloseRequired": true,
+  "riskLevel": "medium"
 }
 ```
 
 Do not write Windows absolute paths or JSON backslash paths into `.hayeos.json`. Do not create a generic `memory` directory; use `<project-name>_obs`.
 
-- `HAYE.md` records operating rules, simple commands, raw-read policy and dependency security policy.
-- `index.md` links core files, active task, dependency checklist, risk log and safe-version decisions.
-- `<resolved memoryPath>/01-prompts/` stores preserved original `/haye:work` prompts for large, massive, architecture and full-system tasks.
-- `<resolved memoryPath>/current.md` records project state, configured source path and constraints.
-- `<resolved memoryPath>/next.md` keeps the top actions short.
-- `<resolved memoryPath>/health.md` tracks memory lint, dependency audit and React/Next audit status.
-- `<resolved memoryPath>/04-tasks/active-task.md` gives the next session a place to record goal, scope and verification.
-- `07-checklists/dependency-security-checklist.md`, `<resolved memoryPath>/12-risks/dependency-risks.md` and `<resolved memoryPath>/02-decisions/safe-dependency-versions.md` support safe dependency decisions.
+## File contents
 
-The `08-raw/` area is for explicit ingestion only. Normal start/work commands should prefer summarized memory and context packs.
+- `HAYE.md` — vault index plus links to active task, dependency checklist, risk log, and v3 process flow.
+- `index.md` — quick links to top-level files and most-used directories.
+- `current.md` — project state, configured source path, current focus, constraints.
+- `next.md` — top concrete actions.
+- `health.md` — vault structure version, last lint date, dependency audit freshness.
+- `changelog.md` — append-only session log.
+- `04-tasks/active-task.md` — current goal, scope, verification plan.
+- `02-decisions/<YYYY-MM-DD>-<topic>-spec.md` — brainstorming output.
+- `04-plans/<YYYY-MM-DD>-<feature>-plan.md` — writing-plans output, bite-sized tasks.
+- `10-reviews/<task-id>/` — subagent code reviewer outputs.
 
 ## Original Prompt Preservation
 
-Large, massive, architecture and full-system work requests must preserve the original user prompt verbatim under `<resolved memoryPath>/01-prompts/`.
+Large or complex work requests must preserve the original user prompt verbatim under `<resolved memoryPath>/01-prompts/<YYYY-MM-DD-HHMM>-<topic>.md`. This is non-negotiable - lossy summarization before persistence is the root cause of context drift across sessions.
 
-- First large master prompt: `<resolved memoryPath>/01-prompts/initial-master-prompt.md`
-- Later work prompts: `<resolved memoryPath>/01-prompts/work-request-YYYY-MM-DD-HHMM.md`
-- Required content: timestamp, task classification summary, original prompt verbatim and optional short normalized brief.
-- Prompt records must never be written to the plugin root or project root.
+## 08-raw read policy
 
-## Work discipline
-
-`HAYE.md` should include:
-
-- User Response Language Rule for Turkish-first responses.
-- Smart Work Router summary for `/haye:work`.
-- Approval Friction Rule.
-- No Fake Completion Rule.
-- Output Budget Rule.
-- Auto Checkpoint Rule.
-- Safe Resume Rule.
-- Scope Control Rule.
-- Token discipline for Team Mode and large tasks.
-
-## Checkpoint files
-
-Long or risky sessions should maintain:
-
-- `<resolved memoryPath>/05-sessions/latest-checkpoint.md`
-- `<resolved memoryPath>/04-tasks/active-task.md`
-- `<resolved memoryPath>/current.md`
-- `<resolved memoryPath>/next.md`
-
-`latest-checkpoint.md` preserves current task, phase, last successful step, changed files, commands run, verification status, blockers, risks and next 3 actions. `/haye:start` uses it for Safe Resume and must not continue implementation without user approval.
+The `08-raw/` area is for explicit ingestion only. Normal start/work commands prefer summarized memory and context packs. Do not pull raw logs into chat without an explicit reason.

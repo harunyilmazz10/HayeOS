@@ -19,14 +19,15 @@ mv /tmp/nextjs-dev.log "<resolved memoryPath>/08-raw/nextjs-dev/${DATE}-${SHORT}
 ```
 
 ## What to look for in the log
-- "You're importing a component that needs ..." → RSC boundary issue
-- "Hydration failed" → server/client mismatch
-- "Module not found" → import path or tsconfig paths drift
-- Repeated full-page reloads → HMR break; check the file changed
+- "You're importing a component that needs ..." -> RSC boundary issue
+- "Hydration failed" -> server/client mismatch
+- "Module not found" -> import path or tsconfig paths drift
+- Repeated full-page reloads -> HMR break; check the file changed
 
 ## Ingest
-- `ingest-session` skill extracts the failing route, the failing component, the error message
-- Output: `03-bugs/open/nextjs-<topic>.md` with repro steps
+- Invoke `Skill(haye:systematic-debugging)` against the saved file path; Phase 1 isolates the failing route, the failing component, and the exact error message.
+- Output: `03-bugs/open/nextjs-<topic>.md` with repro steps and root cause hypothesis.
+- During `/haye:close`, reference the bug entry in the session changelog.
 
 ## What NOT to capture
 - `next dev` startup output when nothing's wrong

@@ -1,5 +1,5 @@
 ---
-description: Update Haye memory and close the session cleanly.
+description: End a HayeOS work block - update changelog, current, next, and session checkpoint in the memory vault.
 ---
 
 # /haye:close
@@ -10,23 +10,44 @@ Use `skills/close/SKILL.md`.
 - Kullanıcı Türkçe yazıyorsa tüm açıklamalar, özetler, uyarılar, sorular ve yönlendirmeler Türkçe verilecek.
 - Komutlar, dosya yolları, paket isimleri, config key'leri ve kod blokları orijinal dilinde kalabilir.
 - Kullanıcı açıkça İngilizce istemedikçe İngilizce cevap verme.
-- HayeOS user-facing komutlarda varsayılan olarak Türkçe konuşur.
 
-Route to advanced workflows when needed:
-- `session-close` to write the handoff.
-- `memory-lint` to keep core memory useful.
-- `token-audit` when context cleanup is needed.
+## What /haye:close does
 
-Summarize work done, files changed, verification output, open risks and next actions into the Obsidian memory vault from `.hayeos.json`.
+End-of-session vault update. The close skill handles all of these inline (no sub-skill dispatch in v3.0.0):
 
-Update the relevant memory files explicitly:
-- `<resolved memoryPath>/current.md` for the new project state.
-- `<resolved memoryPath>/next.md` for the next five actions.
-- `<resolved memoryPath>/changelog.md` for completed changes.
-- `<resolved memoryPath>/health.md` for verification status.
-- `<resolved memoryPath>/05-sessions/` for the session handoff when useful.
+1. **Update changelog/current/next** — appends a session entry to `<resolved memoryPath>/changelog.md`, refreshes `<resolved memoryPath>/current.md` with the new focus, updates `<resolved memoryPath>/next.md` with next concrete actions.
 
-## Checkpoint finalization
-If `<resolved memoryPath>/05-sessions/latest-checkpoint.md` exists, read it, fold it into the session summary, update `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, and `<resolved memoryPath>/04-tasks/active-task.md`, then mark the checkpoint as `closed`. Do not delete it. Chat output stays short/kısa: yapılanlar, değişen dosyalar, doğrulama durumu, sıradaki 3 adım, memory updated files.
+2. **Write latest-checkpoint** — saves full session state snapshot to `<resolved memoryPath>/05-sessions/latest-checkpoint.md` with completed tasks, files touched, verification results, open risks, next actions.
 
-All close/session memory updates must target the resolved `.hayeos.json` `memoryPath`. Never write project memory into `CLAUDE_PLUGIN_ROOT` or the HayeOS plugin repository.
+3. **Vault lint** (optional) — flags `current.md` over 150 lines, stale `04-tasks/active-task.md`, orphan files in `08-raw/`. Reports findings without auto-rewriting.
+
+After all three, reports in Turkish: "Hafıza güncellendi, session kapanabilir."
+
+## When to run /haye:close
+
+- End of a meaningful work block (feature complete, phase done, day ending).
+- Before `/clear` when context is heavy.
+- Before any handoff to another session or developer.
+- After verification commands have run and results are known.
+
+## Close boundaries
+
+- Must not start implementation.
+- Must not create new tasks (just close the current one).
+- Must not run tests/build/lint unless the user explicitly asks.
+- Must write only under `<resolved memoryPath>/`.
+
+## No Fake Completion Rule
+
+Close summary must distinguish:
+- files written
+- verification run vs not run
+- runtime verified vs not verified
+- known gaps
+- next actions
+
+Do not mark work as "hazır", "başarıyla çalışıyor", or "production-ready" unless verification output supports it. If verification did not run, say so explicitly.
+
+## Removed in v3.0.0
+
+In v2.x, `/haye:close` chained to separate `session-close`, `memory-lint`, and `handoff` skills. v3.0.0 removes those — the close skill handles everything inline.

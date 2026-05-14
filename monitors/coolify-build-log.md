@@ -22,9 +22,9 @@ mv /tmp/coolify-build.log "<resolved memoryPath>/08-raw/coolify-builds/${DATE}-$
 ```
 
 ## Ingest
-- Run `ingest-session` skill against the saved file
-- It extracts: failing step, dependency that broke, env mismatch
-- Output: `02-decisions/coolify-<topic>.md` or `03-bugs/open/coolify-<topic>.md`
+- Invoke `Skill(haye:systematic-debugging)` against the saved file path; Phase 1 (Root Cause Investigation) reads the failing step, the dependency that broke, and any env mismatch.
+- Write findings as a structured entry: `02-decisions/coolify-<topic>.md` (architectural decision) or `03-bugs/open/coolify-<topic>.md` (active bug).
+- During `/haye:close`, mention the new vault entries in the session changelog.
 
 ## What to capture
 - First failing line + 20 lines before

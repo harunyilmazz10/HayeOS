@@ -1,1 +1,0 @@
-Please use the haye:fix skill. My API tests fail after the latest refactor and I need a disciplined bug investigation.

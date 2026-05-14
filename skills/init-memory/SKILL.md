@@ -39,7 +39,7 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 
 ## Workflow
 1. Locate the current project root.
-2. If `.hayeos.json` and the configured vault already exist, report that memory is ready. Do not ask a second memory-start question.
+2. If `.hayeos.json` and the configured vault already exist, report that memory is ready. Do not ask a second initialization question.
 3. If this skill was invoked from `/haye:start`, it may run only after the user answered yes to: "Bu projede Haye hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
 4. If memory is missing and the user has approved init, initialize it without asking the user to find `bin/haye`, bash, Python or plugin paths.
 5. First try CLI commands through `${CLAUDE_PLUGIN_ROOT}`.
@@ -166,6 +166,7 @@ Create this vault structure under `<resolved memoryPath>`:
 <resolved memoryPath>/03-bugs/open/
 <resolved memoryPath>/03-bugs/solved/
 <resolved memoryPath>/03-bugs/recurring/
+<resolved memoryPath>/04-plans/
 <resolved memoryPath>/04-tasks/
 <resolved memoryPath>/05-sessions/
 <resolved memoryPath>/06-prompts/
@@ -174,6 +175,7 @@ Create this vault structure under `<resolved memoryPath>`:
 <resolved memoryPath>/08-raw/terminal-logs/
 <resolved memoryPath>/08-raw/screenshots/
 <resolved memoryPath>/08-raw/old-prompts/
+<resolved memoryPath>/08-raw/docs/
 <resolved memoryPath>/09-context-packs/
 <resolved memoryPath>/10-reviews/
 <resolved memoryPath>/11-metrics/
@@ -271,7 +273,7 @@ If the canonical template cannot be read directly, recreate `<resolved memoryPat
 
 Memory vault içinde yalnızca şu tür HayeOS memory hedefleri oluşturulur veya güncellenir:
 - `<resolved memoryPath>/current.md`, `<resolved memoryPath>/next.md`, `<resolved memoryPath>/changelog.md`, `<resolved memoryPath>/health.md`
-- `<resolved memoryPath>/01-prompts/`, `<resolved memoryPath>/02-decisions/`, `<resolved memoryPath>/03-bugs/`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/06-prompts/`, `<resolved memoryPath>/07-checklists/`, `<resolved memoryPath>/08-raw/`, `<resolved memoryPath>/09-context-packs/`, `<resolved memoryPath>/10-reviews/`, `<resolved memoryPath>/11-metrics/`, `<resolved memoryPath>/12-risks/`, `<resolved memoryPath>/99-archive/`
+- `<resolved memoryPath>/01-prompts/`, `<resolved memoryPath>/02-decisions/`, `<resolved memoryPath>/03-bugs/`, `<resolved memoryPath>/04-plans/`, `<resolved memoryPath>/04-tasks/`, `<resolved memoryPath>/05-sessions/`, `<resolved memoryPath>/06-prompts/`, `<resolved memoryPath>/07-checklists/`, `<resolved memoryPath>/08-raw/`, `<resolved memoryPath>/09-context-packs/`, `<resolved memoryPath>/10-reviews/`, `<resolved memoryPath>/11-metrics/`, `<resolved memoryPath>/12-risks/`, `<resolved memoryPath>/99-archive/`
 
 Project source, infra, config ve proje docs asla vault'a yazılmaz. Bir hedef path `<resolved memoryPath>` altındaysa ve `.py`, `.ts`, `.tsx`, `.js`, `.jsx`, `.go`, `.rs`, `.java`, `.html`, `.css`, `.sh`, `.yaml`, `.yml`, `.toml`, `Dockerfile`, `docker-compose*`, `package.json`, `requirements.txt`, `pyproject.toml`, `next.config.*` gibi proje dosyası ya da `services/`, `apps/`, `packages/`, `infra/`, `scripts/`, `tests/`, `public/`, `assets/` gibi source klasörü görünüyorsa DUR.
 
