@@ -49,18 +49,27 @@ Create or repair the Obsidian memory vault for the current project. Use when set
 9. Do not load `/haye:work`, do not start a task classification wizard, and do not move into implementation from init-memory.
 
 ## Cross-platform CLI init order
-Never recommend only `bin/haye init` as a relative command. Use `${CLAUDE_PLUGIN_ROOT}` first.
 
-Windows attempts:
-1. `${CLAUDE_PLUGIN_ROOT}\bin\haye.cmd init`
-2. `powershell -ExecutionPolicy Bypass -File ${CLAUDE_PLUGIN_ROOT}\bin\haye.ps1 init`
-3. `python ${CLAUDE_PLUGIN_ROOT}\bin\haye init`
-4. `py ${CLAUDE_PLUGIN_ROOT}\bin\haye init`
+**IMPORTANT (v3.0.0 HARD-GATE):** Every `bin/haye init` call MUST include the env var `HAYE_INIT_APPROVED=1` as a prefix. Without it, the dangerous-command-guard hook will block the call and re-prompt for user approval.
+
+Set this env var ONLY after the user has explicitly answered "evet" / "tamam" / "onayla" / "devam" to:
+
+> "Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+
+Never recommend a relative `bin/haye init`. Always use `${CLAUDE_PLUGIN_ROOT}` and the env var prefix.
+
+Windows attempts (in order, first success wins):
+1. `HAYE_INIT_APPROVED=1 ${CLAUDE_PLUGIN_ROOT}\bin\haye.cmd init`
+2. `HAYE_INIT_APPROVED=1 powershell -ExecutionPolicy Bypass -File ${CLAUDE_PLUGIN_ROOT}\bin\haye.ps1 init`
+3. `HAYE_INIT_APPROVED=1 python ${CLAUDE_PLUGIN_ROOT}\bin\haye init`
+4. `HAYE_INIT_APPROVED=1 py ${CLAUDE_PLUGIN_ROOT}\bin\haye init`
 
 Mac/Linux attempts:
-1. `python3 ${CLAUDE_PLUGIN_ROOT}/bin/haye init`
-2. `python ${CLAUDE_PLUGIN_ROOT}/bin/haye init`
-3. `${CLAUDE_PLUGIN_ROOT}/bin/haye init`
+1. `HAYE_INIT_APPROVED=1 python3 ${CLAUDE_PLUGIN_ROOT}/bin/haye init`
+2. `HAYE_INIT_APPROVED=1 python ${CLAUDE_PLUGIN_ROOT}/bin/haye init`
+3. `HAYE_INIT_APPROVED=1 ${CLAUDE_PLUGIN_ROOT}/bin/haye init`
+
+If the first attempt succeeds (vault ready message in stdout), **stop trying alternatives**. The init command is idempotent but each retry is wasted tokens.
 
 If `${CLAUDE_PLUGIN_ROOT}` is unavailable, infer the plugin root from the loaded command/skill location when possible. If it still cannot be resolved, skip CLI execution and use the manual fallback.
 

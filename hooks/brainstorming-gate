@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# PreToolUse:Write|Edit|MultiEdit hook.
+# Enforces HayeOS HARD-GATE: no code/file creation while a brainstorming
+# design proposal is pending user approval.
+#
+# State signal: presence of the marker file
+#   <cwd>/.hayeos-state/awaiting-design-approval
+#
+# Lifecycle:
+#   - Brainstorming skill creates the marker when it loads (before asking user).
+#   - User says "evet" / "onayla" / "tamam" / "devam" -> the brainstorming skill
+#     deletes the marker, THEN may proceed to writing-plans or implementation.
+#   - If a Write/Edit tool fires while the marker exists, this hook denies it
+#     with a Turkish message telling Claude to present the design first.
+#
+# Bypass:
+#   - Set env var HAYE_DESIGN_APPROVED=1 in the same tool call (rare, mostly
+#     for power users or test harness).
+#   - Or delete the marker file explicitly (which is what the skill does after
+#     user approval).
+#
+# Files outside the project source area are NOT blocked. Specifically, writes
+# to the memory vault (<project>_obs/) or to .hayeos.json are allowed even
+# while the marker exists, because brainstorming itself writes design docs
+# to <memoryPath>/02-decisions/.
+
+input=$(cat)
+
+# Find cwd from the tool input if present; default to $PWD
+cwd=$(printf '%s' "$input" | python3 -c "
+import sys, json, os
+try:
+    d = json.loads(sys.stdin.read())
+    print(d.get('cwd') or os.environ.get('PWD') or os.getcwd())
+except Exception:
+    print(os.environ.get('PWD') or os.getcwd())
+" 2>/dev/null)
+
+if [ -z "$cwd" ]; then
+  cwd="${PWD:-.}"
+fi
+
+marker="$cwd/.hayeos-state/awaiting-design-approval"
+
+# No marker -> nothing pending, allow
+[ -f "$marker" ] || exit 0
+
+# Marker exists. Check if this tool call targets a file in the memory vault
+# or is the marker-deletion itself.
+file_path=$(printf '%s' "$input" | python3 -c "
+import sys, json
+try:
+    d = json.loads(sys.stdin.read())
+    ti = d.get('tool_input', {})
+    # Write/Create use 'file_path' or 'path'; Edit uses 'file_path'
+    print(ti.get('file_path') or ti.get('path') or '')
+except Exception:
+    pass
+" 2>/dev/null)
+
+# Allow writes inside the memory vault (brainstorming writes design docs there)
+case "$file_path" in
+  *"_obs/"*|*".hayeos-state/"*|*".hayeos.json")
+    exit 0
+    ;;
+esac
+
+cat >&2 <<EOF
+Haye HARD-GATE: design approval pending. Code/file creation is blocked.
+
+A brainstorming session is in progress for this project. You must:
+  1. Present the design proposal to the user in Turkish.
+  2. Stop and wait for explicit approval ("evet" / "tamam" / "onayla" / "devam").
+  3. Only after the user approves, delete the marker:
+       rm "$marker"
+     (or on Windows: del "$marker")
+  4. Then proceed with Write/Edit.
+
+Attempted target: $file_path
+
+This guard prevents the most common HARD-GATE bypass: producing code right
+after brainstorming loads, before the user has actually reviewed the design.
+EOF
+exit 2

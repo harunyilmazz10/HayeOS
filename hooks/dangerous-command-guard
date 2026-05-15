@@ -1,15 +1,69 @@
 #!/usr/bin/env bash
-# PreToolUse Bash hook. Blocks destructive commands.
-# Reads the proposed Bash command via stdin (Claude Code injects the tool_input).
-# Pattern-matches, exits non-zero to block, with a Turkish message on stderr.
+# PreToolUse:Bash hook. Two responsibilities:
+#   1. Block destructive commands (rm -rf, drop database, force-push to main, etc.)
+#   2. Enforce HayeOS HARD-GATE: prevent `bin/haye init` without explicit user approval
+#
+# Bypass for HARD-GATE:
+#   - Set env var HAYE_INIT_APPROVED=1 in the same command:
+#     `HAYE_INIT_APPROVED=1 bin/haye.cmd init`
+#   - The init-memory skill only sets this AFTER the user explicitly approves
+#     ("evet", "tamam", "onayla", "devam", "yes").
+#
+# Read tool_input via stdin (Claude Code injects JSON with tool_input.command).
+# Exit 0 = allow, Exit 2 = block (Claude sees the stderr message and reroutes).
 
 input=$(cat)
 
-# Lowercase a copy for case-insensitive matching of SQL-style keywords
-input_lower="$(printf '%s' "$input" | tr '[:upper:]' '[:lower:]')"
+# Extract the actual command. Claude Code passes tool_input as JSON:
+# {"tool_input": {"command": "...", "description": "..."}}
+# For backward compat we also fall back to the raw input.
+command=$(printf '%s' "$input" | python3 -c "
+import sys, json
+try:
+    d = json.loads(sys.stdin.read())
+    cmd = d.get('tool_input', {}).get('command', '') or d.get('command', '')
+    print(cmd)
+except Exception:
+    pass
+" 2>/dev/null)
 
-# Filesystem destruction
-case "$input" in
+if [ -z "$command" ]; then
+  command="$input"
+fi
+
+command_lower="$(printf '%s' "$command" | tr '[:upper:]' '[:lower:]')"
+
+# ─── HARD-GATE: bin/haye init must be user-approved ───────────────────────────
+case "$command" in
+  *"haye init"*|*"haye.cmd init"*|*"haye.ps1 init"*|*"haye init-config"*|*"haye.cmd init-config"*)
+    # Allow if user approval env var is present in the command
+    if printf '%s' "$command" | grep -qE 'HAYE_INIT_APPROVED=1\b'; then
+      :  # approved, fall through to destructive-command checks below
+    else
+      cat >&2 <<'EOF'
+Haye HARD-GATE: bin/haye init requires explicit user approval.
+
+Correct workflow:
+  1. /haye:start detects missing vault.
+  2. Ask the user EXACTLY in Turkish:
+     "Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+  3. STOP. Wait for the user to reply "evet" / "tamam" / "onayla" / "yes".
+  4. Only after explicit approval, invoke Skill(haye:init-memory).
+  5. init-memory skill calls init with the approval env var:
+     HAYE_INIT_APPROVED=1 bin/haye.cmd init
+
+This guard exists because Claude Code can otherwise silently create the vault
+without the user noticing. Re-ask the user, then retry with the env var prefix.
+EOF
+      exit 2
+    fi
+    ;;
+esac
+
+input_lower="$(printf '%s' "$command" | tr '[:upper:]' '[:lower:]')"
+
+# ─── Destructive: filesystem ──────────────────────────────────────────────────
+case "$command" in
   *"rm -rf /"*|*"rm -rf /*"*|*"rm -rf ~"*|*"rm -rf ~/"*|*"rm -rf \$HOME"*)
     echo "Haye guard: filesystem-wide rm -rf detected. Ask user for explicit approval." >&2
     exit 2
@@ -20,15 +74,14 @@ case "$input" in
     ;;
 esac
 
-# Generic rm -rf (covers project dirs) - block, but with a slightly softer message
-case "$input" in
+case "$command" in
   *"rm -rf"*)
     echo "Haye guard: destructive rm -rf detected. Ask user for explicit approval." >&2
     exit 2
     ;;
 esac
 
-# Database destruction (case-insensitive)
+# ─── Destructive: database ────────────────────────────────────────────────────
 case "$input_lower" in
   *"drop database"*|*"drop schema"*|*"truncate "*|*"prisma migrate reset"*)
     echo "Haye guard: destructive database command detected. Ask user for explicit approval." >&2
@@ -36,24 +89,23 @@ case "$input_lower" in
     ;;
 esac
 
-# Docker volume destruction
-case "$input" in
+# ─── Destructive: docker volume ───────────────────────────────────────────────
+case "$command" in
   *"docker compose down -v"*|*"docker-compose down -v"*|*"docker volume rm"*|*"docker volume prune"*)
     echo "Haye guard: docker volume destruction detected. Ask user for explicit approval." >&2
     exit 2
     ;;
 esac
 
-# Force-push to main/master
-case "$input" in
+# ─── Destructive: git ─────────────────────────────────────────────────────────
+case "$command" in
   *"git push --force"*main*|*"git push --force"*master*|*"git push -f"*main*|*"git push -f"*master*|*"git push --force-with-lease"*main*|*"git push --force-with-lease"*master*)
     echo "Haye guard: force-push to main/master detected. Ask user for explicit approval." >&2
     exit 2
     ;;
 esac
 
-# Git hard reset
-case "$input" in
+case "$command" in
   *"git reset --hard"*)
     echo "Haye guard: git reset --hard detected. Ask user for explicit approval." >&2
     exit 2

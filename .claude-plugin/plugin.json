@@ -1,6 +1,6 @@
 {
   "name": "haye",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Memory-first, discipline-first workflow plugin: Superpowers-based brainstorming -> writing-plans -> subagent-driven-development chain, with TDD Iron Law, verification-before-completion gate, project-local memory vault, and Turkish UX",
   "author": {
     "name": "Haye Labs"

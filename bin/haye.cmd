@@ -3,15 +3,18 @@ setlocal
 set "SCRIPT_DIR=%~dp0"
 set "HAYE_SCRIPT=%SCRIPT_DIR%haye"
 
+set "PYTHONUNBUFFERED=1"
+set "PYTHONIOENCODING=utf-8"
+
 where python >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
-  python "%HAYE_SCRIPT%" %*
+  python -u "%HAYE_SCRIPT%" %*
   exit /b %ERRORLEVEL%
 )
 
 where py >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
-  py "%HAYE_SCRIPT%" %*
+  py -u "%HAYE_SCRIPT%" %*
   exit /b %ERRORLEVEL%
 )
 

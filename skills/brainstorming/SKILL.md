@@ -11,7 +11,30 @@ Start by understanding the current project context, then ask questions one at a 
 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+
+**No tool that produces code or files is allowed between this skill loading and explicit user approval.** That means: no `Write`, no `Edit`, no `Create`, no `Bash` (for code execution), no `MultiEdit`. Searching, reading, and asking questions are allowed. Producing artifacts is NOT.
+
+**Approval signal must be explicit.** "Evet", "tamam", "onayla", "devam", "yes", "go", "approved" count. A user merely re-stating the request does NOT count as approval — they want you to design first, not to skip the gate because they sound impatient.
+
+**The trivial-request trap.** "Basit bir hello world yaz", "küçük bir helper ekle", "tek satırlık script" — these are the MOST common HARD-GATE bypass triggers. The brevity of the request is not permission to skip design. State the design in 2-3 sentences for truly trivial work, then wait.
 </HARD-GATE>
+
+## Concrete Example: Trivial Request Done Right
+
+User: "bana basit bir hello world Python fonksiyonu yaz"
+
+WRONG (HARD-GATE bypass, what NOT to do):
+```
+[Tool: Write(hello_world.py, "def hello_world(): print('Hello, World!')")]
+"Hello world fonksiyonu yazıldı."
+```
+
+CORRECT:
+```
+"Şunu öneriyorum: `hello_world.py` adlı tek dosyada `hello_world()` fonksiyonu olacak, çağrıldığında 'Hello, World!' yazdıracak. Dosya proje köküne yazılacak. Onaylıyor musunuz?"
+```
+
+Then STOP. Wait for "evet" or equivalent before any `Write` call.
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
@@ -29,7 +52,19 @@ You MUST create a task for each of these items and complete them in order:
 6. **Write design doc** — save to `<resolved memoryPath>/02-decisions/YYYY-MM-DD-<topic>-design.md` and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+9. **Remove the brainstorming-gate marker** — once the user has explicitly approved the design (said "evet" / "tamam" / "onayla" / "devam"):
+
+   ```bash
+   # Windows:
+   Remove-Item -Force .hayeos-state\awaiting-design-approval
+
+   # Mac/Linux:
+   rm -f .hayeos-state/awaiting-design-approval
+   ```
+
+   Without this step, the brainstorming-gate hook will continue to block Write/Edit/MultiEdit and you cannot proceed to implementation. **Do not delete the marker before explicit user approval.**
+
+10. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
 

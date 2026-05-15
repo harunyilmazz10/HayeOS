@@ -29,11 +29,11 @@ check_plugin_json_exists() {
 check_version_3() {
     local v
     v=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
-    if [ "$v" != "3.0.0" ]; then
-        fail "plugin.json version is $v, expected 3.0.0"
+    if [ "$v" != "3.0.1" ]; then
+        fail "plugin.json version is $v, expected 3.0.1"
         return
     fi
-    ok "plugin.json version: 3.0.0"
+    ok "plugin.json version: 3.0.1"
 }
 
 check_required_skills_present() {
@@ -216,6 +216,52 @@ check_session_start_is_executable() {
     ok "hooks/session-start is executable"
 }
 
+# ----- HARD-GATE hook checks (v3.0.0) -----
+
+check_brainstorming_gate_hook_present() {
+    if [ ! -f hooks/brainstorming-gate ]; then
+        fail "hooks/brainstorming-gate missing - HARD-GATE not enforced"
+        return
+    fi
+    if [ ! -x hooks/brainstorming-gate ]; then
+        fail "hooks/brainstorming-gate must be executable (chmod +x)"
+        return
+    fi
+    ok "brainstorming-gate hook present and executable"
+}
+
+check_init_guard_in_dangerous_command_guard() {
+    if ! grep -q 'HAYE_INIT_APPROVED' hooks/dangerous-command-guard; then
+        fail "dangerous-command-guard missing HAYE_INIT_APPROVED check - init bypass possible"
+        return
+    fi
+    if ! grep -q 'haye init' hooks/dangerous-command-guard; then
+        fail "dangerous-command-guard missing 'haye init' pattern"
+        return
+    fi
+    ok "dangerous-command-guard enforces init HARD-GATE"
+}
+
+check_hooks_json_includes_brainstorming_gate() {
+    if ! grep -q 'brainstorming-gate' hooks/hooks.json; then
+        fail "hooks.json missing brainstorming-gate registration for Write|Edit|MultiEdit"
+        return
+    fi
+    if ! grep -q 'Write|Edit|MultiEdit' hooks/hooks.json; then
+        fail "hooks.json missing Write|Edit|MultiEdit matcher for brainstorming-gate"
+        return
+    fi
+    ok "hooks.json registers brainstorming-gate for Write|Edit|MultiEdit"
+}
+
+check_init_memory_uses_approval_env_var() {
+    if ! grep -q 'HAYE_INIT_APPROVED=1' skills/init-memory/SKILL.md; then
+        fail "init-memory SKILL.md doesn't mention HAYE_INIT_APPROVED=1 env var - init will be blocked"
+        return
+    fi
+    ok "init-memory uses HAYE_INIT_APPROVED=1 env var"
+}
+
 # ----- smart quote regression -----
 
 check_no_smart_quotes() {
@@ -257,6 +303,10 @@ check_hooks_present
 check_hooks_json_uses_run_hook_wrapper
 check_run_hook_cmd_is_polyglot
 check_session_start_is_executable
+check_brainstorming_gate_hook_present
+check_init_guard_in_dangerous_command_guard
+check_hooks_json_includes_brainstorming_gate
+check_init_memory_uses_approval_env_var
 check_no_smart_quotes
 
 echo ""

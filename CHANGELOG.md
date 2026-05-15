@@ -1,5 +1,34 @@
 # Changelog
 
+## 3.0.1 — HARD-GATE Hook Enforcement
+
+v3.0.0 enforced HARD-GATE in markdown only. Real-world test (`/haye:start` + `/haye:work` "basit hello world") showed Sonnet 4.6 bypasses markdown rules — auto-running `bin/haye init` without asking, and `Write(hello_world.py)` without presenting a design. v3.0.1 moves the enforcement from markdown to the tool layer via Claude Code PreToolUse hooks.
+
+### Hooks (deterministic enforcement)
+
+- **dangerous-command-guard** extended: blocks any `bin/haye init` / `haye.cmd init` / `haye.ps1 init` / `haye init-config` invocation that doesn't include the env var prefix `HAYE_INIT_APPROVED=1`. The init-memory skill is the only place that should set this env var, and it only runs after `/haye:start` has explicitly asked "Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?" and received "evet" / "tamam" / "onayla".
+- **brainstorming-gate** new hook (PreToolUse:Write|Edit|MultiEdit): denies code/file creation outside the memory vault while the marker file `.hayeos-state/awaiting-design-approval` exists. `/haye:work` creates this marker before invoking brainstorming; brainstorming deletes it only after the user explicitly approves the design.
+
+### Skill updates
+
+- `skills/start/SKILL.md` — explicit 4-step ABSOLUTE WORKFLOW at the top, with no-op branch when `.hayeos.json` exists, ask-and-stop branch when it doesn't, no auto-loading of init-memory.
+- `skills/work/SKILL.md` — adds marker file creation step (`.hayeos-state/awaiting-design-approval`) before brainstorming handoff.
+- `skills/brainstorming/SKILL.md` — checklist step 9 is now "Remove the brainstorming-gate marker — once the user has explicitly approved the design." Includes Windows + Unix delete commands.
+- `skills/init-memory/SKILL.md` — every init command in the cross-platform attempt order is now prefixed with `HAYE_INIT_APPROVED=1`. First successful attempt stops the chain (no more 6-attempt token waste).
+- `skills/using-hayeos/SKILL.md` — adds `<HARD-GATE-HOOKS>` block to the SessionStart context, explaining how the two hooks enforce the workflow.
+
+### Quality-of-life
+
+- `bin/haye.cmd` — adds `PYTHONUNBUFFERED=1`, `PYTHONIOENCODING=utf-8`, and `python -u` flag. Fixes Windows stdout buffering that caused Claude Code to mark first call as "Waiting..." and silently retry with 5 alternatives.
+
+### Verify additions
+
+`scripts/verify.sh` now runs 20 checks (4 new):
+- brainstorming-gate hook present and executable
+- dangerous-command-guard enforces init HARD-GATE
+- hooks.json registers brainstorming-gate for Write|Edit|MultiEdit
+- init-memory uses HAYE_INIT_APPROVED=1 env var
+
 ## 3.0.0 — Major Architectural Reset
 
 This release is a foundational rebuild. HayeOS v2.x and earlier tried to instill discipline by adding more written rules. Real-world testing (test6, test7, test8 sessions) proved this hits a ceiling: Sonnet 4.6 reads the rules, even quotes the Iron Law verbatim, but routinely violates them at execution time.

@@ -17,7 +17,7 @@ Use `skills/start/SKILL.md`.
 2. If present: reads `memoryPath` from it; opens minimal memory files (`HAYE.md`, `current.md`, `next.md`, `04-tasks/active-task.md`, latest session checkpoint).
 3. If absent: asks user in Turkish:
    > "Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
-
+   
    On "evet", routes to `Skill(haye:init-memory)`. On "hayır", exits without changes.
 4. Reports a one-line summary in Turkish and asks "Hangi görevle devam edelim?".
 

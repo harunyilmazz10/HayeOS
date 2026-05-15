@@ -15,6 +15,16 @@ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 This is not negotiable. This is not optional. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
+<HARD-GATE-HOOKS>
+Two PreToolUse hooks ENFORCE the workflow at the tool layer. They cannot be bypassed by reasoning.
+
+1. **dangerous-command-guard** — blocks any `bin/haye init` (or `haye.cmd init`, etc.) that does not include the env var prefix `HAYE_INIT_APPROVED=1`. This means: you cannot silently create a memory vault. `/haye:start` MUST ask the user "Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?" and wait for "evet" before invoking init-memory. The init-memory skill then runs `HAYE_INIT_APPROVED=1 ${CLAUDE_PLUGIN_ROOT}/bin/haye.cmd init`.
+
+2. **brainstorming-gate** — blocks `Write`, `Edit`, `MultiEdit` for any file path OUTSIDE the memory vault (`<project>_obs/`) while the marker file `.hayeos-state/awaiting-design-approval` exists. `/haye:work` creates this marker before invoking brainstorming. Brainstorming deletes it ONLY after the user explicitly approves the design ("evet" / "tamam" / "onayla" / "devam").
+
+If a tool call returns a hook denial, do NOT retry with a workaround. The denial means the workflow step was skipped. Go back, follow the correct sequence, and the tool call will succeed.
+</HARD-GATE-HOOKS>
+
 # Using HayeOS
 
 HayeOS is a memory-first, discipline-first workflow plugin built on the Superpowers process model.

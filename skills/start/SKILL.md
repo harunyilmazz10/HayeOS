@@ -5,6 +5,44 @@ description: Use when starting a new HayeOS session - detects vault, loads conte
 
 # Haye Skill: start
 
+## 🚫 ABSOLUTE WORKFLOW — DO NOT DEVIATE
+
+When `/haye:start` is invoked, follow EXACTLY this sequence. Do not skip steps. Do not auto-invoke any other skill.
+
+### Step 1 — Check if `.hayeos.json` exists in the current working directory.
+
+### Step 2a — If `.hayeos.json` EXISTS:
+- Read `memoryPath` from it.
+- Read these files in this exact order (skip silently if missing):
+  - `<memoryPath>/HAYE.md`
+  - `<memoryPath>/current.md`
+  - `<memoryPath>/next.md`
+  - `<memoryPath>/04-tasks/active-task.md`
+  - `<memoryPath>/05-sessions/latest-checkpoint.md`
+- Output a 2-4 line Turkish summary of project state.
+- Ask: "Hangi görevle devam edelim?"
+- **STOP. Wait for the user.**
+
+### Step 2b — If `.hayeos.json` does NOT exist:
+- Output EXACTLY this line in Turkish:
+  > "Bu projede HayeOS hafızası bulunamadı. Şimdi otomatik oluşturayım mı?"
+- **STOP IMMEDIATELY.**
+- Do **NOT** load `Skill(haye:init-memory)`.
+- Do **NOT** call `bin/haye init` or any variation.
+- Do **NOT** create any file.
+- Do **NOT** continue with any other action.
+
+### Step 3 — If and ONLY IF the user replies with explicit approval ("evet" / "tamam" / "onayla" / "devam" / "yes" / "oluştur"):
+- Then load `Skill(haye:init-memory)`.
+- init-memory will run `HAYE_INIT_APPROVED=1 bin/haye.cmd init` (the env var is required by the dangerous-command-guard hook).
+
+### Step 4 — If the user replies "hayır" / "no" / "iptal":
+- Exit cleanly. Do not retry. Do not ask again.
+
+**This is not a suggestion. It is the only correct workflow.** The dangerous-command-guard hook will deny any `bin/haye init` call that lacks `HAYE_INIT_APPROVED=1`, so attempting to bypass this workflow will fail at the tool layer.
+
+---
+
 ## Purpose
 Start simple session
 

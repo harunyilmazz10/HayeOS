@@ -14,6 +14,30 @@ description: Use when user describes a feature, system, refactor, or non-trivial
 When this skill loads, do not attempt to write a plan or code yourself.
 Your FIRST action is to determine which sub-skill to invoke next, based on what the user provided.
 
+## HARD-GATE Enforcement (v3.0.0 Iron Rule)
+
+After invoking `Skill(haye:brainstorming)`, you are **forbidden** from using `Write`, `Edit`, `Create`, `Bash` (for code), or any code-producing tool until the user has explicitly approved a written design proposal.
+
+This applies to:
+- ALL requests including ones that sound trivial ("basit bir X yaz", "hello world", "küçük bir helper", "tek satırlık script")
+- ALL languages (Python, JS, Bash, SQL, anything)
+- ALL file types (source, config, test, doc)
+
+The "this is too simple to need a design" trap is the most common HARD-GATE bypass. Do not fall for it.
+
+**Correct sequence:**
+1. work loads, routes to brainstorming
+2. brainstorming presents a 3-5 sentence design proposal in Turkish:
+   > "Şunu öneriyorum: [tasarım]. Onaylıyor musunuz?"
+3. STOP. Wait for explicit user approval ("evet", "tamam", "onayla", "devam").
+4. Only after approval, invoke `Skill(haye:writing-plans)` or proceed with implementation.
+
+**Forbidden sequence:**
+- work loads → brainstorming loads → Write tool fires (HARD-GATE bypass, Iron Law violation)
+- Any code tool call between brainstorming load and explicit user approval
+
+If you catch yourself about to call Write/Edit/Bash before approval, STOP. Output the design proposal instead.
+
 ### Routing Decision
 
 | User input shape | Route to |
@@ -28,11 +52,26 @@ If the user gave a feature description (e.g., "Premium doktor landing page" — 
 
 ### What `work` does in the message
 
-Announce in Turkish:
+Step 1 — Create the brainstorming-gate marker (Windows-safe):
+
+```bash
+# Windows (PowerShell tool call):
+New-Item -ItemType Directory -Force -Path .hayeos-state | Out-Null
+New-Item -ItemType File -Force -Path .hayeos-state\awaiting-design-approval | Out-Null
+
+# Mac/Linux (Bash tool call):
+mkdir -p .hayeos-state && touch .hayeos-state/awaiting-design-approval
+```
+
+The brainstorming-gate hook checks this file before allowing Write/Edit/MultiEdit. While it exists, the hook denies all code-producing tools EXCEPT writes inside the memory vault (`<project>_obs/`) — that way brainstorming can still save its design doc to `02-decisions/`.
+
+Step 2 — Announce in Turkish:
 
 > "Bu iş için HayeOS akışı: brainstorming -> writing-plans -> subagent-driven-development. Önce design üzerinde anlaşalım. brainstorming skill'ini açıyorum."
 
-Then invoke `Skill(haye:brainstorming)`.
+Step 3 — Invoke `Skill(haye:brainstorming)`.
+
+The marker stays in place until brainstorming receives explicit user approval (see brainstorming/SKILL.md for the delete step).
 
 DO NOT:
 - Output a "Task Classification" block with task_size/task_type/risk_level. That was v2.x. v3 uses brainstorming for scoping instead.
