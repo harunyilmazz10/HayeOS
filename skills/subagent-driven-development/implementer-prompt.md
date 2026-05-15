@@ -54,6 +54,60 @@ Task tool (general-purpose):
     - In existing codebases, follow established patterns. Improve code you're touching
       the way a good developer would, but don't restructure things outside your task.
 
+    ## MANDATORY Quality Defaults (v3.0.4)
+
+    These are NOT optional. Even if the plan doesn't mention them, they MUST be present:
+
+    ### Web HTML forms
+    - Every `<input>`, `<textarea>`, `<select>` MUST have a `<label for="...">` with matching `id`.
+      `placeholder` is NOT a substitute for `<label>` (WCAG 3.3.2 violation).
+    - `<input type="tel">` for phone fields, `type="email"` for email, etc.
+    - `autocomplete` attribute on common fields: `name`, `tel`, `email`, `street-address`.
+    - `maxlength` defense-in-depth: text inputs cap at reasonable max (e.g. name 100, email 254).
+    - `aria-describedby` to link error messages to inputs when error state present.
+
+    ### Dynamic content regions
+    - Error messages: `role="alert"` or `aria-live="assertive"`.
+    - Confirmation / status updates: `role="status"` or `aria-live="polite"`.
+    - Hidden sections: `hidden` attribute OR `aria-hidden="true"`, NOT inline `style="display:none"`.
+
+    ### LocalStorage / sessionStorage / IndexedDB
+    - Every read/write MUST be wrapped in `try/catch`.
+    - On `QuotaExceededError` or parse failure, return a sentinel value (`null`, `[]`, `{}`) AND log/surface the error to the user.
+    - Never let storage errors propagate silently — user must see a Turkish error message like "Depolama hatası, lütfen tekrar deneyin."
+
+    ### Form submission
+    - Implement double-submit guard: disable submit button on submit, re-enable on completion (success or error).
+    - `event.preventDefault()` MUST be the first line in submit handler.
+    - Validate on submit, not just on blur, to catch all error cases.
+
+    ### CSS
+    - Use CSS custom properties (`:root { --primary-color: ...; }`) for:
+      colors, fonts, spacing scales, border-radius, shadows.
+    - This enables theming and consistent design. Hard-coded hex colors in 5+ places is a smell.
+    - `focus-visible` styles on all interactive elements (button, a, input).
+    - Color contrast ratio ≥ 4.5:1 for text vs background (WCAG AA).
+
+    ### JavaScript
+    - `'use strict';` at top of every JS file (or rely on ES modules `type="module"` which is strict by default).
+    - Single `DOMContentLoaded` listener per file; consolidate init logic into one `init()` function.
+    - No global state pollution — wrap in IIFE or use modules.
+    - Event delegation for repeated dynamic elements (grid cells, list items) instead of per-element listeners.
+
+    ### Cross-tab / multi-instance race
+    - When using localStorage, listen to `storage` event on `window` to refresh UI from other tabs.
+    - For critical writes, re-read state immediately before save (TOCTOU mitigation).
+
+    ### Security
+    - User input rendered to DOM: ALWAYS `textContent`, NEVER `innerHTML` unless input is sanitized via a known library.
+    - URL parameters / hash: validate against allowlist, never directly to DOM.
+    - No inline event handlers (`onclick=`), no inline scripts in HTML.
+
+    If the task is not web/HTML/JS related, the analogous defaults apply (input validation,
+    error handling, security, accessibility). Use professional judgment based on context.
+
+    **If you skip any of these and they apply, the quality reviewer will REJECT and you will be re-dispatched.** Building them in correctly the first time is faster.
+
     ## When You're in Over Your Head
 
     It is always OK to stop and say "this is too hard for me." Bad work is worse than

@@ -197,6 +197,116 @@ def health():
     print('Haye health'); print('cwd:', cwd()); print('config:', config_path().exists()); print('source:', source_path()); print('vault:', memory_path())
     return lint()
 
+def doctor():
+    """Vault health check — comprehensive."""
+    import time
+    issues = []
+    warnings = []
+    okays = []
+
+    # 1. Config file
+    cp = config_path()
+    if not cp.exists():
+        issues.append(f".hayeos.json not found at {cp}")
+        print('\n'.join(['ERROR: ' + i for i in issues]))
+        return 2
+    try:
+        cfg = json.loads(cp.read_text())
+        okays.append(f".hayeos.json valid JSON ({cp})")
+    except Exception as e:
+        issues.append(f".hayeos.json invalid JSON: {e}")
+        print('\n'.join(['ERROR: ' + i for i in issues]))
+        return 2
+
+    # 2. Required config keys
+    for key in ['project', 'memoryPath', 'sourcePath']:
+        if key not in cfg:
+            issues.append(f".hayeos.json missing required key: {key}")
+        else:
+            okays.append(f"config.{key}: {cfg[key]}")
+
+    # 3. Vault directory
+    mp = memory_path()
+    if not mp:
+        issues.append(f"memoryPath does not resolve to a directory")
+    elif not mp.exists():
+        issues.append(f"Vault directory missing: {mp}")
+    else:
+        okays.append(f"Vault directory exists: {mp}")
+
+        # 4. Required top-level directories
+        required_dirs = ['00-system', '01-project', '01-prompts', '02-decisions',
+                         '03-bugs', '04-plans', '04-tasks', '05-sessions',
+                         '06-prompts', '07-checklists', '08-raw', '09-context-packs',
+                         '10-reviews', '11-metrics', '12-risks', '99-archive']
+        for d in required_dirs:
+            if (mp / d).is_dir():
+                okays.append(f"  dir present: {d}/")
+            else:
+                warnings.append(f"  missing vault dir: {d}/ (run `bin/haye init` to repair)")
+
+        # 5. Required core files
+        required_files = ['HAYE.md', 'current.md', 'next.md', 'changelog.md', 'health.md', 'index.md']
+        for f in required_files:
+            if (mp / f).is_file():
+                okays.append(f"  file present: {f}")
+            else:
+                warnings.append(f"  missing vault file: {f}")
+
+    # 6. Stale marker check
+    marker = Path(cwd()) / '.hayeos-state' / 'awaiting-design-approval'
+    if marker.exists():
+        try:
+            age_sec = time.time() - marker.stat().st_mtime
+            age_hours = age_sec / 3600
+            if age_hours > 24:
+                warnings.append(f"Stale marker (age {age_hours:.1f}h): {marker}. Brainstorming approval pending too long — design may be abandoned. Consider `rm` to unblock or resume `/haye:work`.")
+            else:
+                okays.append(f"Active marker (age {age_hours:.1f}h): {marker}")
+        except Exception as e:
+            warnings.append(f"Could not stat marker: {e}")
+
+    # 7. Hook scripts executable
+    pr = plugin_root()
+    if pr:
+        hooks_dir = pr / 'hooks'
+        for hook in ['session-start', 'dangerous-command-guard', 'brainstorming-gate',
+                     'large-file-warning', 'session-close-reminder']:
+            hp = hooks_dir / hook
+            if hp.exists():
+                if os.access(hp, os.X_OK):
+                    okays.append(f"  hook executable: {hook}")
+                else:
+                    warnings.append(f"  hook NOT executable (chmod +x): {hook}")
+            else:
+                warnings.append(f"  hook missing: {hook}")
+
+    # Output
+    print('=== HayeOS Doctor ===')
+    print(f"Vault: {mp if mp else '(not configured)'}")
+    print()
+    print(f"OK ({len(okays)}):")
+    for o in okays:
+        print(f"  {o}")
+    if warnings:
+        print(f"\nWARNINGS ({len(warnings)}):")
+        for w in warnings:
+            print(f"  ! {w}")
+    if issues:
+        print(f"\nERRORS ({len(issues)}):")
+        for i in issues:
+            print(f"  X {i}")
+    print()
+    if issues:
+        print(f"Result: FAIL ({len(issues)} errors, {len(warnings)} warnings)")
+        return 2
+    elif warnings:
+        print(f"Result: OK with warnings ({len(warnings)} warnings)")
+        return 0
+    else:
+        print("Result: HEALTHY")
+        return 0
+
 def usage():
     print("""haye CLI
 commands:
@@ -207,6 +317,7 @@ commands:
   print-config          print config
   lint                  lint memory vault
   health                health + lint
+  doctor                comprehensive vault health check (config + dirs + files + marker + hooks)
   raw-status            list raw files
   context-pack [task]   create context pack
 """)
@@ -228,6 +339,7 @@ def main():
         if cmd=='print-config': print(json.dumps(load_config(),indent=2)); return 0
         if cmd=='lint': return lint()
         if cmd=='health': return health()
+        if cmd=='doctor': return doctor()
         if cmd=='raw-status': raw_status(); return 0
         if cmd=='context-pack': return context_pack(' '.join(sys.argv[2:]) or 'manual-task') or 0
 

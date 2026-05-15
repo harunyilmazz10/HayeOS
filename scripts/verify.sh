@@ -29,11 +29,11 @@ check_plugin_json_exists() {
 check_version_3() {
     local v
     v=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
-    if [ "$v" != "3.0.3" ]; then
-        fail "plugin.json version is $v, expected 3.0.3"
+    if [ "$v" != "3.0.4" ]; then
+        fail "plugin.json version is $v, expected 3.0.4"
         return
     fi
-    ok "plugin.json version: 3.0.3"
+    ok "plugin.json version: 3.0.4"
 }
 
 check_required_skills_present() {
@@ -279,6 +279,55 @@ check_all_hooks_have_logging() {
     ok "all hooks emit diagnostic log to ~/.hayeos-hook.log"
 }
 
+# ----- v3.0.4 quality enforcement -----
+
+check_implementer_has_quality_defaults() {
+    local f="skills/subagent-driven-development/implementer-prompt.md"
+    if ! grep -q "MANDATORY Quality Defaults" "$f"; then
+        fail "implementer-prompt.md missing 'MANDATORY Quality Defaults' section"
+        return
+    fi
+    for marker in '<label for' 'try/catch' 'aria-live' 'double-submit' 'CSS custom properties'; do
+        if ! grep -q "$marker" "$f"; then
+            fail "implementer-prompt.md missing quality marker: '$marker'"
+            return
+        fi
+    done
+    ok "implementer-prompt.md has MANDATORY Quality Defaults"
+}
+
+check_code_quality_reviewer_has_severity_rules() {
+    local f="skills/subagent-driven-development/code-quality-reviewer-prompt.md"
+    for marker in 'Severity Rules' 'P0 — BLOCKED' 'P1 — REJECTED' 'P2 — APPROVED WITH NOTES'; do
+        if ! grep -q "$marker" "$f"; then
+            fail "code-quality-reviewer-prompt.md missing: '$marker'"
+            return
+        fi
+    done
+    ok "code-quality-reviewer-prompt.md has severity classification rules"
+}
+
+check_writing_plans_has_quality_requirements() {
+    local f="skills/writing-plans/SKILL.md"
+    if ! grep -q "Quality requirements" "$f"; then
+        fail "writing-plans/SKILL.md missing 'Quality requirements' section in task template"
+        return
+    fi
+    ok "writing-plans/SKILL.md task template requires Quality requirements section"
+}
+
+check_doctor_command_present() {
+    if ! grep -q "cmd=='doctor'" bin/haye; then
+        fail "bin/haye missing 'doctor' command dispatch"
+        return
+    fi
+    if ! grep -q "def doctor" bin/haye; then
+        fail "bin/haye missing 'def doctor' function"
+        return
+    fi
+    ok "bin/haye doctor command present"
+}
+
 # ----- smart quote regression -----
 
 check_no_smart_quotes() {
@@ -325,6 +374,10 @@ check_init_guard_in_dangerous_command_guard
 check_hooks_json_includes_brainstorming_gate
 check_init_memory_uses_approval_env_var
 check_all_hooks_have_logging
+check_implementer_has_quality_defaults
+check_code_quality_reviewer_has_severity_rules
+check_writing_plans_has_quality_requirements
+check_doctor_command_present
 check_no_smart_quotes
 
 echo ""

@@ -1,5 +1,67 @@
 # Changelog
 
+## 3.0.4 — Quality Enforcement + Doctor Command
+
+The v3.0.3 Mac test (doctor randevu sitesi) revealed a structural weakness in the multi-agent workflow: quality reviewer correctly identified missing `<label>`, no try/catch on localStorage, missing ARIA attributes, no double-submit guard, CSS hard-coded colors — but verdicts were "APPROVED WITH NOTES", which the orchestrator treats as merge-allowed. Findings went to `next.md` as deferred debt and never got fixed.
+
+v3.0.4 closes this loop by shifting quality enforcement from downstream review-notes to upstream plan-and-implementer requirements.
+
+### Implementer prompt — MANDATORY Quality Defaults
+
+`skills/subagent-driven-development/implementer-prompt.md` now contains a comprehensive "MANDATORY Quality Defaults" section that the implementer must apply even when the plan doesn't mention them:
+- Web HTML forms: `<label for>`/`id`, `type=tel`/`email`, `autocomplete`, `maxlength`, `aria-describedby`
+- Dynamic content: `role="alert"`/`status`, `aria-live`, `hidden` not `display:none`
+- Storage: try/catch wrap, QuotaExceededError handling, Turkish error surface
+- Form submission: double-submit guard, `event.preventDefault()` first line
+- CSS: custom properties for colors/fonts/spacing, `focus-visible`, WCAG AA contrast
+- JavaScript: `'use strict'`, single `DOMContentLoaded`, event delegation
+- Cross-tab race: `storage` event listener, TOCTOU mitigation
+- Security: `textContent` not `innerHTML`, no inline handlers
+
+The implementer is told: "If you skip any of these and they apply, the quality reviewer will REJECT and you will be re-dispatched."
+
+### Code quality reviewer — Severity Rules
+
+`skills/subagent-driven-development/code-quality-reviewer-prompt.md` now requires the reviewer to classify findings into P0/P1/P2 and return one of four verdicts:
+- **P0 (BLOCKED)**: security or data-loss risk (XSS, secret leak, race corruption, auth bypass, unhandled write-loss)
+- **P1 (REJECTED)**: a11y, error handling, runtime risk (missing label, no try/catch, no aria-live, no double-submit guard, no input cap)
+- **P2 (APPROVED WITH NOTES)**: style, maintainability (magic numbers, hard-coded colors when constants would work, long functions, repeated code)
+- **Clean (APPROVED)**: no findings
+
+The prompt explicitly warns against the most common reviewer failure: downgrading P1 issues to P2. Storage try/catch missing is NEVER P2. Missing form label is NEVER P2. Missing aria-live is NEVER P2.
+
+### Writing-plans — mandatory Quality requirements per task
+
+`skills/writing-plans/SKILL.md` task template now requires a "Quality requirements" section in every task with explicit lines for accessibility, error handling, security, validation, and UX safeguards. If a task genuinely doesn't apply some category, the planner must write "N/A — [reason]" rather than omitting.
+
+This shifts the quality burden from downstream review (costly rework) to upstream planning (cheap text). When the plan says "Form input must have `<label for>` and `id`", the implementer treats this as part of the spec, not optional polish.
+
+### New CLI command — `bin/haye doctor`
+
+Comprehensive vault health check:
+- `.hayeos.json` valid JSON
+- Required keys present (`project`, `memoryPath`, `sourcePath`)
+- Vault directory exists at resolved `memoryPath`
+- All 16 top-level dirs present
+- All 6 core files present (HAYE.md, current.md, next.md, changelog.md, health.md, index.md)
+- Stale marker check (`.hayeos-state/awaiting-design-approval` older than 24h → warn)
+- Hook scripts executable
+
+Returns:
+- 0 if HEALTHY
+- 0 if warnings only
+- 2 if errors
+
+Use: `python3 bin/haye doctor` from project root.
+
+### Verify additions
+
+`scripts/verify.sh` now runs 25 checks (4 new):
+- `check_implementer_has_quality_defaults` — greps for `<label for`, `try/catch`, `aria-live`, `double-submit`, `CSS custom properties`
+- `check_code_quality_reviewer_has_severity_rules` — greps for `P0 — BLOCKED`, `P1 — REJECTED`, `P2 — APPROVED WITH NOTES`
+- `check_writing_plans_has_quality_requirements` — confirms task template has "Quality requirements" section
+- `check_doctor_command_present` — confirms `bin/haye` dispatches and defines `doctor`
+
 ## 3.0.3 — Hook Log Symmetry
 
 Mac end-to-end test (otonom doktor randevu sitesi senaryosu, Claude Opus 4.7) reported all v3.0.2 critical fixes working: VAULT_ROOT path resolution correct, no parent-dir leak, brainstorming HARD-GATE blocks Write while marker present, full E2E flow (start -> init -> work -> brainstorming -> writing-plans -> SDD -> checkpoint -> close) clean. Only one minor inconsistency surfaced: `brainstorming-gate` fired 5 times during the test but only `dangerous-command-guard` wrote to `~/.hayeos-hook.log`.

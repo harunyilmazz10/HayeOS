@@ -70,6 +70,15 @@ This structure informs the task decomposition. Each task should produce self-con
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
 
+**Quality requirements (mandatory, even if not in user's original ask):**
+- Accessibility: [specific a11y attributes required — e.g. `<label>` on inputs, `aria-live` on dynamic regions]
+- Error handling: [specific try/catch / fallback / user-visible error requirements]
+- Security: [input validation, XSS prevention, secret handling]
+- Validation: [input min/max length, format regex, required fields]
+- UX safeguards: [double-submit guard, optimistic locking, loading states]
+
+If this task doesn't apply some of these (e.g. backend task has no a11y), state "N/A — [reason]". Don't omit the section.
+
 - [ ] **Step 1: Write the failing test**
 
 ```python
@@ -102,6 +111,18 @@ git add tests/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
 ````
+
+## Why Quality Requirements MUST be in Every Task
+
+Without explicit quality requirements per task, the implementer optimizes for "make the spec'd thing work" and the quality reviewer's findings ("missing label", "no try/catch") get filed as APPROVED WITH NOTES instead of REJECTED. The notes go to `next.md` as deferred debt and never get fixed.
+
+The fix is to PRE-COMMIT to quality requirements in the plan itself. When the plan says:
+
+> "Form input must have `<label for>` and `id`. Submit handler must double-submit-guard. localStorage call must try/catch."
+
+…then the implementer treats these as part of the spec, NOT as optional polish. The spec reviewer can also enforce them ("plan said label required, implementation has none → REJECTED").
+
+This shifts the quality burden from the reviewer (downstream, costly rework) to the planner (upstream, cheap text edit).
 
 ## No Placeholders
 
