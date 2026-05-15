@@ -5,6 +5,37 @@ description: Use at the end of a meaningful work block when user is about to sto
 
 # Haye Skill: close
 
+## 🚫 STEP 1 — RESOLVE VAULT_ROOT (do this FIRST, do not skip)
+
+Before ANY Write/Edit call, run this exact Bash command to get the absolute vault path:
+
+```bash
+python -c "import json,os; d=json.load(open('.hayeos.json')); p=os.path.abspath(d['memoryPath']); print(p.replace(chr(92),'/'))"
+```
+
+The command output is a single absolute path. Treat it as `VAULT_ROOT` for the entire skill execution.
+
+**Every Write/Edit call in this skill MUST use the literal VAULT_ROOT value as the path prefix.** Do NOT compute paths from the project folder name. Do NOT use `..\test-haye-v3_obs` or any relative parent-dir construction.
+
+Example with correct path construction:
+
+```
+VAULT_ROOT = C:/Users/hayed/Desktop/test-haye-v3/test-haye-v3_obs
+
+✓ Write(VAULT_ROOT + "/changelog.md")
+  → C:/Users/hayed/Desktop/test-haye-v3/test-haye-v3_obs/changelog.md
+
+✗ Write("../test-haye-v3_obs/changelog.md")
+  → ESCAPES the project dir to parent. WRONG.
+
+✗ Write("test-haye-v3_obs/changelog.md")
+  → Ambiguous, can resolve to parent depending on cwd. WRONG.
+```
+
+If the Bash command fails (`.hayeos.json` not found), STOP. Output in Turkish: "Memory vault bulunamadı. `/haye:start` ile başlatın." Do not write any file.
+
+---
+
 ## Purpose
 Close session and update memory
 

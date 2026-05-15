@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.0.2 — Path Resolution Fix + Hook Diagnostic
+
+Real-world test 2 of v3.0.1 showed:
+- HARD-GATE markdown rules now work: /haye:start asks before init, /haye:work presents design before code. 
+- But /haye:close wrote to `..\test-haye-v3_obs\changelog.md` (parent directory), not under the project's vault. The skill said "<resolved memoryPath>" but Claude resolved it via folder-name pattern matching instead of reading .hayeos.json.
+- Hooks did not fire (init command ran without HAYE_INIT_APPROVED=1 prefix and was not blocked). Likely cause: plugin reload not done after install, or hooks.json path resolution issue on Windows.
+
+### Skill fixes (deterministic path resolution)
+
+- `skills/close/SKILL.md`, `skills/checkpoint/SKILL.md` — both now open with **STEP 1: RESOLVE VAULT_ROOT** that runs an explicit Bash command:
+  ```bash
+  python -c "import json,os; d=json.load(open('.hayeos.json')); print(os.path.abspath(d['memoryPath']).replace(chr(92),'/'))"
+  ```
+  The output is the absolute vault path. ALL Write/Edit calls must use this literal value as prefix. Skill text shows correct vs incorrect path construction side by side. The "<resolved memoryPath>" placeholder is no longer used standalone — there is always an explicit Bash resolution step first.
+
+### Hook diagnostic
+
+- `hooks/dangerous-command-guard` — every invocation now appends a line to `~/.hayeos-hook.log` (Windows: `%USERPROFILE%\.hayeos-hook.log`). To verify hooks are firing, the user can `Get-Content $env:USERPROFILE\.hayeos-hook.log`. If the log is empty after a /haye:start cycle, the plugin hasn't reloaded hooks.json — user should disable+enable the plugin or restart Claude Code.
+
 ## 3.0.1 — HARD-GATE Hook Enforcement
 
 v3.0.0 enforced HARD-GATE in markdown only. Real-world test (`/haye:start` + `/haye:work` "basit hello world") showed Sonnet 4.6 bypasses markdown rules — auto-running `bin/haye init` without asking, and `Write(hello_world.py)` without presenting a design. v3.0.1 moves the enforcement from markdown to the tool layer via Claude Code PreToolUse hooks.

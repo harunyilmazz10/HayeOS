@@ -5,6 +5,18 @@ description: Use after writing or modifying 5+ files in one work block, or befor
 
 # Haye Skill: checkpoint
 
+## 🚫 STEP 1 — RESOLVE VAULT_ROOT (do this FIRST, do not skip)
+
+Before ANY Write/Edit call, run this exact Bash command:
+
+```bash
+python -c "import json,os; d=json.load(open('.hayeos.json')); p=os.path.abspath(d['memoryPath']); print(p.replace(chr(92),'/'))"
+```
+
+Use the output as `VAULT_ROOT`. Every checkpoint file path MUST start with this exact prefix. Do NOT use relative `..` paths. Do NOT compute paths from folder name patterns.
+
+---
+
 ## Purpose
 Internal workflow used by `/haye:work`, `/haye:start` and `/haye:close`. It preserves state before `/haye:close` so a crashed or interrupted Claude Code session can resume safely.
 

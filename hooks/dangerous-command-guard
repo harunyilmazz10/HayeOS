@@ -11,8 +11,18 @@
 #
 # Read tool_input via stdin (Claude Code injects JSON with tool_input.command).
 # Exit 0 = allow, Exit 2 = block (Claude sees the stderr message and reroutes).
+#
+# DIAGNOSTIC: every invocation appends a line to ~/.hayeos-hook.log so a user
+# can verify hooks are actually firing. To check: cat ~/.hayeos-hook.log
 
 input=$(cat)
+
+# Log every invocation for diagnostics (best-effort, never blocks on failure)
+{
+  timestamp=$(date +"%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "unknown")
+  log_dir="${HOME:-$USERPROFILE}"
+  echo "$timestamp dangerous-command-guard fired" >> "$log_dir/.hayeos-hook.log" 2>/dev/null
+} || true
 
 # Extract the actual command. Claude Code passes tool_input as JSON:
 # {"tool_input": {"command": "...", "description": "..."}}

@@ -29,11 +29,11 @@ check_plugin_json_exists() {
 check_version_3() {
     local v
     v=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
-    if [ "$v" != "3.0.1" ]; then
-        fail "plugin.json version is $v, expected 3.0.1"
+    if [ "$v" != "3.0.2" ]; then
+        fail "plugin.json version is $v, expected 3.0.2"
         return
     fi
-    ok "plugin.json version: 3.0.1"
+    ok "plugin.json version: 3.0.2"
 }
 
 check_required_skills_present() {
