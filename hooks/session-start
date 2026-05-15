@@ -7,6 +7,16 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SKILL_PATH="${PLUGIN_ROOT}/skills/using-hayeos/SKILL.md"
 
+# Log every invocation for diagnostics (best-effort, never blocks on failure).
+{
+  timestamp=$(date +"%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "unknown")
+  log_dir="${HOME:-$USERPROFILE}"
+  echo "$timestamp session-start fired" >> "$log_dir/.hayeos-hook.log" 2>/dev/null
+} || true
+
+# Tell session-start.py not to log again (we already did)
+export HAYEOS_SESSION_START_LOGGED=1
+
 # Prefer Python (it's already required for bin/haye) for cleaner JSON escaping
 if command -v python3 >/dev/null 2>&1; then
     exec python3 "${SCRIPT_DIR}/session-start.py"

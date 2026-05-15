@@ -5,6 +5,13 @@
 
 set -uo pipefail
 
+# Log every invocation for diagnostics (best-effort, never blocks on failure)
+{
+  timestamp=$(date +"%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "unknown")
+  log_dir="${HOME:-$USERPROFILE}"
+  echo "$timestamp session-close-reminder fired" >> "$log_dir/.hayeos-hook.log" 2>/dev/null
+} || true
+
 # Best-effort and non-blocking: remind only when the current directory looks like
 # a HayeOS project. This is not mandatory for a tiny interaction.
 

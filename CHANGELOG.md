@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.0.3 — Hook Log Symmetry
+
+Mac end-to-end test (otonom doktor randevu sitesi senaryosu, Claude Opus 4.7) reported all v3.0.2 critical fixes working: VAULT_ROOT path resolution correct, no parent-dir leak, brainstorming HARD-GATE blocks Write while marker present, full E2E flow (start -> init -> work -> brainstorming -> writing-plans -> SDD -> checkpoint -> close) clean. Only one minor inconsistency surfaced: `brainstorming-gate` fired 5 times during the test but only `dangerous-command-guard` wrote to `~/.hayeos-hook.log`.
+
+### Hook log symmetry
+
+All five hooks now append to `~/.hayeos-hook.log` on each invocation:
+- `dangerous-command-guard` (was logging in v3.0.2)
+- `brainstorming-gate` (new in v3.0.3)
+- `large-file-warning` (new in v3.0.3)
+- `session-close-reminder` (new in v3.0.3)
+- `session-start` (new in v3.0.3; bash wrapper logs and sets `HAYEOS_SESSION_START_LOGGED=1` to suppress duplicate log from the Python implementation when invoked through the wrapper)
+
+### Verify additions
+
+`scripts/verify.sh` now runs 21 checks (1 new):
+- `check_all_hooks_have_logging` — greps every hook file for `hayeos-hook.log`; fails listing any hook that lacks the diagnostic log line.
+
+This is a tooling/observability change. No skill, command, or workflow behavior changed. The plugin's user-facing semantics in v3.0.3 are identical to v3.0.2.
+
 ## 3.0.2 — Path Resolution Fix + Hook Diagnostic
 
 Real-world test 2 of v3.0.1 showed:

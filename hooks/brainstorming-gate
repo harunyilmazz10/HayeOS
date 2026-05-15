@@ -26,6 +26,13 @@
 
 input=$(cat)
 
+# Log every invocation for diagnostics (best-effort, never blocks on failure)
+{
+  timestamp=$(date +"%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "unknown")
+  log_dir="${HOME:-$USERPROFILE}"
+  echo "$timestamp brainstorming-gate fired" >> "$log_dir/.hayeos-hook.log" 2>/dev/null
+} || true
+
 # Find cwd from the tool input if present; default to $PWD
 cwd=$(printf '%s' "$input" | python3 -c "
 import sys, json, os

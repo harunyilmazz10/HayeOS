@@ -29,11 +29,11 @@ check_plugin_json_exists() {
 check_version_3() {
     local v
     v=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
-    if [ "$v" != "3.0.2" ]; then
-        fail "plugin.json version is $v, expected 3.0.2"
+    if [ "$v" != "3.0.3" ]; then
+        fail "plugin.json version is $v, expected 3.0.3"
         return
     fi
-    ok "plugin.json version: 3.0.2"
+    ok "plugin.json version: 3.0.3"
 }
 
 check_required_skills_present() {
@@ -262,6 +262,23 @@ check_init_memory_uses_approval_env_var() {
     ok "init-memory uses HAYE_INIT_APPROVED=1 env var"
 }
 
+check_all_hooks_have_logging() {
+    local missing=""
+    for hook in dangerous-command-guard brainstorming-gate large-file-warning session-close-reminder session-start; do
+        if [ ! -f "hooks/$hook" ]; then
+            continue
+        fi
+        if ! grep -q "hayeos-hook.log" "hooks/$hook"; then
+            missing="$missing $hook"
+        fi
+    done
+    if [ -n "$missing" ]; then
+        fail "hooks missing diagnostic log line:$missing"
+        return
+    fi
+    ok "all hooks emit diagnostic log to ~/.hayeos-hook.log"
+}
+
 # ----- smart quote regression -----
 
 check_no_smart_quotes() {
@@ -307,6 +324,7 @@ check_brainstorming_gate_hook_present
 check_init_guard_in_dangerous_command_guard
 check_hooks_json_includes_brainstorming_gate
 check_init_memory_uses_approval_env_var
+check_all_hooks_have_logging
 check_no_smart_quotes
 
 echo ""

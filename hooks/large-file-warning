@@ -4,6 +4,14 @@
 set -euo pipefail
 
 input="$(cat)"
+
+# Log every invocation for diagnostics (best-effort, never blocks on failure)
+{
+  timestamp=$(date +"%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "unknown")
+  log_dir="${HOME:-$USERPROFILE}"
+  echo "$timestamp large-file-warning fired" >> "$log_dir/.hayeos-hook.log" 2>/dev/null
+} || true
+
 path="$(printf '%s' "$input" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("tool_input",{}).get("file_path","") or d.get("tool_input",{}).get("path",""))' 2>/dev/null || true)"
 
 warning=""

@@ -16,7 +16,30 @@ import sys
 from pathlib import Path
 
 
+def _log_invocation() -> None:
+    """Best-effort log of hook invocation for diagnostics.
+
+    Only used when this script is called directly (e.g. by Windows run-hook.cmd
+    without bash). When called via the bash wrapper, the wrapper logs already.
+    We detect direct invocation by checking if HAYEOS_SESSION_START_LOGGED is
+    NOT set; the bash wrapper sets it to suppress double-logging.
+    """
+    if os.environ.get("HAYEOS_SESSION_START_LOGGED") == "1":
+        return  # bash wrapper already logged this invocation
+    try:
+        from datetime import datetime
+        log_dir = os.environ.get("HOME") or os.environ.get("USERPROFILE") or "."
+        log_path = Path(log_dir) / ".hayeos-hook.log"
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(f"{ts} session-start fired\n")
+    except Exception:
+        pass  # never block the hook on logging failure
+
+
 def main() -> int:
+    _log_invocation()
+
     script_dir = Path(__file__).resolve().parent
     plugin_root = script_dir.parent
     skill_path = plugin_root / "skills" / "using-hayeos" / "SKILL.md"
